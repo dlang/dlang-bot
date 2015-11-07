@@ -14,6 +14,10 @@ shared static this()
     listenHTTP(settings, router);
 
     githubAuth = "token "~environment["GH_TOKEN"];
+    // workaround for stupid openssl.conf on Heroku
+    HTTPClient.setTLSSetupCallback((ctx) {
+        ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
+    });
 }
 
 void githubHook(HTTPServerRequest req, HTTPServerResponse res)
