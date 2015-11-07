@@ -18,6 +18,7 @@ shared static this()
     HTTPClient.setTLSSetupCallback((ctx) {
         ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
     });
+    HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
 }
 
 void githubHook(HTTPServerRequest req, HTTPServerResponse res)
