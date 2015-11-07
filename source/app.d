@@ -11,7 +11,10 @@ shared static this()
     readOption("port|p", &settings.port, "Sets the port used for serving.");
 
     auto router = new URLRouter;
-    router.post("/github_hook", &githubHook);
+    router
+        .get("/", &hello)
+        .post("/github_hook", &githubHook)
+        ;
     listenHTTP(settings, router);
 
     githubAuth = "token "~environment["GH_TOKEN"];
@@ -21,6 +24,11 @@ shared static this()
         ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
     });
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
+}
+
+void hello(HTTPServerRequest req, HTTPServerResponse res)
+{
+    res.writeBody("Welcome to dlang-bot, there is nothing to see.");
 }
 
 Json verifyRequest(string signature, string data)
