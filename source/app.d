@@ -1,12 +1,13 @@
 import vibe.d, std.algorithm, std.process, std.range, std.regex;
 
-string githubAuth;
+string githubAuth, hookSecret;
 
 shared static this()
 {
     auto settings = new HTTPServerSettings;
     settings.port = 8080;
     settings.bindAddresses = ["0.0.0.0"];
+    settings.options = HTTPServerOption.defaults & ~HTTPServerOption.parseJsonBody;
     readOption("port|p", &settings.port, "Sets the port used for serving.");
 
     auto router = new URLRouter;
@@ -14,6 +15,7 @@ shared static this()
     listenHTTP(settings, router);
 
     githubAuth = "token "~environment["GH_TOKEN"];
+    hookSecret = environment["GH_HOOK_SECRET"];
     // workaround for stupid openssl.conf on Heroku
     HTTPClient.setTLSSetupCallback((ctx) {
         ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
@@ -21,20 +23,31 @@ shared static this()
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
 }
 
+Json verifyRequest(string signature, string data)
+{
+    import std.digest.digest, std.digest.hmac, std.digest.sha;
+
+    auto hmac = HMAC!SHA1(hookSecret.representation);
+    hmac.put(data.representation);
+    enforce(hmac.finish.toHexString!(LetterCase.lower) == signature.chompPrefix("sha1="),
+            "Hook signature mismatch");
+    return parseJsonString(data);
+}
+
 void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 {
+    auto json = verifyRequest(req.headers["X-Hub-Signature"], req.bodyReader.readAllUTF8);
     if (req.headers["X-Github-Event"] == "ping")
         return res.writeBody("pong");
     assert(req.headers["X-GitHub-Event"] == "pull_request");
 
-    // vibe.d parses application/json post bodies by default
-    auto action = req.json["action"].get!string;
-    logDebug("#%s %s", req.json["number"], action);
+    auto action = json["action"].get!string;
+    logDebug("#%s %s", json["number"], action);
     switch (action)
     {
     case "opened", "closed", "synchronize":
-        auto commitsURL = req.json["pull_request"]["commits_url"].get!string;
-        auto commentsURL = req.json["pull_request"]["comments_url"].get!string;
+        auto commitsURL = json["pull_request"]["commits_url"].get!string;
+        auto commentsURL = json["pull_request"]["comments_url"].get!string;
         runTask(toDelegate(&handlePR), action, commitsURL, commentsURL);
         return res.writeBody("handled");
     default:
