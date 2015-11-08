@@ -42,7 +42,8 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     auto json = verifyRequest(req.headers["X-Hub-Signature"], req.bodyReader.readAllUTF8);
     if (req.headers["X-Github-Event"] == "ping")
         return res.writeBody("pong");
-    assert(req.headers["X-GitHub-Event"] == "pull_request");
+    if (req.headers["X-GitHub-Event"] != "pull_request")
+        return res.writeVoidBody();
 
     auto action = json["action"].get!string;
     logDebug("#%s %s", json["number"], action);
