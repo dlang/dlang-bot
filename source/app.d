@@ -12,7 +12,7 @@ shared static this()
 
     auto router = new URLRouter;
     router
-        .get("/", &hello)
+        .get("/", (req, res) => res.redirect("https://github.com/dlang-bot?tab=activity"))
         .post("/github_hook", &githubHook)
         ;
     listenHTTP(settings, router);
@@ -24,11 +24,6 @@ shared static this()
         ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
     });
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
-}
-
-void hello(HTTPServerRequest req, HTTPServerResponse res)
-{
-    res.writeBody("Welcome to dlang-bot, there is nothing to see.");
 }
 
 Json verifyRequest(string signature, string data)
