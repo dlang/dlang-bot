@@ -68,7 +68,7 @@ IssueRef[] getIssueRefs(string commitsURL)
     static auto matchToRefs(M)(M m)
     {
         auto closed = !m.captures[1].empty;
-        return m.captures[5].splitter(ctRegex!`[^\d]+`)
+        return m.captures[5].stripRight.splitter(ctRegex!`[^\d]+`)
             .map!(id => IssueRef(id.to!int, closed));
     }
 
