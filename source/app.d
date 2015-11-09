@@ -150,12 +150,14 @@ void deleteBotComment(string commentURL)
     sendRequest(HTTPMethod.DELETE, commentURL);
 }
 
-void updateBotComment(string commentsURL, string commentURL, string msg)
+void createBotComment(string commentsURL, string msg)
 {
-    if (commentURL.length)
-        sendRequest(HTTPMethod.PATCH, commentURL, ["body" : msg]);
-    else
-        sendRequest(HTTPMethod.POST, commentsURL, ["body" : msg]);
+    sendRequest(HTTPMethod.POST, commentsURL, ["body" : msg]);
+}
+
+void updateBotComment(string commentURL, string msg)
+{
+    sendRequest(HTTPMethod.PATCH, commentURL, ["body" : msg]);
 }
 
 void handlePR(string action, string commitsURL, string commentsURL)
@@ -177,5 +179,10 @@ void handlePR(string action, string commitsURL, string commentsURL)
     logDebug("%s", msg);
 
     if (msg != comment.body_)
-        updateBotComment(commentsURL, comment.url, msg);
+    {
+        if (comment.url.length)
+            updateBotComment(comment.url, msg);
+        else if (action != "closed")
+            createBotComment(commentsURL, msg);
+    }
 }
