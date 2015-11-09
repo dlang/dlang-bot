@@ -72,13 +72,14 @@ IssueRef[] getIssueRefs(string commitsURL)
             .map!(id => IssueRef(id.to!int, closed));
     }
 
-    return requestHTTP(commitsURL, (scope req) { req.headers["Authorization"] = githubAuth; })
+    auto issues = requestHTTP(commitsURL, (scope req) { req.headers["Authorization"] = githubAuth; })
         .readJson[]
         .map!(c => c["commit"]["message"].get!string.matchAll(issueRE).map!matchToRefs.joiner)
         .joiner
-        .array
-        .sort!((a, b) => a.id < b.id)
-        .release;
+        .array;
+    issues.multiSort!((a, b) => a.id < b.id, (a, b) => a.fixed > b.fixed);
+    issues.length -= issues.uniq!((a, b) => a.id == b.id).copy(issues).length;
+    return issues;
 }
 
 struct Issue { int id; string desc; }
