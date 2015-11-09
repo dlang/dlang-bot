@@ -49,7 +49,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     logDebug("#%s %s", json["number"], action);
     switch (action)
     {
-    case "opened", "closed", "synchronize":
+    case "opened", "closed", "reopened", "synchronize":
         auto commitsURL = json["pull_request"]["commits_url"].get!string;
         auto commentsURL = json["pull_request"]["comments_url"].get!string;
         runTask(toDelegate(&handlePR), action, commitsURL, commentsURL);
