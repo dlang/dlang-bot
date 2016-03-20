@@ -54,7 +54,11 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     logDebug("#%s %s", json["number"], action);
     switch (action)
     {
-    case "opened", "closed", "reopened", "synchronize":
+    case "closed":
+        if (json["pull_request"]["merged"].get!bool)
+            action = "merged";
+        goto case;
+    case "opened", "reopened", "synchronize":
         auto pullRequestURL = json["pull_request"]["html_url"].get!string;
         auto commitsURL = json["pull_request"]["commits_url"].get!string;
         auto commentsURL = json["pull_request"]["comments_url"].get!string;
@@ -179,7 +183,7 @@ void updateGithubComment(string action, IssueRef[] refs, Issue[] descs, string c
     {
         if (comment.url.length)
             ghSendRequest(HTTPMethod.PATCH, comment.url, ["body" : msg]);
-        else if (action != "closed")
+        else if (action != "closed" && action != "merged")
             ghSendRequest(HTTPMethod.POST, commentsURL, ["body" : msg]);
     }
 }
@@ -197,10 +201,10 @@ void trelloSendRequest(T...)(HTTPMethod method, string url, T arg)
             req.writeJsonBody(arg);
     }, (scope res) {
         if (res.statusCode / 100 == 2)
-            logInfo("%s success: %s\n", method, res.bodyReader.empty ?
-                    res.statusPhrase : "https://trello.com/c/"~res.readJson["data"]["card"]["shortLink"].get!string);
+            logInfo("%s %s: %s\n", method, url.replace(trelloAuth, "key=[hidden]&token=[hidden]")
+                    , res.statusPhrase);
         else
-            logWarn("%s failed;  %s %s.\n%s", method,
+            logWarn("%s %s: %s %s.\n%s", method, url.replace(trelloAuth, "key=[hidden]&token=[hidden]"),
                 res.statusPhrase, res.statusCode, res.bodyReader.readAllUTF8);
     });
 }
@@ -252,7 +256,23 @@ Comment getTrelloBotComment(string cardID)
     return Comment();
 }
 
-void updateTrelloCard(string action, string pullRequestURL, Issue[] descs)
+void moveCardToList(string cardID, string listName)
+{
+    logInfo("moveCardToDone %s", cardID);
+    auto card = trelloAPI("/1/cards/%s", cardID)
+        .requestHTTP
+        .readJson;
+    auto listID = trelloAPI("/1/board/%s/lists", card["idBoard"].get!string)
+        .requestHTTP
+        .readJson[]
+        .find!(c => c["name"].get!string.startsWith(listName))
+        .front["id"].get!string;
+    if (card["idList"] == listID)
+        return;
+    trelloSendRequest(HTTPMethod.PUT, trelloAPI("/1/cards/%s/idList?value=%s", cardID, listID));
+}
+
+void updateTrelloCard(string action, string pullRequestURL, IssueRef[] refs, Issue[] descs)
 {
     foreach (grp; descs.map!(d => findTrelloCards(d.id)).joiner.chunkBy!((a, b) => a.id == b.id))
     {
@@ -277,6 +297,10 @@ void updateTrelloCard(string action, string pullRequestURL, Issue[] descs)
             else if (action != "closed")
                 trelloSendRequest(HTTPMethod.POST, trelloAPI("/1/cards/%s/actions/comments", cardID), ["text": msg]);
         }
+
+        if ((action == "opened" || action == "merged") &&
+            grp.all!(tc => refs.find!(r => r.id == tc.issueID).front.fixed))
+            moveCardToList(cardID, action == "opened" ? "Testing" : "Done");
     }
 }
 
@@ -287,5 +311,5 @@ void handlePR(string action, string pullRequestURL, string commitsURL, string co
     auto refs = getIssueRefs(commitsURL);
     auto descs = getDescriptions(refs);
     updateGithubComment(action, refs, descs, commentsURL);
-    updateTrelloCard(action, pullRequestURL, descs);
+    updateTrelloCard(action, pullRequestURL, refs, descs);
 }
