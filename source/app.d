@@ -102,6 +102,8 @@ Issue[] getDescriptions(R)(R issueRefs)
 {
     import std.csv;
 
+    if (issueRefs.empty)
+        return null;
     return "https://issues.dlang.org/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc"
         .format(issueRefs.map!(r => r.id))
         .requestHTTP
