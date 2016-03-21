@@ -276,7 +276,7 @@ void moveCardToList(string cardID, string listName)
 
 void updateTrelloCard(string action, string pullRequestURL, IssueRef[] refs, Issue[] descs)
 {
-    foreach (grp; descs.map!(d => findTrelloCards(d.id)).joiner.chunkBy!((a, b) => a.id == b.id))
+    foreach (grp; descs.map!(d => findTrelloCards(d.id)).joiner.array.chunkBy!((a, b) => a.id == b.id))
     {
         auto cardID = grp.front.id;
         auto comment = getTrelloBotComment(cardID);
