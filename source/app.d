@@ -232,7 +232,7 @@ string formatTrelloComment(R)(string existingComment, string pullRequestURL, R i
         app.put('\n');
     app.formattedWrite("- %s\n", pullRequestURL);
     foreach (issue; issues)
-        app.formattedWrite("  - [%s](https://issues.dlang.org/%d)\n", issue.desc, issue.id);
+        app.formattedWrite("  - [Issue %1$d - %2$s](https://issues.dlang.org/show_bug.cgi?id=%1$d)\n", issue.id, issue.desc);
     parts[1].drop(1).find!(line => line.startsWith("- ")).each!(ln => app.put(ln));
     return app.data;
 }
