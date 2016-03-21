@@ -272,6 +272,7 @@ void moveCardToList(string cardID, string listName)
     if (card["idList"] == listID)
         return;
     trelloSendRequest(HTTPMethod.PUT, trelloAPI("/1/cards/%s/idList?value=%s", cardID, listID));
+    trelloSendRequest(HTTPMethod.PUT, trelloAPI("/1/cards/%s/pos?value=bottom", cardID));
 }
 
 void updateTrelloCard(string action, string pullRequestURL, IssueRef[] refs, Issue[] descs)
