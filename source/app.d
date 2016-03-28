@@ -1,6 +1,6 @@
 import vibe.d, std.algorithm, std.process, std.range, std.regex;
 
-string githubAuth, trelloAuth, hookSecret;
+string githubAuth, trelloSecret, trelloAuth, hookSecret;
 
 shared static this()
 {
@@ -14,21 +14,24 @@ shared static this()
     router
         .get("/", (req, res) => res.redirect("https://github.com/dlang-bot?tab=activity"))
         .post("/github_hook", &githubHook)
+        .match(HTTPMethod.HEAD, "/trello_hook", (req, res) => res.writeVoidBody)
+        .post("/trello_hook", &trelloHook)
         ;
     listenHTTP(settings, router);
 
     githubAuth = "token "~environment["GH_TOKEN"];
+    trelloSecret = environment["TRELLO_SECRET"];
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
     hookSecret = environment["GH_HOOK_SECRET"];
     // workaround for stupid openssl.conf on Heroku
-    HTTPClient.setTLSSetupCallback((ctx) {
-        ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
-    });
+    //HTTPClient.setTLSSetupCallback((ctx) {
+    //    ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
+    //});
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
 }
 
 //==============================================================================
-// Gitlab hook
+// Github hook
 //==============================================================================
 
 Json verifyRequest(string signature, string data)
@@ -73,12 +76,8 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 // Bugzilla
 //==============================================================================
 
-struct IssueRef { int id; bool fixed; }
-// get all issues mentioned in a commit
-IssueRef[] getIssueRefs(string commitsURL)
+auto matchIssueRefs(string message)
 {
-    // see https://github.com/github/github-services/blob/2e886f407696261bd5adfc99b16d36d5e7b50241/lib/services/bugzilla.rb#L155
-    enum issueRE = ctRegex!(`((close|fix|address)e?(s|d)? )?(ticket|bug|tracker item|issue)s?:? *([\d ,\+&#and]+)`, "i");
     static auto matchToRefs(M)(M m)
     {
         auto closed = !m.captures[1].empty;
@@ -86,9 +85,18 @@ IssueRef[] getIssueRefs(string commitsURL)
             .map!(id => IssueRef(id.to!int, closed));
     }
 
+    // see https://github.com/github/github-services/blob/2e886f407696261bd5adfc99b16d36d5e7b50241/lib/services/bugzilla.rb#L155
+    enum issueRE = ctRegex!(`((close|fix|address)e?(s|d)? )?(ticket|bug|tracker item|issue)s?:? *([\d ,\+&#and]+)`, "i");
+    return message.matchAll(issueRE).map!matchToRefs.joiner;
+}
+
+struct IssueRef { int id; bool fixed; }
+// get all issues mentioned in a commit
+IssueRef[] getIssueRefs(string commitsURL)
+{
     auto issues = requestHTTP(commitsURL, (scope req) { req.headers["Authorization"] = githubAuth; })
         .readJson[]
-        .map!(c => c["commit"]["message"].get!string.matchAll(issueRE).map!matchToRefs.joiner)
+        .map!(c => c["commit"]["message"].get!string.matchIssueRefs)
         .joiner
         .array;
     issues.multiSort!((a, b) => a.id < b.id, (a, b) => a.fixed > b.fixed);
@@ -219,21 +227,32 @@ string trelloAPI(Args...)(string fmt, Args args)
     return encode("https://api.trello.com"~fmt.format(args)~(fmt.canFind("?") ? "&" : "?")~trelloAuth);
 }
 
-string formatTrelloComment(R)(string existingComment, string pullRequestURL, R issues)
+string formatTrelloComment(string existingComment, Issue[] issues)
 {
     import std.format : formattedWrite;
 
     auto app = appender!string();
-    auto parts = existingComment
-        .lineSplitter!(KeepTerminator.yes)
-        .findSplitBefore!((line, pr) => line.startsWith("- ") && line.canFind(pr))(only(pullRequestURL));
-    parts[0].each!(ln => app.put(ln));
-    if (app.data.length && app.data[$-1] != '\n')
-        app.put('\n');
-    app.formattedWrite("- %s\n", pullRequestURL);
     foreach (issue; issues)
-        app.formattedWrite("  - [Issue %1$d - %2$s](https://issues.dlang.org/show_bug.cgi?id=%1$d)\n", issue.id, issue.desc);
-    parts[1].drop(1).find!(line => line.startsWith("- ")).each!(ln => app.put(ln));
+        app.formattedWrite("- [Issue %1$d - %2$s](https://issues.dlang.org/show_bug.cgi?id=%1$d)\n", issue.id, issue.desc);
+
+    existingComment
+        .lineSplitter!(KeepTerminator.yes)
+        .filter!(line => !line.canFind("issues.dlang.org"))
+        .each!(ln => app.put(ln));
+    return app.data;
+}
+
+string formatTrelloComment(string existingComment, string pullRequestURL)
+{
+    import std.format : formattedWrite;
+
+    auto app = appender!string();
+
+    auto lines = existingComment
+        .lineSplitter!(KeepTerminator.yes);
+    lines.each!(ln => app.put(ln));
+    if (!lines.canFind!(line => line.canFind(pullRequestURL)))
+        app.formattedWrite("- %s\n", pullRequestURL);
     return app.data;
 }
 
@@ -290,7 +309,7 @@ void updateTrelloCard(string action, string pullRequestURL, IssueRef[] refs, Iss
             return;
         }
 
-        auto msg = formatTrelloComment(comment.body_, pullRequestURL, issues);
+        auto msg = formatTrelloComment(comment.body_, pullRequestURL);
         logDebug("%s", msg);
 
         if (msg != comment.body_)
@@ -305,6 +324,77 @@ void updateTrelloCard(string action, string pullRequestURL, IssueRef[] refs, Iss
             grp.all!(tc => refs.find!(r => r.id == tc.issueID).front.fixed))
             moveCardToList(cardID, action == "opened" ? "Testing" : "Done");
     }
+}
+
+void updateTrelloCard(string cardID, IssueRef[] refs, Issue[] descs)
+{
+    auto comment = getTrelloBotComment(cardID);
+    auto issues = descs;
+    logDebug("%s %s", cardID, issues);
+    if (issues.empty)
+    {
+        if (comment.url.length)
+            trelloSendRequest(HTTPMethod.DELETE, comment.url);
+        return;
+    }
+
+    auto msg = formatTrelloComment(comment.body_, issues);
+    logDebug("%s", msg);
+
+    if (msg != comment.body_)
+    {
+        if (comment.url.length)
+            trelloSendRequest(HTTPMethod.PUT, comment.url, ["text": msg]);
+        else
+            trelloSendRequest(HTTPMethod.POST, trelloAPI("/1/cards/%s/actions/comments", cardID), ["text": msg]);
+    }
+}
+
+//==============================================================================
+// Trello hook
+//==============================================================================
+
+Json verifyTrelloRequest(string signature, string body_, string url)
+{
+    import std.digest.digest, std.digest.hmac, std.digest.sha;
+
+    static ubyte[28] base64Digest(Range)(Range range)
+    {
+        import std.base64;
+
+        auto hmac = HMAC!SHA1(trelloSecret.representation);
+        foreach (c; range)
+            hmac.put(c);
+        ubyte[28] buf = void;
+        Base64.encode(hmac.finish, buf[]);
+        return buf;
+    }
+
+    import std.utf : byUTF;
+    enforce(
+        base64Digest(base64Digest(body_.byUTF!dchar.map!(c => cast(immutable ubyte) c).chain(url.representation))) ==
+        base64Digest(signature.representation), "Hook signature mismatch");
+    return parseJsonString(body_);
+}
+
+void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
+{
+    auto url = "https://dlang-bot.herokuapp.com/trello_hook";
+    auto json = verifyTrelloRequest(req.headers["X-Trello-Webhook"], req.bodyReader.readAllUTF8, url);
+    logDebug("trelloHook %s", json);
+    auto action = json["action"]["type"].get!string;
+    switch (action)
+    {
+    case "createCard", "updateCard":
+        auto refs = matchIssueRefs(json["action"]["data"]["card"]["name"].get!string).array;
+        auto descs = getDescriptions(refs);
+        updateTrelloCard(json["action"]["data"]["card"]["id"].get!string, refs, descs);
+        break;
+    default:
+        return res.writeBody("ignored");
+    }
+
+    res.writeVoidBody;
 }
 
 //==============================================================================
