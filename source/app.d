@@ -24,9 +24,9 @@ shared static this()
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
     hookSecret = environment["GH_HOOK_SECRET"];
     // workaround for stupid openssl.conf on Heroku
-    //HTTPClient.setTLSSetupCallback((ctx) {
-    //    ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
-    //});
+    HTTPClient.setTLSSetupCallback((ctx) {
+        ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
+    });
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
 }
 
