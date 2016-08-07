@@ -421,7 +421,7 @@ void cancelBuild(size_t buildId)
 
 void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
 {
-    if (action != "synchronize")
+    if (action != "synchronize" && action != "merged")
         return;
 
     static bool activeState(string state)
@@ -441,9 +441,10 @@ void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
         .readJson["builds"][]
         .filter!(b => activeState(b["state"].get!string))
         .filter!(b => b["pull_request_number"].get!uint == pullRequestNumber);
-    // builds are sorted from new to old, and also paginated by 25
-    // (but we'll hardly have 25 active builds at the same time)
-    foreach (b; activeBuildsForPR.drop(1))
+
+    // Keep only the most recent build for this PR.  Kill all builds
+    // when it got merged as it'll be retested after the merge anyhow.
+    foreach (b; activeBuildsForPR.drop(action == "merged" ? 0 : 1))
         cancelBuild(b["id"].get!size_t);
 }
 
