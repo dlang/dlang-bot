@@ -1,5 +1,6 @@
 doctype html
 head
+  title Dlang-Bot
   link(rel="stylesheet", href="css/style.min.css")
   :css
     img#logo {
