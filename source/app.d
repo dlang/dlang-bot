@@ -1,6 +1,6 @@
 import vibe.d, std.algorithm, std.process, std.range, std.regex;
 
-string githubAuth, trelloSecret, trelloAuth, hookSecret;
+string githubAuth, trelloSecret, trelloAuth, hookSecret, travisAuth;
 
 shared static this()
 {
@@ -23,6 +23,7 @@ shared static this()
     trelloSecret = environment["TRELLO_SECRET"];
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
     hookSecret = environment["GH_HOOK_SECRET"];
+    travisAuth = "token " ~ environment["TRAVIS_TOKEN"];
     // workaround for stupid openssl.conf on Heroku
     HTTPClient.setTLSSetupCallback((ctx) {
         ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
@@ -62,10 +63,11 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
             action = "merged";
         goto case;
     case "opened", "reopened", "synchronize":
+        auto repoSlug = json["pull_request"]["base"]["repo"]["full_name"].get!string;
         auto pullRequestURL = json["pull_request"]["html_url"].get!string;
         auto commitsURL = json["pull_request"]["commits_url"].get!string;
         auto commentsURL = json["pull_request"]["comments_url"].get!string;
-        runTask(toDelegate(&handlePR), action, pullRequestURL, commitsURL, commentsURL);
+        runTask(toDelegate(&handlePR), action, repoSlug, pullRequestURL, commitsURL, commentsURL);
         return res.writeBody("handled");
     default:
         return res.writeBody("ignored");
@@ -398,11 +400,65 @@ void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
 }
 
 //==============================================================================
+// Dedup Travis-CI builds
+//==============================================================================
 
-void handlePR(string action, string pullRequestURL, string commitsURL, string commentsURL)
+void cancelBuild(size_t buildId)
+{
+    auto url = "https://api.travis-ci.org/builds/%s/cancel".format(buildId);
+    requestHTTP(url, (scope req) {
+        req.headers["Authorization"] = travisAuth;
+        req.method = HTTPMethod.POST;
+    }, (scope res) {
+        if (res.statusCode / 100 == 2)
+            logInfo("Canceled Build %s\n", buildId);
+        else
+            logWarn("POST %s failed;  %s %s.\n%s", url, res.statusPhrase,
+                res.statusCode, res.bodyReader.readAllUTF8);
+    });
+}
+
+void dedupTravisBuilds(string action, string repoSlug)
+{
+    if (action != "synchronize")
+        return;
+
+    static bool activeState(string state)
+    {
+        switch (state)
+        {
+        case "created", "queued", "started": return true;
+        default: return false;
+        }
+    }
+
+    auto url = "https://api.travis-ci.org/repos/%s/builds?event_type=pull_request".format(repoSlug);
+    auto activeBuilds = requestHTTP(url, (scope req) {
+            req.headers["Authorization"] = travisAuth;
+            req.headers["Accept"] = "application/vnd.travis-ci.2+json";
+        })
+        .readJson["builds"][]
+        .filter!(b => activeState(b["state"].get!string));
+    // builds are sorted from new to old, and also paginated by 25
+    // (but we'll hardly have 25 active builds at the same time)
+    bool[uint] seen;
+    foreach (b; activeBuilds)
+    {
+        immutable pr = b["pull_request_number"].get!uint;
+        if (pr in seen)
+            cancelBuild(b["id"].get!size_t);
+        else
+            seen[pr] = true;
+    }
+}
+
+//==============================================================================
+
+void handlePR(string action, string repoSlug, string pullRequestURL, string commitsURL, string commentsURL)
 {
     auto refs = getIssueRefs(commitsURL);
     auto descs = getDescriptions(refs);
     updateGithubComment(action, refs, descs, commentsURL);
     updateTrelloCard(action, pullRequestURL, refs, descs);
+    dedupTravisBuilds(action, repoSlug);
 }
