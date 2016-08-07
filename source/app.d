@@ -65,9 +65,10 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     case "opened", "reopened", "synchronize":
         auto repoSlug = json["pull_request"]["base"]["repo"]["full_name"].get!string;
         auto pullRequestURL = json["pull_request"]["html_url"].get!string;
+        auto pullRequestNumber = json["pull_request"]["number"].get!uint;
         auto commitsURL = json["pull_request"]["commits_url"].get!string;
         auto commentsURL = json["pull_request"]["comments_url"].get!string;
-        runTask(toDelegate(&handlePR), action, repoSlug, pullRequestURL, commitsURL, commentsURL);
+        runTask(toDelegate(&handlePR), action, repoSlug, pullRequestURL, pullRequestNumber, commitsURL, commentsURL);
         return res.writeBody("handled");
     default:
         return res.writeBody("ignored");
@@ -418,9 +419,9 @@ void cancelBuild(size_t buildId)
     });
 }
 
-void dedupTravisBuilds(string action, string repoSlug)
+void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
 {
-    if (action != "synchronize")
+    if (action != "synchronize" && action != "merged")
         return;
 
     static bool activeState(string state)
@@ -433,33 +434,28 @@ void dedupTravisBuilds(string action, string repoSlug)
     }
 
     auto url = "https://api.travis-ci.org/repos/%s/builds?event_type=pull_request".format(repoSlug);
-    auto activeBuilds = requestHTTP(url, (scope req) {
+    auto activeBuildsForPR = requestHTTP(url, (scope req) {
             req.headers["Authorization"] = travisAuth;
             req.headers["Accept"] = "application/vnd.travis-ci.2+json";
         })
         .readJson["builds"][]
-        .filter!(b => activeState(b["state"].get!string));
-    // builds are sorted from new to old, and also paginated by 25
-    // (but we'll hardly have 25 active builds at the same time)
-    bool[uint] seen;
-    foreach (b; activeBuilds)
-    {
-        immutable pr = b["pull_request_number"].get!uint;
-        if (pr in seen)
-            cancelBuild(b["id"].get!size_t);
-        else
-            seen[pr] = true;
-    }
+        .filter!(b => activeState(b["state"].get!string))
+        .filter!(b => b["pull_request_number"].get!uint == pullRequestNumber);
+
+    // Keep only the most recent build for this PR.  Kill all builds
+    // when it got merged as it'll be retested after the merge anyhow.
+    foreach (b; activeBuildsForPR.drop(action == "merged" ? 0 : 1))
+        cancelBuild(b["id"].get!size_t);
 }
 
 //==============================================================================
 
-void handlePR(string action, string repoSlug, string pullRequestURL, string commitsURL, string commentsURL)
+void handlePR(string action, string repoSlug, string pullRequestURL, uint pullRequestNumber, string commitsURL, string commentsURL)
 {
     auto refs = getIssueRefs(commitsURL);
     auto descs = getDescriptions(refs);
     updateGithubComment(action, refs, descs, commentsURL);
     updateTrelloCard(action, pullRequestURL, refs, descs);
     // wait until builds for the current push are created
-    setTimer(30.seconds, { dedupTravisBuilds(action, repoSlug); });
+    setTimer(30.seconds, { dedupTravisBuilds(action, repoSlug, pullRequestNumber); });
 }
