@@ -1,0 +1,27 @@
+doctype html
+head
+  link(rel="stylesheet", href="css/style.min.css")
+  :css
+    img#logo {
+      display: inline-block;
+      max-height: 50%;
+    }
+body(style="text-align: center; position: absolute; left: 0; top: 0; height: 100%; width: 100%")
+  h2(style="margin-top: 6rem") Dlang-Bot
+  img(id="logo", src="img/dlang_bot.png")
+  h3(style="text-decoration: underline") Useful Links
+  ul
+    li
+      a(href="https://dlang.org") Dlang's Official Website
+    li
+      a(href="https://trello.com/b/XoFjxiqG/active") Dlang's Trello board
+    li
+      a(href="https://trello.com/b/jGdlx9vZ/backlog") Dlang's Trello backlog
+    li
+      a(href="https://github.com/dlang-bot?tab=activity") Dlang-Bot's activity on GitHub
+    li
+      a(href="https://travis-ci.org/dlang") Dlang on Travis-CI
+    li
+      a(href="https://codecov.io/gh/dlang") Dlang on Codecov
+    li
+      a(href="https://auto-tester.puremagic.com") Dlang Auto-Tester

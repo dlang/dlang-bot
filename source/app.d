@@ -12,7 +12,8 @@ shared static this()
 
     auto router = new URLRouter;
     router
-        .get("/", (req, res) => res.redirect("https://github.com/dlang-bot?tab=activity"))
+        .get("/", (req, res) => res.render!"index.dt")
+        .get("*", serveStaticFiles("public"))
         .post("/github_hook", &githubHook)
         .match(HTTPMethod.HEAD, "/trello_hook", (req, res) => res.writeVoidBody)
         .post("/trello_hook", &trelloHook)
