@@ -460,5 +460,6 @@ void handlePR(string action, string repoSlug, string pullRequestURL, string comm
     auto descs = getDescriptions(refs);
     updateGithubComment(action, refs, descs, commentsURL);
     updateTrelloCard(action, pullRequestURL, refs, descs);
-    dedupTravisBuilds(action, repoSlug);
+    // wait until builds for the current push are created
+    setTimer(30.seconds, { dedupTravisBuilds(action, repoSlug); });
 }
