@@ -151,9 +151,10 @@ struct Comment { string url, body_; }
 
 Comment getBotComment(string commentsURL)
 {
+    // the bot may post multiple comments (mention-bot & bugzilla links)
     auto res = requestHTTP(commentsURL, (scope req) { req.headers["Authorization"] = githubAuth; })
         .readJson[]
-        .find!(c => c["user"]["login"] == "dlang-bot");
+        .find!(c => c["user"]["login"] == "dlang-bot" && c["body"].get!string.canFind("Bugzilla"));
     if (res.length)
         return deserializeJson!Comment(res[0]);
     return Comment();
