@@ -2,7 +2,8 @@ import vibe.d, std.algorithm, std.process, std.range, std.regex;
 
 string githubAuth, trelloSecret, trelloAuth, hookSecret, travisAuth;
 
-shared static this()
+version (unittest) {}
+else shared static this()
 {
     auto settings = new HTTPServerSettings;
     settings.port = 8080;
@@ -86,12 +87,18 @@ auto matchIssueRefs(string message)
     {
         auto closed = !m.captures[1].empty;
         return m.captures[5].stripRight.splitter(ctRegex!`[^\d]+`)
+            .filter!(id => !id.empty) // see #6
             .map!(id => IssueRef(id.to!int, closed));
     }
 
     // see https://github.com/github/github-services/blob/2e886f407696261bd5adfc99b16d36d5e7b50241/lib/services/bugzilla.rb#L155
     enum issueRE = ctRegex!(`((close|fix|address)e?(s|d)? )?(ticket|bug|tracker item|issue)s?:? *([\d ,\+&#and]+)`, "i");
     return message.matchAll(issueRE).map!matchToRefs.joiner;
+}
+
+unittest
+{
+    assert(equal(matchIssueRefs("fix issue 16319 and fix std.traits.isInnerClass"), [IssueRef(16319, true)]));
 }
 
 struct IssueRef { int id; bool fixed; }
