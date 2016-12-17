@@ -291,17 +291,25 @@ Comment getTrelloBotComment(string cardID)
 
 void moveCardToList(string cardID, string listName)
 {
-    logInfo("moveCardToDone %s", cardID);
     auto card = trelloAPI("/1/cards/%s", cardID)
         .requestHTTP
         .readJson;
-    auto listID = trelloAPI("/1/board/%s/lists", card["idBoard"].get!string)
+    auto lists = trelloAPI("/1/board/%s/lists", card["idBoard"].get!string)
         .requestHTTP
-        .readJson[]
-        .find!(c => c["name"].get!string.startsWith(listName))
-        .front["id"].get!string;
-    if (card["idList"] == listID)
+        .readJson[];
+
+    immutable curListName = lists.find!(c => c["id"].get!string == card["idList"].get!string)
+        .front["name"].get!string;
+    // don't move cards in done, see #9
+    if (curListName.startsWith("Done", listName))
+    {
+        logInfo("moveCardToList(%s, %s) card already in %s", cardID, listName, curListName);
         return;
+    }
+
+    logInfo("moveCardToList(%s, %s)", cardID, listName);
+    immutable listID = lists.find!(c => c["name"].get!string.startsWith(listName))
+        .front["id"].get!string;
     trelloSendRequest(HTTPMethod.PUT, trelloAPI("/1/cards/%s/idList?value=%s", cardID, listID));
     trelloSendRequest(HTTPMethod.PUT, trelloAPI("/1/cards/%s/pos?value=bottom", cardID));
 }
