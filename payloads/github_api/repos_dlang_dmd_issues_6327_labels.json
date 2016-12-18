@@ -1,0 +1,9 @@
+[
+  {
+    "id": 119492872,
+    "url": "https://api.github.com/repos/dlang/phobos/labels/auto-merge",
+    "name": "blocked",
+    "color": "e11d21",
+    "default": false
+  }
+]
