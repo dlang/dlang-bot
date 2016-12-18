@@ -1,0 +1,8 @@
+sudo: false
+os:
+ - linux
+language: d
+d:
+ - dmd-beta
+ - dmd
+ - ldc
