@@ -1,15 +1,48 @@
+module app;
+
 import vibe.d, std.algorithm, std.process, std.range, std.regex;
+import std.datetime, std.typecons;
 
 string githubAuth, trelloSecret, trelloAuth, hookSecret, travisAuth;
 
-version (unittest) {}
-else shared static this()
+string githubAPIURL = "https://api.github.com";
+string travisAPIURL = "https://api.travis-ci.org";
+string trelloAPIURL = "https://api.trello.com";
+string bugzillaURL = "https://issues.dlang.org";
+bool runAsync = true;
+bool runTrello = true;
+
+SysTime lastFullPRCheck;
+Duration timeBetweenFullPRChecks = 15.minutes;
+
+version(unittest){} else
+shared static this()
 {
     auto settings = new HTTPServerSettings;
     settings.port = 8080;
+    readOption("port|p", &settings.port, "Sets the port used for serving.");
+
+    githubAuth = "token "~environment["GH_TOKEN"];
+    trelloSecret = environment["TRELLO_SECRET"];
+    trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
+    hookSecret = environment["GH_HOOK_SECRET"];
+    travisAuth = "token " ~ environment["TRAVIS_TOKEN"];
+
+    // workaround for stupid openssl.conf on Heroku
+    if (environment.get("DYNO") !is null)
+    {
+        HTTPClient.setTLSSetupCallback((ctx) {
+            ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
+        });
+    }
+}
+
+void startServer(HTTPServerSettings settings)
+{
     settings.bindAddresses = ["0.0.0.0"];
     settings.options = HTTPServerOption.defaults & ~HTTPServerOption.parseJsonBody;
-    readOption("port|p", &settings.port, "Sets the port used for serving.");
+
+    lastFullPRCheck = SysTime(DateTime(0, 1, 1, 0, 0, 0));
 
     auto router = new URLRouter;
     router
@@ -19,31 +52,32 @@ else shared static this()
         .match(HTTPMethod.HEAD, "/trello_hook", (req, res) => res.writeVoidBody)
         .post("/trello_hook", &trelloHook)
         ;
-    listenHTTP(settings, router);
 
-    githubAuth = "token "~environment["GH_TOKEN"];
-    trelloSecret = environment["TRELLO_SECRET"];
-    trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
-    hookSecret = environment["GH_HOOK_SECRET"];
-    travisAuth = "token " ~ environment["TRAVIS_TOKEN"];
-    // workaround for stupid openssl.conf on Heroku
-    HTTPClient.setTLSSetupCallback((ctx) {
-        ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
-    });
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
+
+    listenHTTP(settings, router);
 }
 
 //==============================================================================
 // Github hook
 //==============================================================================
 
-Json verifyRequest(string signature, string data)
+auto getSignature(string data)
 {
     import std.digest.digest, std.digest.hmac, std.digest.sha;
+    import std.string : representation;
 
     auto hmac = HMAC!SHA1(hookSecret.representation);
     hmac.put(data.representation);
-    enforce(hmac.finish.toHexString!(LetterCase.lower) == signature.chompPrefix("sha1="),
+    return hmac.finish.toHexString!(LetterCase.lower);
+}
+
+Json verifyRequest(string signature, string data)
+{
+    import std.exception : enforce;
+    import std.string : chompPrefix;
+
+    enforce(getSignature(data) == signature.chompPrefix("sha1="),
             "Hook signature mismatch");
     return parseJsonString(data);
 }
@@ -53,28 +87,56 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     auto json = verifyRequest(req.headers["X-Hub-Signature"], req.bodyReader.readAllUTF8);
     if (req.headers["X-Github-Event"] == "ping")
         return res.writeBody("pong");
+    if (req.headers["X-GitHub-Event"] == "status")
+    {
+        string repoSlug = json["name"].get!string;
+        string state = json["state"].get!string;
+        // no need to trigger the checker for failure/pending
+        if (state == "success")
+        {
+            if (Clock.currTime - lastFullPRCheck >= timeBetweenFullPRChecks)
+            {
+                searchForAutoMergePrs(repoSlug);
+                lastFullPRCheck = Clock.currTime();
+            }
+        }
+        return res.writeBody("handled");
+    }
     if (req.headers["X-GitHub-Event"] != "pull_request")
         return res.writeVoidBody();
 
     auto action = json["action"].get!string;
     logDebug("#%s %s", json["number"], action);
+
     switch (action)
     {
+    case "unlabeled":
+        // for now unlabel events are ignored
+        return res.writeBody("ignored");
     case "closed":
         if (json["pull_request"]["merged"].get!bool)
             action = "merged";
         goto case;
-    case "opened", "reopened", "synchronize":
+    case "opened", "reopened", "synchronize", "labeled":
         auto repoSlug = json["pull_request"]["base"]["repo"]["full_name"].get!string;
         auto pullRequestURL = json["pull_request"]["html_url"].get!string;
         auto pullRequestNumber = json["pull_request"]["number"].get!uint;
         auto commitsURL = json["pull_request"]["commits_url"].get!string;
         auto commentsURL = json["pull_request"]["comments_url"].get!string;
-        runTask(toDelegate(&handlePR), action, repoSlug, pullRequestURL, pullRequestNumber, commitsURL, commentsURL);
+        auto isOpen = json["pull_request"]["state"].get!string == "open";
+        runTaskHelper(toDelegate(&handlePR), action, repoSlug, pullRequestURL, pullRequestNumber, commitsURL, commentsURL, isOpen);
         return res.writeBody("handled");
     default:
         return res.writeBody("ignored");
     }
+}
+
+auto runTaskHelper(Fun, Args...)(Fun fun, Args args)
+{
+    if (runAsync)
+        runTask(fun, args);
+    else
+        return fun(args);
 }
 
 //==============================================================================
@@ -85,8 +147,9 @@ auto matchIssueRefs(string message)
 {
     static auto matchToRefs(M)(M m)
     {
+        enum splitRE = regex(`[^\d]+`); // ctRegex throws a weird error in unittest compilation
         auto closed = !m.captures[1].empty;
-        return m.captures[5].stripRight.splitter(ctRegex!`[^\d]+`)
+        return m.captures[5].stripRight.splitter(splitRE)
             .filter!(id => !id.empty) // see #6
             .map!(id => IssueRef(id.to!int, closed));
     }
@@ -101,12 +164,17 @@ unittest
     assert(equal(matchIssueRefs("fix issue 16319 and fix std.traits.isInnerClass"), [IssueRef(16319, true)]));
 }
 
+Json[] getCommits(string commitsURL)
+{
+    return requestHTTP(commitsURL, (scope req) { req.headers["Authorization"] = githubAuth; })
+            .readJson[];
+}
+
 struct IssueRef { int id; bool fixed; }
 // get all issues mentioned in a commit
-IssueRef[] getIssueRefs(string commitsURL)
+IssueRef[] getIssueRefs(Json[] commits)
 {
-    auto issues = requestHTTP(commitsURL, (scope req) { req.headers["Authorization"] = githubAuth; })
-        .readJson[]
+    auto issues = commits
         .map!(c => c["commit"]["message"].get!string.matchIssueRefs)
         .joiner
         .array;
@@ -123,8 +191,8 @@ Issue[] getDescriptions(R)(R issueRefs)
 
     if (issueRefs.empty)
         return null;
-    return "https://issues.dlang.org/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc"
-        .format(issueRefs.map!(r => r.id))
+    return "%s/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc"
+        .format(bugzillaURL, issueRefs.map!(r => r.id))
         .requestHTTP
         .bodyReader.readAllUTF8
         .csvReader!Issue(null)
@@ -145,11 +213,12 @@ string formatComment(R1, R2)(R1 refs, R2 descs)
     auto app = appender!string();
     app.put("Fix | Bugzilla | Description\n");
     app.put("--- | --- | ---\n");
+
     foreach (num, closed, desc; combined)
     {
         app.formattedWrite(
-            "%1$s | [%2$s](https://issues.dlang.org/show_bug.cgi?id=%2$s) | %3$s\n",
-            closed ? "✓" : "✗", num, desc);
+            "%1$s | [%2$s](%4$s/show_bug.cgi?id=%2$s) | %3$s\n",
+            closed ? "✓" : "✗", num, desc, bugzillaURL);
     }
     return app.data;
 }
@@ -159,7 +228,7 @@ struct Comment { string url, body_; }
 Comment getBotComment(string commentsURL)
 {
     // the bot may post multiple comments (mention-bot & bugzilla links)
-    auto res = requestHTTP(commentsURL, (scope req) { req.headers["Authorization"] = githubAuth; })
+    auto res = ghGetRequest(commentsURL)
         .readJson[]
         .find!(c => c["user"]["login"] == "dlang-bot" && c["body"].get!string.canFind("Bugzilla"));
     if (res.length)
@@ -167,22 +236,41 @@ Comment getBotComment(string commentsURL)
     return Comment();
 }
 
-void ghSendRequest(T...)(HTTPMethod method, string url, T arg)
-    if (T.length <= 1)
+auto ghGetRequest(string url)
 {
+    return requestHTTP(url, (scope req) {
+        req.headers["Authorization"] = githubAuth;
+    });
+}
+
+
+void ghSendRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
+{
+    HTTPMethod method;
     requestHTTP(url, (scope req) {
         req.headers["Authorization"] = githubAuth;
-        req.method = method;
-        static if (T.length)
-            req.writeJsonBody(arg);
+        userReq(req);
+        method = req.method;
     }, (scope res) {
         if (res.statusCode / 100 == 2)
-            logInfo("%s %s, %s\n", method, url, res.bodyReader.empty ?
-                    res.statusPhrase : res.readJson["html_url"].get!string);
+        {
+            logInfo("%s %s, %s\n", method, url, res.statusPhrase);
+            res.bodyReader.readAllUTF8;
+        }
         else
             logWarn("%s %s failed;  %s %s.\n%s", method, url,
                 res.statusPhrase, res.statusCode, res.bodyReader.readAllUTF8);
     });
+}
+
+auto ghSendRequest(T...)(HTTPMethod method, string url, T arg)
+    if (T.length <= 1)
+{
+    return ghSendRequest((scope req) {
+        req.method = method;
+        static if (T.length)
+            req.writeJsonBody(arg);
+    }, url);
 }
 
 void updateGithubComment(string action, IssueRef[] refs, Issue[] descs, string commentsURL)
@@ -207,6 +295,93 @@ void updateGithubComment(string action, IssueRef[] refs, Issue[] descs, string c
             ghSendRequest(HTTPMethod.PATCH, comment.url, ["body" : msg]);
         else if (action != "closed" && action != "merged")
             ghSendRequest(HTTPMethod.POST, commentsURL, ["body" : msg]);
+    }
+}
+
+
+//==============================================================================
+// Github Auto-merge
+//==============================================================================
+
+alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");
+alias LabelInfo = Tuple!(bool, "hasAutoMerge", bool, "hasAutoMergeSquash");
+
+auto analyseLabels(Json[] labels)
+{
+    auto labelNames = labels.map!`a["name"].get!string`.array;
+    bool hasAutoMerge = labelNames.any!`a == "auto-merge"`;
+    bool hasAutoMergeSquash = labelNames.any!`a == "auto-merge-squash"`;
+    return LabelInfo(hasAutoMerge, hasAutoMergeSquash);
+}
+
+auto handleGithubLabel(string repoSlug, uint pullRequestNumber, string commitsURL, bool isOpen)
+{
+    auto url = "%s/repos/%s/issues/%d/labels".format(githubAPIURL, repoSlug, pullRequestNumber);
+    auto res = ghGetRequest(url);
+
+    auto labels = res.readJson[];
+    auto labelInfo = analyseLabels(labels);
+    Json[] commits = null;
+
+    if (labelInfo.hasAutoMerge || labelInfo.hasAutoMergeSquash)
+    {
+        commits = getCommits(commitsURL);
+
+        if (!isOpen)
+        {
+            logWarn("Can't auto-merge PR %s/%d - it is already closed", repoSlug, pullRequestNumber);
+            goto end;
+        }
+
+        if (commits.length == 0)
+        {
+            logWarn("Can't auto-merge PR %s/%d has no commits attached", repoSlug, pullRequestNumber);
+            goto end;
+        }
+
+        string lastCommitSha = commits[$ - 1]["sha"].get!string;
+        string[string] reqInput = ["sha": lastCommitSha];
+
+        // lazy implementation -> try merge
+        if (labelInfo.hasAutoMerge)
+            reqInput["merge_method"] = "merge";
+
+        if (labelInfo.hasAutoMergeSquash)
+            reqInput["merge_method"] = "squash";
+
+        auto prUrl = "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, repoSlug, pullRequestNumber);
+        ghSendRequest((scope req){
+            req.method = HTTPMethod.PUT;
+            // custom media type is required during preview period:
+            // https://developer.github.com/changes/2016-09-26-pull-request-merge-api-update/
+            req.headers["Accept"] = "application/vnd.github.polaris-preview+json";
+            req.writeJsonBody(reqInput);
+        }, prUrl);
+    }
+    end:
+    return LabelsAndCommits(labels, commits);
+}
+
+void checkAndRemoveMergeLabels(Json[] labels, string repoSlug, uint pullRequestNumber)
+{
+    auto labelInfo = analyseLabels(labels);
+    if (labelInfo.hasAutoMerge || labelInfo.hasAutoMergeSquash)
+    {
+        auto labelUrl = "%s/repos/%s/issues/%d/labels/".format(githubAPIURL, repoSlug, pullRequestNumber);
+        if (labelInfo.hasAutoMerge)
+            labelUrl ~= "auto-merge";
+        if (labelInfo.hasAutoMergeSquash)
+            labelUrl ~= "auto-merge-squash";
+        ghSendRequest(HTTPMethod.DELETE, labelUrl);
+    }
+}
+
+void searchForAutoMergePrs(string repoSlug)
+{
+    auto prs = ghGetRequest("%s/repos/%s/pulls?state=open".format(githubAPIURL, repoSlug)).readJson[];
+    foreach (pr; prs)
+    {
+        handleGithubLabel(repoSlug, pr["number"].get!uint, pr["commits_url"].get!string, true);
     }
 }
 
@@ -236,7 +411,7 @@ struct TrelloCard { string id; int issueID; }
 string trelloAPI(Args...)(string fmt, Args args)
 {
     import std.uri : encode;
-    return encode("https://api.trello.com"~fmt.format(args)~(fmt.canFind("?") ? "&" : "?")~trelloAuth);
+    return encode(trelloAPIURL ~fmt.format(args)~(fmt.canFind("?") ? "&" : "?")~trelloAuth);
 }
 
 string formatTrelloComment(string existingComment, Issue[] issues)
@@ -423,7 +598,7 @@ void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
 
 void cancelBuild(size_t buildId)
 {
-    auto url = "https://api.travis-ci.org/builds/%s/cancel".format(buildId);
+    auto url = "%s/builds/%s/cancel".format(trelloAPIURL, buildId);
     requestHTTP(url, (scope req) {
         req.headers["Authorization"] = travisAuth;
         req.method = HTTPMethod.POST;
@@ -450,7 +625,7 @@ void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
         }
     }
 
-    auto url = "https://api.travis-ci.org/repos/%s/builds?event_type=pull_request".format(repoSlug);
+    auto url = "%s/repos/%s/builds?event_type=pull_request".format(trelloAPIURL, repoSlug);
     auto activeBuildsForPR = requestHTTP(url, (scope req) {
             req.headers["Authorization"] = travisAuth;
             req.headers["Accept"] = "application/vnd.travis-ci.2+json";
@@ -467,12 +642,35 @@ void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
 
 //==============================================================================
 
-void handlePR(string action, string repoSlug, string pullRequestURL, uint pullRequestNumber, string commitsURL, string commentsURL)
+void handlePR(string action, string repoSlug, string pullRequestURL, uint pullRequestNumber, string commitsURL, string commentsURL,
+              bool isOpen)
 {
-    auto refs = getIssueRefs(commitsURL);
+    Json[] commits;
+
+    if (action == "labeled" || action == "synchronize")
+    {
+        auto labelsAndCommits = handleGithubLabel(repoSlug, pullRequestNumber, commitsURL, isOpen);
+        if (action == "labeled")
+            return;
+        if (action == "synchronize")
+        {
+            checkAndRemoveMergeLabels(labelsAndCommits.labels, repoSlug, pullRequestNumber);
+            if (labelsAndCommits.commits !is null)
+                commits = labelsAndCommits.commits;
+        }
+    }
+
+    if (commits is null)
+        commits = getCommits(commitsURL);
+
+    auto refs = getIssueRefs(commits);
+
     auto descs = getDescriptions(refs);
     updateGithubComment(action, refs, descs, commentsURL);
-    updateTrelloCard(action, pullRequestURL, refs, descs);
+
+    if (runTrello)
+        updateTrelloCard(action, pullRequestURL, refs, descs);
+
     // wait until builds for the current push are created
     setTimer(30.seconds, { dedupTravisBuilds(action, repoSlug, pullRequestNumber); });
 }
