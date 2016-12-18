@@ -1,0 +1,72 @@
+[
+  {
+    "sha": "d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+    "commit": {
+      "author": {
+        "name": "RazvanN7",
+        "email": "razvan.nitu1305@gmail.com",
+        "date": "2016-11-24T14:06:51Z"
+      },
+      "committer": {
+        "name": "RazvanN7",
+        "email": "razvan.nitu1305@gmail.com",
+        "date": "2016-12-16T09:11:07Z"
+      },
+      "message": "Issue 8573 - A simpler Phobos function that returns the index of the mix or max item\n\nIssue 8573 - A simpler Phobos function that returns the index of the mix or max item\n\nadded some review fixes\n\nfixed an issue with a mutable variable\n\nApplied review feedback\n\nRenamed functions to minIndex and maxIndex + used sizediff_t for return value type\n\nUpdated function so that it works optimally even for lazy ranges and algorithms\n\nReverted to having only copyable elements in ranges\n\nAdded more unittests; implemented an array path; fixed documentation\n\nSquashed commits",
+      "tree": {
+        "sha": "dae14cbc7dcd78423698c41f9f20d30b89d249c3",
+        "url": "https://api.github.com/repos/dlang/phobos/git/trees/dae14cbc7dcd78423698c41f9f20d30b89d249c3"
+      },
+      "url": "https://api.github.com/repos/dlang/phobos/git/commits/d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+      "comment_count": 0
+    },
+    "url": "https://api.github.com/repos/dlang/phobos/commits/d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+    "html_url": "https://github.com/dlang/phobos/commit/d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/commits/d2c7d3761b73405ee39da3fd7fe5030dee35a39e/comments",
+    "author": {
+      "login": "RazvanN7",
+      "id": 22907766,
+      "avatar_url": "https://avatars.githubusercontent.com/u/22907766?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/RazvanN7",
+      "html_url": "https://github.com/RazvanN7",
+      "followers_url": "https://api.github.com/users/RazvanN7/followers",
+      "following_url": "https://api.github.com/users/RazvanN7/following{/other_user}",
+      "gists_url": "https://api.github.com/users/RazvanN7/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/RazvanN7/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/RazvanN7/subscriptions",
+      "organizations_url": "https://api.github.com/users/RazvanN7/orgs",
+      "repos_url": "https://api.github.com/users/RazvanN7/repos",
+      "events_url": "https://api.github.com/users/RazvanN7/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/RazvanN7/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "RazvanN7",
+      "id": 22907766,
+      "avatar_url": "https://avatars.githubusercontent.com/u/22907766?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/RazvanN7",
+      "html_url": "https://github.com/RazvanN7",
+      "followers_url": "https://api.github.com/users/RazvanN7/followers",
+      "following_url": "https://api.github.com/users/RazvanN7/following{/other_user}",
+      "gists_url": "https://api.github.com/users/RazvanN7/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/RazvanN7/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/RazvanN7/subscriptions",
+      "organizations_url": "https://api.github.com/users/RazvanN7/orgs",
+      "repos_url": "https://api.github.com/users/RazvanN7/repos",
+      "events_url": "https://api.github.com/users/RazvanN7/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/RazvanN7/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "72af0090db27e438cfbcd3d1b9a0343a71079d42",
+        "url": "https://api.github.com/repos/dlang/phobos/commits/72af0090db27e438cfbcd3d1b9a0343a71079d42",
+        "html_url": "https://github.com/dlang/phobos/commit/72af0090db27e438cfbcd3d1b9a0343a71079d42"
+      }
+    ]
+  }
+]
