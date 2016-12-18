@@ -2,5 +2,14 @@ name "dlang-bot"
 description "dlang-bot for automated bugzilla, github, and trello references"
 copyright "Copyright © 2015, Martin Nowak"
 authors "Martin Nowak"
-dependency "vibe-d" version="~>0.7.23"
-versions "VibeDefaultMain"
+dependency "vibe-d" version="~>0.7.30"
+configuration "default" {
+	versions "VibeDefaultMain"
+	targetType "executable"
+}
+configuration "unittest" {
+	versions "VibeCustomMain"
+	sourcePaths "source" "test"
+	importPaths "source" "test"
+	stringImportPaths "views"
+}

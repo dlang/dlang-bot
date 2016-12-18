@@ -1,15 +1,42 @@
+module app;
+
 import vibe.d, std.algorithm, std.process, std.range, std.regex;
 
 string githubAuth, trelloSecret, trelloAuth, hookSecret, travisAuth;
 
-version (unittest) {}
-else shared static this()
+string githubAPIURL = "https://api.github.com";
+string travisAPIURL = "https://api.travis-ci.org";
+string trelloAPIURL = "https://api.trello.com";
+string bugzillaURL = "https://issues.dlang.org";
+bool runAsync = true;
+bool runTrello = true;
+
+version(unittest){} else
+shared static this()
 {
     auto settings = new HTTPServerSettings;
     settings.port = 8080;
+    readOption("port|p", &settings.port, "Sets the port used for serving.");
+
+    githubAuth = "token "~environment["GH_TOKEN"];
+    trelloSecret = environment["TRELLO_SECRET"];
+    trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
+    hookSecret = environment["GH_HOOK_SECRET"];
+    travisAuth = "token " ~ environment["TRAVIS_TOKEN"];
+
+    // workaround for stupid openssl.conf on Heroku
+    if (environment.get("DYNO") !is null)
+    {
+        HTTPClient.setTLSSetupCallback((ctx) {
+            ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
+        });
+    }
+}
+
+void startServer(HTTPServerSettings settings)
+{
     settings.bindAddresses = ["0.0.0.0"];
     settings.options = HTTPServerOption.defaults & ~HTTPServerOption.parseJsonBody;
-    readOption("port|p", &settings.port, "Sets the port used for serving.");
 
     auto router = new URLRouter;
     router
@@ -19,31 +46,32 @@ else shared static this()
         .match(HTTPMethod.HEAD, "/trello_hook", (req, res) => res.writeVoidBody)
         .post("/trello_hook", &trelloHook)
         ;
-    listenHTTP(settings, router);
 
-    githubAuth = "token "~environment["GH_TOKEN"];
-    trelloSecret = environment["TRELLO_SECRET"];
-    trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
-    hookSecret = environment["GH_HOOK_SECRET"];
-    travisAuth = "token " ~ environment["TRAVIS_TOKEN"];
-    // workaround for stupid openssl.conf on Heroku
-    HTTPClient.setTLSSetupCallback((ctx) {
-        ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
-    });
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
+
+    listenHTTP(settings, router);
 }
 
 //==============================================================================
 // Github hook
 //==============================================================================
 
-Json verifyRequest(string signature, string data)
+auto getSignature(string data)
 {
     import std.digest.digest, std.digest.hmac, std.digest.sha;
+    import std.string : representation;
 
     auto hmac = HMAC!SHA1(hookSecret.representation);
     hmac.put(data.representation);
-    enforce(hmac.finish.toHexString!(LetterCase.lower) == signature.chompPrefix("sha1="),
+    return hmac.finish.toHexString!(LetterCase.lower);
+}
+
+Json verifyRequest(string signature, string data)
+{
+    import std.exception : enforce;
+    import std.string : chompPrefix;
+
+    enforce(getSignature(data) == signature.chompPrefix("sha1="),
             "Hook signature mismatch");
     return parseJsonString(data);
 }
@@ -70,11 +98,19 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
         auto pullRequestNumber = json["pull_request"]["number"].get!uint;
         auto commitsURL = json["pull_request"]["commits_url"].get!string;
         auto commentsURL = json["pull_request"]["comments_url"].get!string;
-        runTask(toDelegate(&handlePR), action, repoSlug, pullRequestURL, pullRequestNumber, commitsURL, commentsURL);
+        runTaskHelper(toDelegate(&handlePR), action, repoSlug, pullRequestURL, pullRequestNumber, commitsURL, commentsURL);
         return res.writeBody("handled");
     default:
         return res.writeBody("ignored");
     }
+}
+
+auto runTaskHelper(Fun, Args...)(Fun fun, Args args)
+{
+    if (runAsync)
+        runTask(fun, args);
+    else
+        return fun(args);
 }
 
 //==============================================================================
@@ -85,8 +121,9 @@ auto matchIssueRefs(string message)
 {
     static auto matchToRefs(M)(M m)
     {
+        enum splitRE = regex(`[^\d]+`); // ctRegex throws a weird error in unittest compilation
         auto closed = !m.captures[1].empty;
-        return m.captures[5].stripRight.splitter(ctRegex!`[^\d]+`)
+        return m.captures[5].stripRight.splitter(splitRE)
             .filter!(id => !id.empty) // see #6
             .map!(id => IssueRef(id.to!int, closed));
     }
@@ -123,8 +160,8 @@ Issue[] getDescriptions(R)(R issueRefs)
 
     if (issueRefs.empty)
         return null;
-    return "https://issues.dlang.org/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc"
-        .format(issueRefs.map!(r => r.id))
+    return "%s/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc"
+        .format(bugzillaURL, issueRefs.map!(r => r.id))
         .requestHTTP
         .bodyReader.readAllUTF8
         .csvReader!Issue(null)
@@ -145,11 +182,12 @@ string formatComment(R1, R2)(R1 refs, R2 descs)
     auto app = appender!string();
     app.put("Fix | Bugzilla | Description\n");
     app.put("--- | --- | ---\n");
+
     foreach (num, closed, desc; combined)
     {
         app.formattedWrite(
-            "%1$s | [%2$s](https://issues.dlang.org/show_bug.cgi?id=%2$s) | %3$s\n",
-            closed ? "✓" : "✗", num, desc);
+            "%1$s | [%2$s](%4$s/show_bug.cgi?id=%2$s) | %3$s\n",
+            closed ? "✓" : "✗", num, desc, bugzillaURL);
     }
     return app.data;
 }
@@ -236,7 +274,7 @@ struct TrelloCard { string id; int issueID; }
 string trelloAPI(Args...)(string fmt, Args args)
 {
     import std.uri : encode;
-    return encode("https://api.trello.com"~fmt.format(args)~(fmt.canFind("?") ? "&" : "?")~trelloAuth);
+    return encode(trelloAPIURL ~fmt.format(args)~(fmt.canFind("?") ? "&" : "?")~trelloAuth);
 }
 
 string formatTrelloComment(string existingComment, Issue[] issues)
@@ -423,7 +461,7 @@ void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
 
 void cancelBuild(size_t buildId)
 {
-    auto url = "https://api.travis-ci.org/builds/%s/cancel".format(buildId);
+    auto url = "%s/builds/%s/cancel".format(trelloAPIURL, buildId);
     requestHTTP(url, (scope req) {
         req.headers["Authorization"] = travisAuth;
         req.method = HTTPMethod.POST;
@@ -450,7 +488,7 @@ void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
         }
     }
 
-    auto url = "https://api.travis-ci.org/repos/%s/builds?event_type=pull_request".format(repoSlug);
+    auto url = "%s/repos/%s/builds?event_type=pull_request".format(trelloAPIURL, repoSlug);
     auto activeBuildsForPR = requestHTTP(url, (scope req) {
             req.headers["Authorization"] = travisAuth;
             req.headers["Accept"] = "application/vnd.travis-ci.2+json";
@@ -472,7 +510,10 @@ void handlePR(string action, string repoSlug, string pullRequestURL, uint pullRe
     auto refs = getIssueRefs(commitsURL);
     auto descs = getDescriptions(refs);
     updateGithubComment(action, refs, descs, commentsURL);
-    updateTrelloCard(action, pullRequestURL, refs, descs);
+
+    if (runTrello)
+        updateTrelloCard(action, pullRequestURL, refs, descs);
+
     // wait until builds for the current push are created
     setTimer(30.seconds, { dedupTravisBuilds(action, repoSlug, pullRequestNumber); });
 }
