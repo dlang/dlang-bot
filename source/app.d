@@ -138,8 +138,9 @@ auto matchIssueRefs(string message)
 {
     static auto matchToRefs(M)(M m)
     {
+        enum splitRE = regex(`[^\d]+`); // ctRegex throws a weird error in unittest compilation
         auto closed = !m.captures[1].empty;
-        return m.captures[5].stripRight.splitter(ctRegex!`[^\d]+`)
+        return m.captures[5].stripRight.splitter(splitRE)
             .filter!(id => !id.empty) // see #6
             .map!(id => IssueRef(id.to!int, closed));
     }
