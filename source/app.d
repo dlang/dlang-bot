@@ -270,7 +270,7 @@ string formatTrelloComment(string existingComment, string pullRequestURL)
 
 auto findTrelloCards(int issueID)
 {
-    return trelloAPI("/1/search?query=name:'Issue %d'", issueID)
+    return trelloAPI("/1/search?query=name:\"Issue %d\"", issueID)
         .requestHTTP
         .readJson["cards"][]
         .map!(c => TrelloCard(c["id"].get!string, issueID));
