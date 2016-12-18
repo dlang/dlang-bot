@@ -4,3 +4,4 @@ __dummy.html
 *.o
 *.obj
 dlang-bot
+__test__unittest__
