@@ -227,8 +227,7 @@ unittest
     payloader = (scope HTTPServerRequest req, scope HTTPServerResponse res) {
         if (req.requestURL == "/github/repos/dlang/dmd/pulls/6327/merge")
         {
-            req.json["sha"].writeln;
-            //assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
+            assert(req.json["sha"] == "782fd3fdd4a9c23e1307b4b963b443ed60517dfe");
             assert(req.json["merge_method"] == "merge");
             res.statusCode = 200;
             res.writeVoidBody;
