@@ -129,6 +129,9 @@ void buildGitHubRequest(string payload, ref string[] expectedURLs, void delegate
             assert(0, "Request for unexpected URL received: " ~ req.requestURL);
     };
 
+    // safety copy
+    auto timeBetweenFullPRChecksCopy = timeBetweenFullPRChecks;
+
     auto req = requestHTTP(ghTestHookURL, (scope req) {
         req.method = HTTPMethod.POST;
 
@@ -167,6 +170,7 @@ void buildGitHubRequest(string payload, ref string[] expectedURLs, void delegate
     urlExpector = null;
     payloader = null;
     jsonPostprocessor = null;
+    timeBetweenFullPRChecks = timeBetweenFullPRChecksCopy;
 }
 
 // synchronize event -> should unlabel the PR

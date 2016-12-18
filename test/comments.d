@@ -191,6 +191,27 @@ unittest
     });
 }
 
+// send success status event -> don't trigger PR check due to being within the same time frame
+unittest
+{
+    string[] expectedURLs = [];
+
+    jsonPostprocessor = (scope HTTPServerRequest req, Json j) {
+        if (req.requestURL == "/github/repos/dlang/dmd/pulls?state=open")
+        {
+            Json k = j[0..2];
+            return k;
+        }
+
+        return j;
+    };
+
+    "./payloads/github_hooks/dlang_dmd_status_6324.json".buildGitHubRequest(expectedURLs, (ref Json j, scope HTTPClientRequest req){
+        j["state"] = "success";
+        req.headers["X-GitHub-Event"] = "status";
+    });
+}
+
 // send success status event -> tryMergeForAllOpenPrs -> merge()
 // PR 6237 has the label "auto-merge"
 unittest
@@ -230,6 +251,7 @@ unittest
     "./payloads/github_hooks/dlang_dmd_status_6324.json".buildGitHubRequest(expectedURLs, (ref Json j, scope HTTPClientRequest req){
         j["state"] = "success";
         req.headers["X-GitHub-Event"] = "status";
+        timeBetweenFullPRChecks = 0.seconds;
     });
 }
 

@@ -1,7 +1,7 @@
 module app;
 
 import vibe.d, std.algorithm, std.process, std.range, std.regex;
-import std.typecons;
+import std.datetime, std.typecons;
 
 string githubAuth, trelloSecret, trelloAuth, hookSecret, travisAuth;
 
@@ -11,6 +11,9 @@ string trelloAPIURL = "https://api.trello.com";
 string bugzillaURL = "https://issues.dlang.org";
 bool runAsync = true;
 bool runTrello = true;
+
+SysTime lastFullPRCheck;
+Duration timeBetweenFullPRChecks = 15.minutes;
 
 version(unittest){} else
 shared static this()
@@ -38,6 +41,8 @@ void startServer(HTTPServerSettings settings)
 {
     settings.bindAddresses = ["0.0.0.0"];
     settings.options = HTTPServerOption.defaults & ~HTTPServerOption.parseJsonBody;
+
+    lastFullPRCheck = SysTime(DateTime(0, 1, 1, 0, 0, 0));
 
     auto router = new URLRouter;
     router
@@ -89,7 +94,11 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
         // no need to trigger the checker for failure/pending
         if (state == "success")
         {
-            searchForAutoMergePrs(repoSlug);
+            if (Clock.currTime - lastFullPRCheck >= timeBetweenFullPRChecks)
+            {
+                searchForAutoMergePrs(repoSlug);
+                lastFullPRCheck = Clock.currTime();
+            }
         }
         return res.writeBody("handled");
     }
