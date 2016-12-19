@@ -390,11 +390,18 @@ void checkAndRemoveMergeLabels(Json[] labels, in ref PullRequestParams pr)
     }
 }
 
+Json[] getIssuesForLabel(string repoSlug, string label)
+{
+    return ghGetRequest("%s/repos/%s/issues?state=open&labels=%s"
+                .format(githubAPIURL, repoSlug, label)).readJson[];
+}
+
 void searchForAutoMergePrs(string repoSlug)
 {
-    auto issues = ghGetRequest("%s/repos/%s/issues?state=open&labels=auto-merge,auto-merge-squash"
-                .format(githubAPIURL, repoSlug)).readJson[];
-    foreach (issue; issues)
+    // the GitHub API doesn't allow a logical OR
+    auto issues = getIssuesForLabel(repoSlug, "auto-merge").chain(getIssuesForLabel(repoSlug, "auto-merge-squash"));
+    issues.sort!((a, b) => a["number"] < b["number"]);
+    foreach (issue; issues.uniq)
     {
         auto prNumber = issue["number"].get!uint;
         if ("pull_request" !in issue)
@@ -407,7 +414,6 @@ void searchForAutoMergePrs(string repoSlug)
             isOpen: true
         };
         auto labelInfo = analyseLabels(issue["labels"][]);
-        logInfo("labels %s", labelInfo);
         tryMerge(prParams, labelInfo);
     }
 }
