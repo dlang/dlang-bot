@@ -65,6 +65,26 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
             assert(req.json["merge_method"] == "squash");
+            assert(req.json["commit_message"] ==
+`Issue 8573 - A simpler Phobos function that returns the index of the mix or max item
+
+Issue 8573 - A simpler Phobos function that returns the index of the mix or max item
+
+added some review fixes
+
+fixed an issue with a mutable variable
+
+Applied review feedback
+
+Renamed functions to minIndex and maxIndex + used sizediff_t for return value type
+
+Updated function so that it works optimally even for lazy ranges and algorithms
+
+Reverted to having only copyable elements in ranges
+
+Added more unittests; implemented an array path; fixed documentation
+
+Squashed commits (#4921)`);
             res.statusCode = 200;
             res.writeVoidBody;
         }
