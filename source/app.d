@@ -117,15 +117,8 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
             goto case;
         case "opened", "reopened", "synchronize", "labeled":
 
-            PullRequestParams prParams = {
-                repoSlug : json["pull_request"]["base"]["repo"]["full_name"].get!string,
-                pullRequestURL : json["pull_request"]["html_url"].get!string,
-                pullRequestNumber : json["pull_request"]["number"].get!uint,
-                commitsURL : json["pull_request"]["commits_url"].get!string,
-                commentsURL : json["pull_request"]["comments_url"].get!string,
-                isOpen : json["pull_request"]["state"].get!string == "open",
-            };
-            runTaskHelper(toDelegate(&handlePR), action, prParams);
+            auto pullRequest = json["pull_request"].deserializeJson!PullRequest;
+            runTaskHelper(toDelegate(&handlePR), action, pullRequest);
             return res.writeBody("handled");
         default:
             return res.writeBody("ignored");
@@ -301,14 +294,29 @@ void updateGithubComment(string action, IssueRef[] refs, Issue[] descs, string c
 // Github Auto-merge
 //==============================================================================
 
-struct PullRequestParams
+struct PullRequest
 {
-    string repoSlug;
-    uint pullRequestNumber;
-    bool isOpen;
-    string commitsURL;
-    string commentsURL;
-    string pullRequestURL;
+    static struct Repo
+    {
+        @name("full_name") string fullName;
+    }
+    static struct Branch
+    {
+        Repo repo;
+    }
+    Branch base, head;
+    enum State { open, closed }
+    @byName State state;
+    uint number;
+    string title;
+
+    string baseRepoSlug() const { return base.repo.fullName; }
+    string headRepoSlug() const { return head.repo.fullName; }
+    alias repoSlug = baseRepoSlug;
+    bool isOpen() const { return state == State.open; }
+    string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
+    string commitsURL() const { return "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, number); }
+    string url() const { return "%s/repos/%s/pulls/%d".format(githubAPIURL, repoSlug, number); }
 }
 
 alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");
@@ -322,9 +330,9 @@ auto analyseLabels(Json[] labels)
     return LabelInfo(hasAutoMerge, hasAutoMergeSquash);
 }
 
-auto handleGithubLabel(in ref PullRequestParams pr)
+auto handleGithubLabel(in ref PullRequest pr)
 {
-    auto url = "%s/repos/%s/issues/%d/labels".format(githubAPIURL, pr.repoSlug, pr.pullRequestNumber);
+    auto url = "%s/repos/%s/issues/%d/labels".format(githubAPIURL, pr.repoSlug, pr.number);
     auto res = ghGetRequest(url);
 
     auto labels = res.readJson[];
@@ -337,19 +345,19 @@ auto handleGithubLabel(in ref PullRequestParams pr)
     return LabelsAndCommits(labels, commits);
 }
 
-Json[] tryMerge(in ref PullRequestParams pr, LabelInfo labelInfo)
+Json[] tryMerge(in ref PullRequest pr, LabelInfo labelInfo)
 {
     auto commits = ghGetRequest(pr.commitsURL).readJson[];
 
     if (!pr.isOpen)
     {
-        logWarn("Can't auto-merge PR %s/%d - it is already closed", pr.repoSlug, pr.pullRequestNumber);
+        logWarn("Can't auto-merge PR %s/%d - it is already closed", pr.repoSlug, pr.number);
         return commits;
     }
 
     if (commits.length == 0)
     {
-        logWarn("Can't auto-merge PR %s/%d has no commits attached", pr.repoSlug, pr.pullRequestNumber);
+        logWarn("Can't auto-merge PR %s/%d has no commits attached", pr.repoSlug, pr.number);
         return commits;
     }
 
@@ -363,7 +371,7 @@ Json[] tryMerge(in ref PullRequestParams pr, LabelInfo labelInfo)
     if (labelInfo.hasAutoMergeSquash)
         reqInput["merge_method"] = "squash";
 
-    auto prUrl = "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, pr.repoSlug, pr.pullRequestNumber);
+    auto prUrl = "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, pr.repoSlug, pr.number);
     ghSendRequest((scope req){
         req.method = HTTPMethod.PUT;
         // custom media type is required during preview period:
@@ -375,12 +383,12 @@ Json[] tryMerge(in ref PullRequestParams pr, LabelInfo labelInfo)
     return commits;
 }
 
-void checkAndRemoveMergeLabels(Json[] labels, in ref PullRequestParams pr)
+void checkAndRemoveMergeLabels(Json[] labels, in ref PullRequest pr)
 {
     auto labelInfo = analyseLabels(labels);
     if (labelInfo.hasAutoMerge || labelInfo.hasAutoMergeSquash)
     {
-        auto labelUrl = "%s/repos/%s/issues/%d/labels/".format(githubAPIURL, pr.repoSlug, pr.pullRequestNumber);
+        auto labelUrl = "%s/repos/%s/issues/%d/labels/".format(githubAPIURL, pr.repoSlug, pr.number);
         if (labelInfo.hasAutoMerge)
             labelUrl ~= "auto-merge";
         if (labelInfo.hasAutoMergeSquash)
@@ -406,14 +414,13 @@ void searchForAutoMergePrs(string repoSlug)
         if ("pull_request" !in issue)
             continue;
 
-        PullRequestParams prParams = {
-            repoSlug: repoSlug,
-            pullRequestNumber: prNumber,
-            commitsURL: "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, prNumber),
-            isOpen: true
-        };
+        PullRequest pr;
+        pr.base.repo.fullName = repoSlug;
+        pr.number = prNumber;
+        pr.state = PullRequest.State.open;
         auto labelInfo = analyseLabels(issue["labels"][]);
-        tryMerge(prParams, labelInfo);
+
+        tryMerge(pr, labelInfo);
     }
 }
 
@@ -674,7 +681,7 @@ void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
 
 //==============================================================================
 
-void handlePR(string action, PullRequestParams pr)
+void handlePR(string action, PullRequest pr)
 {
     Json[] commits;
 
@@ -701,8 +708,8 @@ void handlePR(string action, PullRequestParams pr)
     updateGithubComment(action, refs, descs, pr.commentsURL);
 
     if (runTrello)
-        updateTrelloCard(action, pr.pullRequestURL, refs, descs);
+        updateTrelloCard(action, pr.url, refs, descs);
 
     // wait until builds for the current push are created
-    setTimer(30.seconds, { dedupTravisBuilds(action, pr.repoSlug, pr.pullRequestNumber); });
+    setTimer(30.seconds, { dedupTravisBuilds(action, pr.repoSlug, pr.number); });
 }
