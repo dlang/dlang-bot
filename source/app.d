@@ -398,8 +398,8 @@ void searchForAutoMergePrs(string repoSlug)
 {
     // the GitHub API doesn't allow a logical OR
     auto issues = getIssuesForLabel(repoSlug, "auto-merge").chain(getIssuesForLabel(repoSlug, "auto-merge-squash"));
-    issues.sort!((a, b) => a["number"] < b["number"]);
-    foreach (issue; issues.uniq)
+    issues.sort!((a, b) => a["number"].get!int < b["number"].get!int);
+    foreach (issue; issues.uniq!((a, b) => a["number"].get!int == b["number"].get!int))
     {
         auto prNumber = issue["number"].get!uint;
         if ("pull_request" !in issue)
