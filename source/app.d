@@ -309,6 +309,7 @@ struct PullRequest
     @byName State state;
     uint number;
     string title;
+    Nullable!bool mergeable;
 
     string baseRepoSlug() const { return base.repo.fullName; }
     string headRepoSlug() const { return head.repo.fullName; }
