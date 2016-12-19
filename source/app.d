@@ -21,6 +21,7 @@ shared static this()
     auto settings = new HTTPServerSettings;
     settings.port = 8080;
     readOption("port|p", &settings.port, "Sets the port used for serving.");
+    startServer(settings);
 
     githubAuth = "token "~environment["GH_TOKEN"];
     trelloSecret = environment["TRELLO_SECRET"];
