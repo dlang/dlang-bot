@@ -665,7 +665,7 @@ void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
         }
     }
 
-    auto url = "%s/repos/%s/builds?event_type=pull_request".format(trelloAPIURL, repoSlug);
+    auto url = "%s/repos/%s/builds?event_type=pull_request".format(travisAPIURL, repoSlug);
     auto activeBuildsForPR = requestHTTP(url, (scope req) {
             req.headers["Authorization"] = travisAuth;
             req.headers["Accept"] = "application/vnd.travis-ci.2+json";
