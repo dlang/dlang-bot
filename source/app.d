@@ -42,8 +42,6 @@ void startServer(HTTPServerSettings settings)
     settings.bindAddresses = ["0.0.0.0"];
     settings.options = HTTPServerOption.defaults & ~HTTPServerOption.parseJsonBody;
 
-    lastFullPRCheck = SysTime(Date(0, 1, 1));
-
     auto router = new URLRouter;
     router
         .get("/", (req, res) => res.render!"index.dt")
@@ -95,7 +93,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
         // no need to trigger the checker for failure/pending
         if (state == "success")
         {
-            if (Clock.currTime - lastFullPRCheck >= timeBetweenFullPRChecks)
+            if (lastFullPRCheck + timeBetweenFullPRChecks < Clock.currTime)
             {
                 searchForAutoMergePrs(repoSlug);
                 lastFullPRCheck = Clock.currTime();

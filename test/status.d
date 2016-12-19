@@ -42,11 +42,23 @@ unittest
     );
 }
 
+// send success status event within throttle time -> no action
+unittest
+{
+    setAPIExpectations();
+
+    postGitHubHook("dlang_dmd_status_6324.json", "status",
+        (ref Json j, scope HTTPClientRequest req){
+            j["state"] = "success";
+        }
+    );
+}
+
 // send success status event -> tryMergeForAllOpenPrs -> merge()
 // PR 6237 has the label "auto-merge"
 unittest
 {
-    lastFullPRCheck = SysTime(Date(0, 1, 1));
+    lastFullPRCheck = SysTime.min;
 
     setAPIExpectations(
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge",
@@ -74,7 +86,7 @@ unittest
 // PR 6237 has the label "auto-merge-squash"
 unittest
 {
-    lastFullPRCheck = SysTime(Date(0, 1, 1));
+    lastFullPRCheck = SysTime.min;
 
     setAPIExpectations(
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge", (ref Json j) {
@@ -103,7 +115,7 @@ unittest
 // 6328 has "auto-merge-squash"
 unittest
 {
-    lastFullPRCheck = SysTime(Date(0, 1, 1));
+    lastFullPRCheck = SysTime.min;
 
     setAPIExpectations(
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge",
