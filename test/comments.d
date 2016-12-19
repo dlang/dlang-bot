@@ -8,6 +8,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4921/commits",
+        "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments",
         "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc",
         "/github/repos/dlang/phobos/issues/comments/262784442",
@@ -31,6 +32,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4921/commits",
+        "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
             j = Json.emptyArray;
         },
@@ -59,8 +61,37 @@ unittest
         "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
             j = Json.emptyArray;
          },
+        "/github/repos/dlang/phobos/issues/4921/labels",
          "/github/repos/dlang/phobos/issues/4921/comments",
          "/github/repos/dlang/phobos/issues/comments/262784442",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.DELETE);
+            res.writeVoidBody;
+        }
+    );
+
+    postGitHubHook("dlang_phobos_synchronize_4921.json");
+}
+
+// existing dlang bot comment -> update comment
+// auto-merge label -> remove (due to synchronization)
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
+            j[0]["commit"]["message"] = "No message";
+         },
+        "/github/repos/dlang/phobos/issues/4921/labels", (ref Json j) {
+            j[0]["name"] = "auto-merge";
+        },
+        "/github/repos/dlang/phobos/issues/4921/labels/auto-merge",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.DELETE);
+            res.statusCode = 200;
+            res.writeVoidBody;
+        },
+        "/github/repos/dlang/phobos/issues/4921/comments",
+        "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.DELETE);
             res.writeVoidBody;

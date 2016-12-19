@@ -65,7 +65,7 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     auto idx = apiExpectations.map!(x => x.url).countUntil(req.requestURL);
     if (idx >= 0)
     {
-        expectation = apiExpectations[0];
+        expectation = apiExpectations[idx];
         if (apiExpectations.length > 1)
             apiExpectations = apiExpectations[0 .. idx] ~ apiExpectations[idx + 1 .. $];
         else
@@ -73,6 +73,9 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     }
     else
     {
+        scope(failure) {
+            writeln("Remaining expected URLs:", apiExpectations.map!(x => x.url));
+        }
         assert(0, "Request for unexpected URL received: " ~ req.requestURL);
     }
 
@@ -174,7 +177,8 @@ void setAPIExpectations(Args...)(Args args)
     }
 }
 
-void postGitHubHook(string payload, void delegate(ref Json j, scope HTTPClientRequest req) postprocess = null)
+void postGitHubHook(string payload, string eventType = "pull_request",
+    void delegate(ref Json j, scope HTTPClientRequest req) postprocess = null)
 {
     import std.file : readText;
     import std.path : buildPath;
@@ -189,7 +193,7 @@ void postGitHubHook(string payload, void delegate(ref Json j, scope HTTPClientRe
         // localize accessed URLs
         replaceAPIReferences("https://api.github.com", githubAPIURL, payload);
 
-        req.headers["X-GitHub-Event"] = "pull_request";
+        req.headers["X-GitHub-Event"] = eventType;
 
         if (postprocess !is null)
             postprocess(payload, req);

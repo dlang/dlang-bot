@@ -1,0 +1,72 @@
+[
+  {
+    "sha": "d6fc98058b637f9a558206847e6d7057ab9fb3de",
+    "commit": {
+      "author": {
+        "name": "Walter Bright",
+        "email": "walter@walterbright.com",
+        "date": "2016-12-17T12:51:55Z"
+      },
+      "committer": {
+        "name": "Walter Bright",
+        "email": "walter@walterbright.com",
+        "date": "2016-12-17T12:51:55Z"
+      },
+      "message": "taking address of local means it cannot be 'scope' later",
+      "tree": {
+        "sha": "c858c3e56176141265dd77964480c324020668ff",
+        "url": "https://api.github.com/repos/dlang/dmd/git/trees/c858c3e56176141265dd77964480c324020668ff"
+      },
+      "url": "https://api.github.com/repos/dlang/dmd/git/commits/d6fc98058b637f9a558206847e6d7057ab9fb3de",
+      "comment_count": 0
+    },
+    "url": "https://api.github.com/repos/dlang/dmd/commits/d6fc98058b637f9a558206847e6d7057ab9fb3de",
+    "html_url": "https://github.com/dlang/dmd/commit/d6fc98058b637f9a558206847e6d7057ab9fb3de",
+    "comments_url": "https://api.github.com/repos/dlang/dmd/commits/d6fc98058b637f9a558206847e6d7057ab9fb3de/comments",
+    "author": {
+      "login": "WalterBright",
+      "id": 568298,
+      "avatar_url": "https://avatars.githubusercontent.com/u/568298?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/WalterBright",
+      "html_url": "https://github.com/WalterBright",
+      "followers_url": "https://api.github.com/users/WalterBright/followers",
+      "following_url": "https://api.github.com/users/WalterBright/following{/other_user}",
+      "gists_url": "https://api.github.com/users/WalterBright/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/WalterBright/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/WalterBright/subscriptions",
+      "organizations_url": "https://api.github.com/users/WalterBright/orgs",
+      "repos_url": "https://api.github.com/users/WalterBright/repos",
+      "events_url": "https://api.github.com/users/WalterBright/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/WalterBright/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "WalterBright",
+      "id": 568298,
+      "avatar_url": "https://avatars.githubusercontent.com/u/568298?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/WalterBright",
+      "html_url": "https://github.com/WalterBright",
+      "followers_url": "https://api.github.com/users/WalterBright/followers",
+      "following_url": "https://api.github.com/users/WalterBright/following{/other_user}",
+      "gists_url": "https://api.github.com/users/WalterBright/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/WalterBright/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/WalterBright/subscriptions",
+      "organizations_url": "https://api.github.com/users/WalterBright/orgs",
+      "repos_url": "https://api.github.com/users/WalterBright/repos",
+      "events_url": "https://api.github.com/users/WalterBright/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/WalterBright/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "fbbfce8f6e0afb716ec96ba3dc2e82b3536cbaac",
+        "url": "https://api.github.com/repos/dlang/dmd/commits/fbbfce8f6e0afb716ec96ba3dc2e82b3536cbaac",
+        "html_url": "https://github.com/dlang/dmd/commit/fbbfce8f6e0afb716ec96ba3dc2e82b3536cbaac"
+      }
+    ]
+  }
+]
