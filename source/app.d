@@ -96,8 +96,8 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
         {
             if (lastFullPRCheck + timeBetweenFullPRChecks < Clock.currTime)
             {
-                searchForAutoMergePrs(repoSlug);
                 lastFullPRCheck = Clock.currTime();
+                runTaskHelper(toDelegate(&searchForAutoMergePrs), repoSlug);
             }
         }
         return res.writeBody("handled");
