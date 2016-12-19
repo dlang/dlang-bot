@@ -317,7 +317,6 @@ struct PullRequest
     string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
     string commitsURL() const { return "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, number); }
     string url() const { return "%s/repos/%s/pulls/%d".format(githubAPIURL, repoSlug, number); }
-    uint pullRequestNumber() const { return number; }
 }
 
 alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");
@@ -333,7 +332,7 @@ auto analyseLabels(Json[] labels)
 
 auto handleGithubLabel(in ref PullRequest pr)
 {
-    auto url = "%s/repos/%s/issues/%d/labels".format(githubAPIURL, pr.repoSlug, pr.pullRequestNumber);
+    auto url = "%s/repos/%s/issues/%d/labels".format(githubAPIURL, pr.repoSlug, pr.number);
     auto res = ghGetRequest(url);
 
     auto labels = res.readJson[];
@@ -352,13 +351,13 @@ Json[] tryMerge(in ref PullRequest pr, LabelInfo labelInfo)
 
     if (!pr.isOpen)
     {
-        logWarn("Can't auto-merge PR %s/%d - it is already closed", pr.repoSlug, pr.pullRequestNumber);
+        logWarn("Can't auto-merge PR %s/%d - it is already closed", pr.repoSlug, pr.number);
         return commits;
     }
 
     if (commits.length == 0)
     {
-        logWarn("Can't auto-merge PR %s/%d has no commits attached", pr.repoSlug, pr.pullRequestNumber);
+        logWarn("Can't auto-merge PR %s/%d has no commits attached", pr.repoSlug, pr.number);
         return commits;
     }
 
@@ -372,7 +371,7 @@ Json[] tryMerge(in ref PullRequest pr, LabelInfo labelInfo)
     if (labelInfo.hasAutoMergeSquash)
         reqInput["merge_method"] = "squash";
 
-    auto prUrl = "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, pr.repoSlug, pr.pullRequestNumber);
+    auto prUrl = "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, pr.repoSlug, pr.number);
     ghSendRequest((scope req){
         req.method = HTTPMethod.PUT;
         // custom media type is required during preview period:
@@ -389,7 +388,7 @@ void checkAndRemoveMergeLabels(Json[] labels, in ref PullRequest pr)
     auto labelInfo = analyseLabels(labels);
     if (labelInfo.hasAutoMerge || labelInfo.hasAutoMergeSquash)
     {
-        auto labelUrl = "%s/repos/%s/issues/%d/labels/".format(githubAPIURL, pr.repoSlug, pr.pullRequestNumber);
+        auto labelUrl = "%s/repos/%s/issues/%d/labels/".format(githubAPIURL, pr.repoSlug, pr.number);
         if (labelInfo.hasAutoMerge)
             labelUrl ~= "auto-merge";
         if (labelInfo.hasAutoMergeSquash)
@@ -712,5 +711,5 @@ void handlePR(string action, PullRequest pr)
         updateTrelloCard(action, pr.url, refs, descs);
 
     // wait until builds for the current push are created
-    setTimer(30.seconds, { dedupTravisBuilds(action, pr.repoSlug, pr.pullRequestNumber); });
+    setTimer(30.seconds, { dedupTravisBuilds(action, pr.repoSlug, pr.number); });
 }
