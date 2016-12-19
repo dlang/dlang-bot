@@ -98,6 +98,7 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.json["sha"] == "d6fc98058b637f9a558206847e6d7057ab9fb3de");
             assert(req.json["merge_method"] == "squash");
+            assert(req.json["commit_message"] == "taking address of local means it cannot be 'scope' later (#6328)");
             res.statusCode = 200;
             res.writeVoidBody;
         }

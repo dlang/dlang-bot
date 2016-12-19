@@ -370,7 +370,10 @@ Json[] tryMerge(in ref PullRequest pr, LabelInfo labelInfo)
         reqInput["merge_method"] = "merge";
 
     if (labelInfo.hasAutoMergeSquash)
+    {
         reqInput["merge_method"] = "squash";
+        reqInput["commit_message"] = "%s (#%d)".format(commits[0]["commit"]["message"].get!string, pr.number);
+    }
 
     auto prUrl = "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, pr.repoSlug, pr.number);
     ghSendRequest((scope req){
