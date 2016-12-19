@@ -212,14 +212,10 @@ Json[] tryMerge(in ref PullRequest pr, LabelInfo labelInfo)
 
 void checkAndRemoveMergeLabels(Json[] labels, in ref PullRequest pr)
 {
-    auto labelInfo = analyseLabels(labels);
-    if (labelInfo.hasAutoMerge || labelInfo.hasAutoMergeSquash)
+    foreach (label; labels.map!(l => l["name"].get!string).filter!(n => n.startsWith("auto-merge")))
     {
-        auto labelUrl = "%s/repos/%s/issues/%d/labels/".format(githubAPIURL, pr.repoSlug, pr.number);
-        if (labelInfo.hasAutoMerge)
-            labelUrl ~= "auto-merge";
-        if (labelInfo.hasAutoMergeSquash)
-            labelUrl ~= "auto-merge-squash";
+        auto labelUrl = "%s/repos/%s/issues/%d/labels/%s"
+            .format(githubAPIURL, pr.repoSlug, pr.number, label);
         ghSendRequest(HTTPMethod.DELETE, labelUrl);
     }
 }
