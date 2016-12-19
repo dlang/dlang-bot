@@ -1,8 +1,4 @@
-import app;
 import utils;
-
-import vibe.d;
-import std.functional;
 
 // send normal label event --> nothing
 unittest
