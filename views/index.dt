@@ -7,22 +7,43 @@ head
       display: inline-block;
       max-height: 50%;
     }
+    li {
+      font-size: 18px;
+    }
 body(style="text-align: center; position: absolute; left: 0; top: 0; height: 100%; width: 100%")
   h2(style="margin-top: 6rem") Dlang-Bot
   img(id="logo", src="img/dlang_bot.png")
-  h3(style="text-decoration: underline") Useful Links
+
+  h3 Official links
   ul
     li
-      a(href="https://dlang.org") Dlang's Official Website
+      a(href="https://dlang.org") Dlang.org
+    li
+      a(href="https://github.com/dlang") Dlang on GitHub
+
+  h3 The DLang-Bot
+  ul
+    li
+      a(href="https://github.com/dlang-bot?tab=activity") Activity on GitHub
+    li
+      a(href="https://github.com/dlang-bots/dlang-bot") GitHub repository
+
+  h3 Internal resources
+  ul
     li
       a(href="https://trello.com/b/XoFjxiqG/active") Dlang's Trello board
     li
       a(href="https://trello.com/b/jGdlx9vZ/backlog") Dlang's Trello backlog
+
+  h3 Services
+  ul
     li
-      a(href="https://github.com/dlang-bot?tab=activity") Dlang-Bot's activity on GitHub
+      a(href="https://ci.dawg.eu/") Dlang DUB Project tester
     li
       a(href="https://travis-ci.org/dlang") Dlang on Travis-CI
     li
       a(href="https://codecov.io/gh/dlang") Dlang on Codecov
     li
       a(href="https://auto-tester.puremagic.com") Dlang Auto-Tester
+    li
+      a(href="https://circleci.com/gh/dlang") Dlang on CircleCi
