@@ -8,7 +8,7 @@
     "html_url": "https://github.com/dlang/dmd/pull/6328",
     "id": 196285279,
     "number": 6328,
-    "title": "fix annoying warnings compiling back end",
+    "title": "taking address of local means it cannot be 'scope' later",
     "user": {
       "login": "WalterBright",
       "id": 568298,

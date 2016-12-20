@@ -1,0 +1,83 @@
+[
+  {
+    "id": 898966016,
+    "url": "https://api.github.com/repos/dlang/dmd/issues/events/898966016",
+    "actor": {
+      "login": "WalterBright",
+      "id": 568298,
+      "avatar_url": "https://avatars.githubusercontent.com/u/568298?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/WalterBright",
+      "html_url": "https://github.com/WalterBright",
+      "followers_url": "https://api.github.com/users/WalterBright/followers",
+      "following_url": "https://api.github.com/users/WalterBright/following{/other_user}",
+      "gists_url": "https://api.github.com/users/WalterBright/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/WalterBright/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/WalterBright/subscriptions",
+      "organizations_url": "https://api.github.com/users/WalterBright/orgs",
+      "repos_url": "https://api.github.com/users/WalterBright/repos",
+      "events_url": "https://api.github.com/users/WalterBright/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/WalterBright/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "event": "referenced",
+    "commit_id": "d2b804b4fbff6187d31a5c854b096d21ab09edc9",
+    "commit_url": "https://api.github.com/repos/dlang/dmd/commits/d2b804b4fbff6187d31a5c854b096d21ab09edc9",
+    "created_at": "2016-12-19T17:39:57Z"
+  },
+  {
+    "id": 898966017,
+    "url": "https://api.github.com/repos/dlang/dmd/issues/events/898966017",
+    "actor": {
+      "login": "WalterBright",
+      "id": 568298,
+      "avatar_url": "https://avatars.githubusercontent.com/u/568298?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/WalterBright",
+      "html_url": "https://github.com/WalterBright",
+      "followers_url": "https://api.github.com/users/WalterBright/followers",
+      "following_url": "https://api.github.com/users/WalterBright/following{/other_user}",
+      "gists_url": "https://api.github.com/users/WalterBright/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/WalterBright/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/WalterBright/subscriptions",
+      "organizations_url": "https://api.github.com/users/WalterBright/orgs",
+      "repos_url": "https://api.github.com/users/WalterBright/repos",
+      "events_url": "https://api.github.com/users/WalterBright/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/WalterBright/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "event": "merged",
+    "commit_id": "d2b804b4fbff6187d31a5c854b096d21ab09edc9",
+    "commit_url": "https://api.github.com/repos/dlang/dmd/commits/d2b804b4fbff6187d31a5c854b096d21ab09edc9",
+    "created_at": "2016-12-19T17:39:58Z"
+  },
+  {
+    "id": 898966018,
+    "url": "https://api.github.com/repos/dlang/dmd/issues/events/898966018",
+    "actor": {
+      "login": "WalterBright",
+      "id": 568298,
+      "avatar_url": "https://avatars.githubusercontent.com/u/568298?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/WalterBright",
+      "html_url": "https://github.com/WalterBright",
+      "followers_url": "https://api.github.com/users/WalterBright/followers",
+      "following_url": "https://api.github.com/users/WalterBright/following{/other_user}",
+      "gists_url": "https://api.github.com/users/WalterBright/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/WalterBright/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/WalterBright/subscriptions",
+      "organizations_url": "https://api.github.com/users/WalterBright/orgs",
+      "repos_url": "https://api.github.com/users/WalterBright/repos",
+      "events_url": "https://api.github.com/users/WalterBright/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/WalterBright/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "event": "closed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2016-12-19T17:39:58Z"
+  }
+]
