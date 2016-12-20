@@ -150,9 +150,9 @@ alias LabelInfo = Tuple!(bool, "hasAutoMerge", bool, "hasAutoMergeSquash");
 
 auto analyseLabels(Json[] labels)
 {
-    auto labelNames = labels.map!(l => l["name"].get!string).array;
-    bool hasAutoMerge = labelNames.any!(l => l == "auto-merge");
-    bool hasAutoMergeSquash = labelNames.any!(l => l == "auto-merge-squash");
+    auto labelNames = labels.map!(l => l["name"].get!string);
+    bool hasAutoMerge = labelNames.canFind!(l => l == "auto-merge");
+    bool hasAutoMergeSquash = labelNames.canFind!(l => l == "auto-merge-squash");
     return LabelInfo(hasAutoMerge, hasAutoMergeSquash);
 }
 
