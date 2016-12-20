@@ -146,33 +146,44 @@ struct PullRequest
 }
 
 alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");
-alias LabelInfo = Tuple!(bool, "hasAutoMerge", bool, "hasAutoMergeSquash");
+enum MergeMethod { none = 0, merge, squash, rebase }
 
-auto analyseLabels(Json[] labels)
+string labelName(MergeMethod method)
+{
+    final switch (method) with (MergeMethod)
+    {
+    case none: return null;
+    case merge: return "auto-merge";
+    case squash: return "auto-merge-squash";
+    case rebase: return "auto-merge-rebase";
+    }
+}
+
+MergeMethod autoMergeMethod(Json[] labels)
 {
     auto labelNames = labels.map!(l => l["name"].get!string);
-    bool hasAutoMerge = labelNames.canFind!(l => l == "auto-merge");
-    bool hasAutoMergeSquash = labelNames.canFind!(l => l == "auto-merge-squash");
-    return LabelInfo(hasAutoMerge, hasAutoMergeSquash);
+    if (labelNames.canFind!(l => l == "auto-merge"))
+        return MergeMethod.merge;
+    else if (labelNames.canFind!(l => l == "auto-merge-squash"))
+        return MergeMethod.squash;
+    else if (labelNames.canFind!(l => l == "auto-merge-rebase"))
+        return MergeMethod.rebase;
+    return MergeMethod.none;
 }
 
 auto handleGithubLabel(in ref PullRequest pr)
 {
-
     auto url = "%s/repos/%s/issues/%d/labels".format(githubAPIURL, pr.repoSlug, pr.number);
-    auto res = ghGetRequest(url);
+    auto labels = ghGetRequest(url).readJson[];
 
-    auto labels = res.readJson[];
-    auto labelInfo = analyseLabels(labels);
     Json[] commits;
-
-    if (labelInfo.hasAutoMerge || labelInfo.hasAutoMergeSquash)
-        commits = pr.tryMerge(labelInfo);
+    if (auto method = labels.autoMergeMethod)
+        commits = pr.tryMerge(method);
 
     return LabelsAndCommits(labels, commits);
 }
 
-Json[] tryMerge(in ref PullRequest pr, LabelInfo labelInfo)
+Json[] tryMerge(in ref PullRequest pr, MergeMethod method)
 {
     auto commits = ghGetRequest(pr.commitsURL).readJson[];
 
@@ -188,15 +199,12 @@ Json[] tryMerge(in ref PullRequest pr, LabelInfo labelInfo)
         return commits;
     }
 
-    string lastCommitSha = commits[$ - 1]["sha"].get!string;
-    string[string] reqInput = ["sha": lastCommitSha];
 
-    // lazy implementation -> try merge
-    if (labelInfo.hasAutoMerge)
-        reqInput["merge_method"] = "merge";
+    auto reqInput = [
+        "sha": commits[$ - 1]["sha"].get!string,
+        "merge_method": method.to!string,
+    ];
 
-    if (labelInfo.hasAutoMergeSquash)
-        reqInput["merge_method"] = "squash";
 
     auto prUrl = "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, pr.repoSlug, pr.number);
     ghSendRequest((scope req){
@@ -241,9 +249,8 @@ void searchForAutoMergePrs(string repoSlug)
         pr.base.repo.fullName = repoSlug;
         pr.number = prNumber;
         pr.state = PullRequest.State.open;
-        auto labelInfo = analyseLabels(issue["labels"][]);
-
-        tryMerge(pr, labelInfo);
+        if (auto method = autoMergeMethod(issue["labels"][]))
+            pr.tryMerge(method);
     }
 }
 
