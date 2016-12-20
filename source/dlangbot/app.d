@@ -1,6 +1,7 @@
 module dlangbot.app;
 
-import dlangbot.bugzilla, dlangbot.github, dlangbot.travis, dlangbot.trello;
+import dlangbot.bugzilla, dlangbot.github, dlangbot.travis, dlangbot.trello,
+       dlangbot.utils;
 
 public import dlangbot.bugzilla : bugzillaURL;
 public import dlangbot.github   : githubAPIURL, githubAuth, hookSecret;
@@ -20,8 +21,8 @@ import vibe.stream.operations : readAllUTF8;
 bool runAsync = true;
 bool runTrello = true;
 
-SysTime lastFullPRCheck = SysTime.min;
-Duration timeBetweenFullPRChecks = 5.minutes;
+Duration timeBetweenFullPRChecks = 5.minutes; // this should never be larger 30 mins on heroku
+Throttler!(typeof(&searchForAutoMergePrs)) prThrottler;
 
 version(unittest){} else
 shared static this()
@@ -68,6 +69,8 @@ void startServer(HTTPServerSettings settings)
         ;
 
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
+
+    prThrottler = typeof(prThrottler)(&searchForAutoMergePrs, timeBetweenFullPRChecks);
 
     listenHTTP(settings, router);
 }
@@ -132,13 +135,8 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
         string state = json["state"].get!string;
         // no need to trigger the checker for failure/pending
         if (state == "success")
-        {
-            if (lastFullPRCheck + timeBetweenFullPRChecks < Clock.currTime)
-            {
-                lastFullPRCheck = Clock.currTime();
-                runTaskHelper(toDelegate(&searchForAutoMergePrs), repoSlug);
-            }
-        }
+            prThrottler(repoSlug);
+
         return res.writeBody("handled");
     case "pull_request":
 
@@ -165,16 +163,6 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     default:
         return res.writeVoidBody();
     }
-}
-
-auto runTaskHelper(Fun, Args...)(Fun fun, Args args)
-{
-    import vibe.core.core : runTask;
-
-    if (runAsync)
-        runTask(fun, args);
-    else
-        return fun(args);
 }
 
 //==============================================================================
