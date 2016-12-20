@@ -41,7 +41,7 @@ private:
     static struct ThrottleEntry
     {
         SysTime startedTime;
-        Timer* timer;
+        Timer timer;
     }
 
     ThrottleEntry[Tuple!Args] timersPerArgs;
@@ -59,7 +59,7 @@ public:
     void reset()
     {
         foreach (entry; timersPerArgs)
-            if (entry.timer !is null)
+            if (entry.timer)
                 entry.timer.stop;
 
         // can't use clear due to 2.070 support
@@ -68,7 +68,6 @@ public:
 
     void opCall(Args args)
     {
-
         auto key = Tuple!Args(args);
         auto entry = key in timersPerArgs;
 
@@ -84,18 +83,15 @@ public:
         else
         {
             // stop if there's a pending timer -> ignore request
-            if (entry.timer !is null)
-                if (entry.timer.pending)
-                    return;
+            if (entry.timer && entry.timer.pending)
+                return;
 
             // depending on the time stamp of the last run,
             // run directly or start a timer
             if (entry.startedTime + throttleTime <= Clock.currTime)
                 runTaskHelper(fun, args);
             else
-                entry.timer = [setTimer(throttleTime, () {
-                    fun(args);
-                })].ptr;
+                entry.timer = setTimer(throttleTime, { fun(args); });
 
             entry.startedTime = Clock.currTime;
         }
