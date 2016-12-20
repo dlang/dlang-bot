@@ -55,7 +55,7 @@ unittest
 // PR 6237 has the label "auto-merge"
 unittest
 {
-    lastFullPRCheck = SysTime.min;
+    prThrottler.reset;
 
     setAPIExpectations(
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge",
@@ -86,7 +86,7 @@ unittest
 // PR 6237 has the label "auto-merge-squash"
 unittest
 {
-    lastFullPRCheck = SysTime.min;
+    prThrottler.reset;
 
     setAPIExpectations(
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge", (ref Json j) {
@@ -119,7 +119,7 @@ unittest
 // 6328 has "auto-merge-squash"
 unittest
 {
-    lastFullPRCheck = SysTime.min;
+    prThrottler.reset;
 
     setAPIExpectations(
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge",

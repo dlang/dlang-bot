@@ -186,6 +186,8 @@ auto handleGithubLabel(in ref PullRequest pr)
 
 Json[] tryMerge(in ref PullRequest pr, MergeMethod method)
 {
+    import std.conv : to;
+
     auto commits = ghGetRequest(pr.commitsURL).readJson[];
 
     if (!pr.isOpen)
