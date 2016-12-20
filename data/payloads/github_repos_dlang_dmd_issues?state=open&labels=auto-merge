@@ -8,7 +8,7 @@
     "html_url": "https://github.com/dlang/dmd/pull/6327",
     "id": 196285279,
     "number": 6327,
-    "title": "fix annoying warnings compiling back end",
+    "title": "Fix issue 16977 - bad debug info for function default arguments",
     "user": {
       "login": "WalterBright",
       "id": 568298,

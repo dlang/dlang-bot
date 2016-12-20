@@ -142,6 +142,7 @@ struct PullRequest
     bool isOpen() const { return state == State.open; }
     string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
     string commitsURL() const { return "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, number); }
+    string eventsURL() const { return "%s/repos/%s/issues/%d/events".format(githubAPIURL, repoSlug, number); }
     string url() const { return "%s/repos/%s/pulls/%d".format(githubAPIURL, repoSlug, number); }
 }
 
@@ -199,8 +200,17 @@ Json[] tryMerge(in ref PullRequest pr, MergeMethod method)
         return commits;
     }
 
+    auto labelName = method.labelName;
+    auto events = ghGetRequest(pr.eventsURL).readJson[]
+        .retro
+        .filter!(e => e["event"] == "labeled" && e["label"]["name"] == labelName);
+
+    string author = "unknown";
+    if (!events.empty)
+        author = getUserEmail(events.front["actor"]["login"].get!string);
 
     auto reqInput = [
+        "commit_message": "%s\nmerged-on-behalf-of: %s".format(pr.title, author),
         "sha": commits[$ - 1]["sha"].get!string,
         "merge_method": method.to!string,
     ];
@@ -228,6 +238,14 @@ void checkAndRemoveMergeLabels(Json[] labels, in ref PullRequest pr)
     }
 }
 
+string getUserEmail(string login)
+{
+    auto user = ghGetRequest("%s/users/%s".format(githubAPIURL, login)).readJson;
+    auto name = user["name"].get!string;
+    auto email = user["email"].opt!string(login ~ "@users.noreply.github.com");
+    return "%s <%s>".format(name, email);
+}
+
 Json[] getIssuesForLabel(string repoSlug, string label)
 {
     return ghGetRequest("%s/repos/%s/issues?state=open&labels=%s"
@@ -249,6 +267,7 @@ void searchForAutoMergePrs(string repoSlug)
         pr.base.repo.fullName = repoSlug;
         pr.number = prNumber;
         pr.state = PullRequest.State.open;
+        pr.title = issue["title"].get!string;
         if (auto method = autoMergeMethod(issue["labels"][]))
             pr.tryMerge(method);
     }
