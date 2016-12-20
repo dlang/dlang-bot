@@ -2,7 +2,17 @@ module utils;
 
 import vibe.d, std.algorithm, std.process, std.range, std.regex, std.stdio;
 import std.functional, std.string;
-import app;
+
+// forward commonly needed imports
+public import dlangbot.app;
+public import vibe.http.common : HTTPMethod;
+public import vibe.http.client : HTTPClientRequest;
+public import vibe.http.server : HTTPServerRequest, HTTPServerResponse;
+public import std.functional : toDelegate;
+public import vibe.data.json : Json;
+public import std.datetime : SysTime;
+
+// existing dlang bot comment -> update comment
 
 string testServerURL;
 string ghTestHookURL;

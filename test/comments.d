@@ -1,9 +1,7 @@
-import app;
 import utils;
 
-import vibe.d;
+import std.format : format;
 
-// existing dlang bot comment -> update comment
 unittest
 {
     setAPIExpectations(
