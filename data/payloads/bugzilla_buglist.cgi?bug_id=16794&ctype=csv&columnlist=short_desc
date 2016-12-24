@@ -1,0 +1,2 @@
+bug_id,"short_desc"
+16794,"dmd not working on Ubuntu 16.10 because of default PIE linking"

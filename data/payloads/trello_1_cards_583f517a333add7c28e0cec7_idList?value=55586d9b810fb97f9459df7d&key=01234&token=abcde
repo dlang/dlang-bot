@@ -1,0 +1,55 @@
+{
+    "id": "583f517a333add7c28e0cec7",
+    "badges": {
+        "votes": 0,
+        "viewingMemberVoted": false,
+        "subscribed": false,
+        "fogbugz": "",
+        "checkItems": 0,
+        "checkItemsChecked": 0,
+        "comments": 1,
+        "attachments": 0,
+        "description": false,
+        "due": null,
+        "dueComplete": false
+    },
+    "checkItemStates": [],
+    "closed": false,
+    "dateLastActivity": "2016-12-24T20:04:39.793Z",
+    "desc": "",
+    "descData": null,
+    "due": null,
+    "dueComplete": false,
+    "email": null,
+    "idBoard": "55586bf9fd02d8c66074321a",
+    "idChecklists": [],
+    "idLabels": [
+        "559e5b4419ad3a5dc2c17ece",
+        "57e7a35684e677fd368a013b"
+    ],
+    "idList": "55586d9b810fb97f9459df7d",
+    "idMembers": [],
+    "idShort": 269,
+    "idAttachmentCover": null,
+    "manualCoverAttachment": false,
+    "labels": [
+        {
+            "id": "559e5b4419ad3a5dc2c17ece",
+            "idBoard": "55586bf9fd02d8c66074321a",
+            "name": "dmd",
+            "color": "lime",
+            "uses": 69
+        },
+        {
+            "id": "57e7a35684e677fd368a013b",
+            "idBoard": "55586bf9fd02d8c66074321a",
+            "name": "2.072",
+            "color": "pink",
+            "uses": 18
+        }
+    ],
+    "name": "Issue 16794 - .deb not working on Ubuntu 16.10 because of default PIE linking",
+    "pos": 1513471,
+    "shortUrl": "https://trello.com/c/E1LU0SAe",
+    "url": "https://trello.com/c/E1LU0SAe/269-issue-16794-deb-not-working-on-ubuntu-16-10-because-of-default-pie-linking"
+}

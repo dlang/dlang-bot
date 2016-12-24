@@ -1,0 +1,75 @@
+{
+  "model": {
+    "id": "583f517a333add7c28e0cec7",
+    "name": "Active",
+    "desc": "",
+    "descData": null,
+    "closed": false,
+    "idOrganization": "4f15dd34dc12a90c6f171ad4",
+    "pinned": false,
+    "url": "https://trello.com/b/XoFjxiqG/active",
+    "shortUrl": "https://trello.com/b/XoFjxiqG",
+    "prefs": {
+      "permissionLevel": "public",
+      "voting": "disabled",
+      "comments": "public",
+      "invitations": "members",
+      "selfJoin": true,
+      "cardCovers": true,
+      "cardAging": "regular",
+      "calendarFeedEnabled": false,
+      "background": "green",
+      "backgroundImage": null,
+      "backgroundImageScaled": null,
+      "backgroundTile": false,
+      "backgroundBrightness": "dark",
+      "backgroundColor": "#519839",
+      "canBePublic": true,
+      "canBeOrg": true,
+      "canBePrivate": true,
+      "canInvite": true
+    },
+    "labelNames": {
+      "green": "",
+      "yellow": "",
+      "orange": "",
+      "red": "",
+      "purple": "",
+      "blue": "",
+      "sky": "",
+      "lime": "",
+      "pink": "",
+      "black": ""
+    }
+  },
+  "action": {
+    "id": "585ecea7029d95c196f2bce1",
+    "idMemberCreator": "4f163af63529cf014d0b3c8a",
+    "data": {
+      "board": {
+        "shortLink": "XoFjxiqG",
+        "name": "Active",
+        "id": "55586bf9fd02d8c66074321a"
+      },
+      "list": {
+        "name": "WIP",
+        "id": "55586d963eab57c21df17371"
+      },
+      "card": {
+        "shortLink": "H1IPmxHc",
+        "idShort": 279,
+        "name": "Test Card Issue 16794",
+        "id": "583f517a333add7c28e0cec7"
+      }
+    },
+    "type": "createCard",
+    "date": "2016-12-24T19:38:15.469Z",
+    "memberCreator": {
+      "id": "4f163af63529cf014d0b3c8a",
+      "avatarHash": "",
+      "fullName": "Martin Nowak",
+      "initials": "MN",
+      "username": "dawg"
+    }
+  }
+}

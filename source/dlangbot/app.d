@@ -24,6 +24,8 @@ bool runTrello = true;
 Duration timeBetweenFullPRChecks = 5.minutes; // this should never be larger 30 mins on heroku
 Throttler!(typeof(&searchForAutoMergePrs)) prThrottler;
 
+enum trelloHookURL = "https://dlang-bot.herokuapp.com/trello_hook";
+
 version(unittest){} else
 shared static this()
 {
@@ -102,9 +104,9 @@ Json verifyRequest(string signature, string data)
 void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
 {
     import std.array : array;
+    import dlangbot.trello : verifyRequest;
 
-    auto url = "https://dlang-bot.herokuapp.com/trello_hook";
-    auto json = verifyTrelloRequest(req.headers["X-Trello-Webhook"], req.bodyReader.readAllUTF8, url);
+    auto json = verifyRequest(req.headers["X-Trello-Webhook"], req.bodyReader.readAllUTF8, trelloHookURL);
     logDebug("trelloHook %s", json);
     auto action = json["action"]["type"].get!string;
     switch (action)
@@ -113,12 +115,10 @@ void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
         auto refs = matchIssueRefs(json["action"]["data"]["card"]["name"].get!string).array;
         auto descs = getDescriptions(refs);
         updateTrelloCard(json["action"]["data"]["card"]["id"].get!string, refs, descs);
-        break;
+        return res.writeBody("handled");
     default:
         return res.writeBody("ignored");
     }
-
-    res.writeVoidBody;
 }
 
 void githubHook(HTTPServerRequest req, HTTPServerResponse res)

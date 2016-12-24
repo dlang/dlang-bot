@@ -1,0 +1,72 @@
+[
+  {
+    "sha": "9fbce55814bdc8f78d6fead3243db657eafc4ec7",
+    "commit": {
+      "author": {
+        "name": "Martin Nowak",
+        "email": "code@dawg.eu",
+        "date": "2016-12-24T17:58:32Z"
+      },
+      "committer": {
+        "name": "Martin Nowak",
+        "email": "code@dawg.eu",
+        "date": "2016-12-24T17:58:32Z"
+      },
+      "message": "fix Issue 16794 - dmd not working on Ubuntu 16.10\n\n- enable PIC by default on amd64 linux (no significant overhead, full\n  PIC/PIE support)\n- also see https://github.com/dlang/installer/pull/207",
+      "tree": {
+        "sha": "7fe104c3fc612cb2b527eab295f858d2e14796a3",
+        "url": "https://api.github.com/repos/dlang/dmd/git/trees/7fe104c3fc612cb2b527eab295f858d2e14796a3"
+      },
+      "url": "https://api.github.com/repos/dlang/dmd/git/commits/9fbce55814bdc8f78d6fead3243db657eafc4ec7",
+      "comment_count": 0
+    },
+    "url": "https://api.github.com/repos/dlang/dmd/commits/9fbce55814bdc8f78d6fead3243db657eafc4ec7",
+    "html_url": "https://github.com/dlang/dmd/commit/9fbce55814bdc8f78d6fead3243db657eafc4ec7",
+    "comments_url": "https://api.github.com/repos/dlang/dmd/commits/9fbce55814bdc8f78d6fead3243db657eafc4ec7/comments",
+    "author": {
+      "login": "MartinNowak",
+      "id": 288976,
+      "avatar_url": "https://avatars.githubusercontent.com/u/288976?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MartinNowak",
+      "html_url": "https://github.com/MartinNowak",
+      "followers_url": "https://api.github.com/users/MartinNowak/followers",
+      "following_url": "https://api.github.com/users/MartinNowak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MartinNowak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MartinNowak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MartinNowak/subscriptions",
+      "organizations_url": "https://api.github.com/users/MartinNowak/orgs",
+      "repos_url": "https://api.github.com/users/MartinNowak/repos",
+      "events_url": "https://api.github.com/users/MartinNowak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MartinNowak/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "MartinNowak",
+      "id": 288976,
+      "avatar_url": "https://avatars.githubusercontent.com/u/288976?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MartinNowak",
+      "html_url": "https://github.com/MartinNowak",
+      "followers_url": "https://api.github.com/users/MartinNowak/followers",
+      "following_url": "https://api.github.com/users/MartinNowak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MartinNowak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MartinNowak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MartinNowak/subscriptions",
+      "organizations_url": "https://api.github.com/users/MartinNowak/orgs",
+      "repos_url": "https://api.github.com/users/MartinNowak/repos",
+      "events_url": "https://api.github.com/users/MartinNowak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MartinNowak/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "907e2eff63da664406b2250566738be5aafaf043",
+        "url": "https://api.github.com/repos/dlang/dmd/commits/907e2eff63da664406b2250566738be5aafaf043",
+        "html_url": "https://github.com/dlang/dmd/commit/907e2eff63da664406b2250566738be5aafaf043"
+      }
+    ]
+  }
+]
