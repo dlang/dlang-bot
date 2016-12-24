@@ -143,7 +143,7 @@ struct PullRequest
     string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
     string commitsURL() const { return "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, number); }
     string eventsURL() const { return "%s/repos/%s/issues/%d/events".format(githubAPIURL, repoSlug, number); }
-    string url() const { return "%s/repos/%s/pulls/%d".format(githubAPIURL, repoSlug, number); }
+    string htmlURL() const { return "https://github.com/%s/pull/%d".format(repoSlug, number); }
 }
 
 alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");

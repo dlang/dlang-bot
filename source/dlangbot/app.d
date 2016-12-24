@@ -196,7 +196,7 @@ void handlePR(string action, PullRequest pr)
     updateGithubComment(action, refs, descs, pr.commentsURL);
 
     if (runTrello)
-        updateTrelloCard(action, pr.url, refs, descs);
+        updateTrelloCard(action, pr.htmlURL, refs, descs);
 
     // wait until builds for the current push are created
     setTimer(30.seconds, { dedupTravisBuilds(action, pr.repoSlug, pr.number); });
