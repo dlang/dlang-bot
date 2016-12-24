@@ -16,9 +16,10 @@ public import std.datetime : SysTime;
 
 string testServerURL;
 string ghTestHookURL;
+string trelloTestHookURL;
 
 string payloadDir = "./data/payloads";
-string ghHookDir = "./data/hooks";
+string hookDir = "./data/hooks";
 
 version(unittest)
 shared static this()
@@ -26,6 +27,7 @@ shared static this()
     // overwrite environment configs
     githubAuth = "GH_DUMMY_AUTH_TOKEN";
     hookSecret = "GH_DUMMY_HOOK_SECRET";
+    trelloAuth = "key=01234&token=abcde";
 
     // start our hook server
     auto settings = new HTTPServerSettings;
@@ -36,12 +38,12 @@ shared static this()
     testServerURL = "http://" ~ settings.bindAddresses[0] ~ ":"
                              ~ settings.port.to!string;
     ghTestHookURL = testServerURL ~ "/github_hook";
+    trelloTestHookURL = testServerURL ~ "/trello_hook";
 
     import vibe.core.log;
     setLogLevel(LogLevel.info);
 
     runAsync = false;
-    runTrello = false;
 }
 
 void startFakeAPIServer()
@@ -101,10 +103,11 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     {
         logInfo("reading payload: %s", filePath);
         auto payload = filePath.readText;
-        if (req.requestURL.startsWith("/github"))
+        if (req.requestURL.startsWith("/github", "/trello"))
         {
             auto payloadJson = payload.parseJsonString;
             replaceAPIReferences("https://api.github.com", githubAPIURL, payloadJson);
+            replaceAPIReferences("https://api.trello.com", trelloAPIURL, payloadJson);
 
             if (expectation.jsonHandler !is null)
                 expectation.jsonHandler(payloadJson);
@@ -193,7 +196,7 @@ void postGitHubHook(string payload, string eventType = "pull_request",
     import std.file : readText;
     import std.path : buildPath;
 
-    payload = ghHookDir.buildPath(payload);
+    payload = hookDir.buildPath("github", payload);
 
     auto req = requestHTTP(ghTestHookURL, (scope req) {
         req.method = HTTPMethod.POST;
@@ -210,6 +213,42 @@ void postGitHubHook(string payload, string eventType = "pull_request",
 
         auto respStr = payload.toString;
         req.headers["X-Hub-Signature"] = getSignature(respStr);
+        req.writeBody(cast(ubyte[]) respStr);
+    });
+    scope(failure) {
+        if (req.statusCode != 200)
+            writeln(req.bodyReader.readAllUTF8);
+    }
+    assert(req.statusCode == 200);
+    assert(req.bodyReader.readAllUTF8 == "handled");
+    scope(failure) {
+        writefln("Didn't request: %s", apiExpectations.map!(x => x.url));
+    }
+    assert(apiExpectations.length == 0);
+}
+
+void postTrelloHook(string payload,
+    void delegate(ref Json j, scope HTTPClientRequest req) postprocess = null)
+{
+    import std.file : readText;
+    import std.path : buildPath;
+    import dlangbot.trello : getSignature;
+
+    payload = hookDir.buildPath("trello", payload);
+
+    auto req = requestHTTP(trelloTestHookURL, (scope req) {
+        req.method = HTTPMethod.POST;
+
+        auto payload = payload.readText.parseJsonString;
+
+        // localize accessed URLs
+        replaceAPIReferences("https://api.trello.com", trelloAPIURL, payload);
+
+        if (postprocess !is null)
+            postprocess(payload, req);
+
+        auto respStr = payload.toString;
+        req.headers["X-Trello-Webhook"] = getSignature(respStr, trelloHookURL);
         req.writeBody(cast(ubyte[]) respStr);
     });
     scope(failure) {

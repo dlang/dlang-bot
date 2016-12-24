@@ -19,7 +19,8 @@ unittest
 `.format(bugzillaURL);
             assert(req.json["body"].get!string == expectedComment);
             res.writeVoidBody;
-        }
+        },
+        "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
@@ -45,7 +46,8 @@ unittest
 `.format(bugzillaURL);
             assert(req.json["body"].get!string == expectedComment);
             res.writeVoidBody;
-        }
+        },
+        "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");

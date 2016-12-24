@@ -126,7 +126,7 @@ void moveCardToList(string cardID, string listName)
 
 void updateTrelloCard(string action, string pullRequestURL, IssueRef[] refs, Issue[] descs)
 {
-    foreach (grp; descs.map!(d => findTrelloCards(d.id)).joiner.array.chunkBy!((a, b) => a.id == b.id))
+    foreach (grp; descs.map!(d => findTrelloCards(d.id)).join.chunkBy!((a, b) => a.id == b.id))
     {
         auto cardID = grp.front.id;
         auto comment = getTrelloBotComment(cardID);
@@ -184,27 +184,32 @@ void updateTrelloCard(string cardID, IssueRef[] refs, Issue[] descs)
 // Trello hook
 //==============================================================================
 
-Json verifyTrelloRequest(string signature, string body_, string url)
+import std.string : representation;
+
+private char[28] base64Digest(Range)(Range range)
 {
     import std.digest.digest, std.digest.hmac, std.digest.sha;
-    import std.string : representation;
+    import std.base64;
+
+    auto hmac = HMAC!SHA1(trelloSecret.representation);
+    foreach (c; range)
+        hmac.put(c);
+    char[28] buf = void;
+    Base64.encode(hmac.finish, buf[]);
+    return buf;
+}
+
+char[28] getSignature(string body_, string url)
+{
+    import std.utf : byUTF;
+
+    return base64Digest(body_.byUTF!dchar.map!(c => cast(immutable ubyte) c).chain(url.representation));
+}
+
+Json verifyRequest(string signature, string body_, string url)
+{
     import std.exception : enforce;
 
-    static ubyte[28] base64Digest(Range)(Range range)
-    {
-        import std.base64;
-
-        auto hmac = HMAC!SHA1(trelloSecret.representation);
-        foreach (c; range)
-            hmac.put(c);
-        ubyte[28] buf = void;
-        Base64.encode(hmac.finish, buf[]);
-        return buf;
-    }
-
-    import std.utf : byUTF;
-    enforce(
-        base64Digest(base64Digest(body_.byUTF!dchar.map!(c => cast(immutable ubyte) c).chain(url.representation))) ==
-        base64Digest(signature.representation), "Hook signature mismatch");
+    enforce(getSignature(body_, url) == signature, "signature mismatch");
     return parseJsonString(body_);
 }

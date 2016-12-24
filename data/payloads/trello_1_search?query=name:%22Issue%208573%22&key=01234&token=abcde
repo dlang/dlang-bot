@@ -1,0 +1,28 @@
+{
+    "options": {
+        "terms": [
+            {
+                "fields": [
+                    "name"
+                ],
+                "text": "Issue 8573",
+                "phrase": true,
+                "partial": false
+            }
+        ],
+        "modifiers": [],
+        "modelTypes": [
+            "actions",
+            "cards",
+            "boards",
+            "organizations",
+            "members"
+        ],
+        "partial": false
+    },
+    "boards": [],
+    "cards": [],
+    "organizations": [],
+    "members": []
+}
+
