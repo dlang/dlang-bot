@@ -5,5 +5,14 @@ language: d
 d:
  - dmd-beta
  - dmd
- - dmd-2.070.2
  - ldc
+
+matrix:
+  include:
+    - d: dmd-2.070.2 # the deployment compiler
+      env: COVERAGE=true
+      script:
+        # https://issues.dlang.org/show_bug.cgi?id=13742
+        - dub test --compiler=$DC --build=unittest-cov --build-mode=singleFile
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)

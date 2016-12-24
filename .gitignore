@@ -1,7 +1,32 @@
+dlang-bot
+__test__unittest__
+
+# Created by https://www.gitignore.io/api/d
+
+### D ###
+# Compiled Object files
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.a
+*.lib
+
+# Executables
+*.exe
+
+# DUB
 .dub
 docs.json
 __dummy.html
-*.o
-*.obj
-dlang-bot
-__test__unittest__
+docs/
+
+# Code coverage
+*.lst
+
+# End of https://www.gitignore.io/api/d
