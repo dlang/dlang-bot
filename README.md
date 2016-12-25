@@ -34,10 +34,19 @@ It would comment on GitHub with list of all mentioned issues and link them to Bu
 
 The first column of the table is the current status of the referenced issue.
 
+### Trello
+
+For the [Trello board](https://trello.com/b/XoFjxiqG/active) it will also provide a
+reference:
+
+<img alt="dlang-bot-trello" height="120px" src="public/img/dlang_bot_trello_comment.png" />
+
+And once a PR gets merged, the bot moves the linked Trello card to "Testing / Review".
+
 ### Bugzilla
 
-Once a PR has been merged (i.e. the commits got pushed to master or stable), the Dlang-Bot
-will automatically comment to Bugzilla with the regarding commit:
+Once a PR has been merged (i.e. the commits got pushed to master or stable),
+GitHub's Bugzilla integration will automatically comment to Bugzilla with a regarding commit:
 
 <img alt="dlang-bot-bugzilla" height="120px" src="public/img/dlang_bot_bugzilla_comment.png" />
 
@@ -48,15 +57,6 @@ Using this syntax is also very important because for the changelog generation, t
 git history will be used. Thus _only_ if the Dlang-Bot has detected an issue
 and commented on your PR it can become part of the changelog.
 
-### Trello
-
-For the [Trello board](https://trello.com/b/XoFjxiqG/active) it will also provide a
-reference:
-
-<img alt="dlang-bot-trello" height="120px" src="public/img/dlang_bot_trello_comment.png" />
-
-And once a PR gets merged, the bot moves the linked Trello card to "Testing / Review".
-
 ### Nerdy details
 
 - one can mention multiple issues in one commit and/or multiple commits
@@ -66,12 +66,15 @@ And once a PR gets merged, the bot moves the linked Trello card to "Testing / Re
 ((close|fix|address)e?(s|d)? )?(ticket|bug|tracker item|issue)s?:? *([\d ,\+&#and]+)
 ```
 
+(the GitHub Bugzilla integration and the Dlang-Bot use the same RegEx to parse
+git commit messages)
+
 <a name="auto-merge" />
 
 Auto-merge (WIP)
 ---------------
 
-At the moment the Dlang-Bot support merging via special `auto-merge` and
+At the moment the Dlang-Bot supports merging via special `auto-merge` and
 `auto-merge-squash` labels. The later will perform a squashed merge of all commits
 in the PR into a single one.
 
