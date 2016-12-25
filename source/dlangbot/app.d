@@ -197,6 +197,9 @@ void handlePR(string action, PullRequest pr)
 
     pr.updateGithubComment(comment, action, refs, descs);
 
+    if (refs.length > 0 && comment.body_.length == 0)
+        pr.addLabels(["Bug fix"]);
+
     if (runTrello)
         updateTrelloCard(action, pr.htmlURL, refs, descs);
 

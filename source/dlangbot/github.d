@@ -237,6 +237,13 @@ void checkAndRemoveMergeLabels(Json[] labels, in ref PullRequest pr)
         .each!(l => pr.removeLabel(l));
 }
 
+void addLabels(in ref PullRequest pr, string[] labels)
+{
+    auto labelUrl = "%s/repos/%s/issues/%d/labels"
+            .format(githubAPIURL, pr.repoSlug, pr.number);
+    ghSendRequest(HTTPMethod.POST, labelUrl, labels);
+}
+
 void removeLabel(in ref PullRequest pr, string label)
 {
     auto labelUrl = "%s/repos/%s/issues/%d/labels/%s"
