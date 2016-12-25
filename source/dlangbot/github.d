@@ -40,10 +40,10 @@ string formatComment(R1, R2)(R1 refs, R2 descs)
 
 struct Comment { string url, body_; }
 
-Comment getBotComment(string commentsURL)
+Comment getBotComment(in ref PullRequest pr)
 {
     // the bot may post multiple comments (mention-bot & bugzilla links)
-    auto res = ghGetRequest(commentsURL)
+    auto res = ghGetRequest(pr.commentsURL)
         .readJson[]
         .find!(c => c["user"]["login"] == "dlang-bot" && c["body"].get!string.canFind("Bugzilla"));
     if (res.length)
@@ -87,9 +87,8 @@ auto ghSendRequest(T...)(HTTPMethod method, string url, T arg)
     }, url);
 }
 
-void updateGithubComment(string action, IssueRef[] refs, Issue[] descs, string commentsURL)
+void updateGithubComment(in ref PullRequest pr, in ref Comment comment, string action, IssueRef[] refs, Issue[] descs)
 {
-    auto comment = getBotComment(commentsURL);
     logDebug("%s", refs);
     if (refs.empty)
     {
@@ -108,7 +107,7 @@ void updateGithubComment(string action, IssueRef[] refs, Issue[] descs, string c
         if (comment.url.length)
             ghSendRequest(HTTPMethod.PATCH, comment.url, ["body" : msg]);
         else if (action != "closed" && action != "merged")
-            ghSendRequest(HTTPMethod.POST, commentsURL, ["body" : msg]);
+            ghSendRequest(HTTPMethod.POST, pr.commentsURL, ["body" : msg]);
     }
 }
 
@@ -232,12 +231,17 @@ Json[] tryMerge(in ref PullRequest pr, MergeMethod method)
 
 void checkAndRemoveMergeLabels(Json[] labels, in ref PullRequest pr)
 {
-    foreach (label; labels.map!(l => l["name"].get!string).filter!(n => n.startsWith("auto-merge")))
-    {
-        auto labelUrl = "%s/repos/%s/issues/%d/labels/%s"
-            .format(githubAPIURL, pr.repoSlug, pr.number, label);
-        ghSendRequest(HTTPMethod.DELETE, labelUrl);
-    }
+    labels
+        .map!(l => l["name"].get!string)
+        .filter!(n => n.startsWith("auto-merge"))
+        .each!(l => pr.removeLabel(l));
+}
+
+void removeLabel(in ref PullRequest pr, string label)
+{
+    auto labelUrl = "%s/repos/%s/issues/%d/labels/%s"
+        .format(githubAPIURL, pr.repoSlug, pr.number, label);
+    ghSendRequest(HTTPMethod.DELETE, labelUrl);
 }
 
 string getUserEmail(string login)

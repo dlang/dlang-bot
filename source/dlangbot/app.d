@@ -193,7 +193,9 @@ void handlePR(string action, PullRequest pr)
     auto refs = getIssueRefs(commits);
 
     auto descs = getDescriptions(refs);
-    updateGithubComment(action, refs, descs, pr.commentsURL);
+    auto comment = pr.getBotComment;
+
+    pr.updateGithubComment(comment, action, refs, descs);
 
     if (runTrello)
         updateTrelloCard(action, pr.htmlURL, refs, descs);
