@@ -37,13 +37,7 @@ unittest
             j = Json.emptyArray;
         },
         "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc",
-        // action: add bug fix label
-        "/github/repos/dlang/phobos/issues/4921/labels",
-        (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            assert(req.method == HTTPMethod.POST);
-            assert(req.json[0].get!string == "Bug fix");
-            res.writeVoidBody;
-        },
+        // no bug fix label, since Issues are only referenced but not fixed according to commit messages
         "/github/repos/dlang/phobos/issues/4921/comments",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);
