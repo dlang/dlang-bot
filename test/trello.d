@@ -42,7 +42,7 @@ unittest
     postTrelloHook("active_issue_16794.json");
 }
 
-// update existing dlang bot comment with related GH PRs
+// no existing dlang bot comment -> create comment
 unittest
 {
     setAPIExpectations(
@@ -50,6 +50,13 @@ unittest
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc",
         "/github/repos/dlang/dmd/issues/6359/comments",
+        // action: add bug fix label
+        "/github/repos/dlang/dmd/issues/6359/labels",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.POST);
+            assert(req.json[0].get!string == "Bug fix");
+            res.writeVoidBody;
+        },
         "/trello/1/search?query=name:%22Issue%2016794%22&"~trelloAuth,
         "/trello/1/cards/583f517a333add7c28e0cec7/actions?filter=commentCard&"~trelloAuth,
         "/trello/1/cards/583f517a333add7c28e0cec7/actions/583f517b91413ef81f1f9d34/comments?"~trelloAuth,
@@ -78,6 +85,13 @@ unittest
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc",
         "/github/repos/dlang/dmd/issues/6359/comments",
+        // action: add bug fix label
+        "/github/repos/dlang/dmd/issues/6359/labels",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.POST);
+            assert(req.json[0].get!string == "Bug fix");
+            res.writeVoidBody;
+        },
         "/trello/1/search?query=name:%22Issue%2016794%22&"~trelloAuth,
         "/trello/1/cards/583f517a333add7c28e0cec7/actions?filter=commentCard&"~trelloAuth,
         (ref Json j) { j = Json.emptyArray; },

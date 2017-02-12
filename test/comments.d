@@ -2,6 +2,7 @@ import utils;
 
 import std.format : format;
 
+// existing comment
 unittest
 {
     setAPIExpectations(
@@ -26,7 +27,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// no existing dlang bot comment -> create comment
+// no existing dlang bot comment -> create comment and add bug fix label
 unittest
 {
     setAPIExpectations(
@@ -36,6 +37,7 @@ unittest
             j = Json.emptyArray;
         },
         "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc",
+        // no bug fix label, since Issues are only referenced but not fixed according to commit messages
         "/github/repos/dlang/phobos/issues/4921/comments",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);

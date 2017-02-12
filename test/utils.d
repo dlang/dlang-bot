@@ -191,10 +191,13 @@ void setAPIExpectations(Args...)(Args args)
 }
 
 void postGitHubHook(string payload, string eventType = "pull_request",
-    void delegate(ref Json j, scope HTTPClientRequest req) postprocess = null)
+    void delegate(ref Json j, scope HTTPClientRequest req) postprocess = null,
+    int line = __LINE__, string file = __FILE__)
 {
     import std.file : readText;
     import std.path : buildPath;
+
+    logInfo("Starting test in %s:%d with payload: %s", file, line, payload);
 
     payload = hookDir.buildPath("github", payload);
 
@@ -228,13 +231,16 @@ void postGitHubHook(string payload, string eventType = "pull_request",
 }
 
 void postTrelloHook(string payload,
-    void delegate(ref Json j, scope HTTPClientRequest req) postprocess = null)
+    void delegate(ref Json j, scope HTTPClientRequest req) postprocess = null,
+    int line = __LINE__, string file = __FILE__)
 {
     import std.file : readText;
     import std.path : buildPath;
     import dlangbot.trello : getSignature;
 
     payload = hookDir.buildPath("trello", payload);
+
+    logInfo("Starting test in %s:%d with payload: %s", file, line, payload);
 
     auto req = requestHTTP(trelloTestHookURL, (scope req) {
         req.method = HTTPMethod.POST;

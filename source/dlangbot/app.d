@@ -169,6 +169,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 
 void handlePR(string action, PullRequest pr)
 {
+    import std.algorithm : any;
     import vibe.core.core : setTimer;
 
     Json[] commits;
@@ -193,7 +194,12 @@ void handlePR(string action, PullRequest pr)
     auto refs = getIssueRefs(commits);
 
     auto descs = getDescriptions(refs);
-    updateGithubComment(action, refs, descs, pr.commentsURL);
+    auto comment = pr.getBotComment;
+
+    pr.updateGithubComment(comment, action, refs, descs);
+
+    if (refs.any!(r => r.fixed) && comment.body_.length == 0)
+        pr.addLabels(["Bug fix"]);
 
     if (runTrello)
         updateTrelloCard(action, pr.htmlURL, refs, descs);
