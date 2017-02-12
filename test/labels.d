@@ -93,6 +93,7 @@ unittest
             json = Json.emptyArray;
         },
         "/github/repos/dlang/dmd/issues/6359/comments",
+        "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/labels",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.method == HTTPMethod.POST);
@@ -115,6 +116,7 @@ unittest
         "/github/repos/dlang/dmd/pulls/6359/commits", (ref Json json) {
             json = Json.emptyArray;
         },
+        "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/comments",
     );
 

@@ -18,7 +18,7 @@ unittest
 --- | --- | ---
 ✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
 `.format(bugzillaURL);
-            assert(req.json["body"].get!string == expectedComment);
+            assert(req.json["body"].get!string.canFind(expectedComment));
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
     );
@@ -45,7 +45,7 @@ unittest
 --- | --- | ---
 ✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
 `.format(bugzillaURL);
-            assert(req.json["body"].get!string == expectedComment);
+            assert(req.json["body"].get!string.canFind(expectedComment));
             res.writeVoidBody;
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
@@ -55,7 +55,7 @@ unittest
 }
 
 // existing dlang bot comment, but no commits that reference a issue
-// -> delete comment
+// -> update comment (without references to Bugzilla)
 unittest
 {
     setAPIExpectations(
@@ -66,7 +66,10 @@ unittest
          "/github/repos/dlang/phobos/issues/4921/comments",
          "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            assert(req.method == HTTPMethod.DELETE);
+            assert(req.method == HTTPMethod.PATCH);
+            auto body_= req.json["body"].get!string;
+            assert(!body_.canFind("Fix | Bugzilla"), "Shouldn't contain bug header");
+            assert(!body_.canFind("/show_bug.cgi?id="), "Shouldn't contain a Bugzilla reference");
         }
     );
 
@@ -92,7 +95,7 @@ unittest
         "/github/repos/dlang/phobos/issues/4921/comments",
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            assert(req.method == HTTPMethod.DELETE);
+            assert(req.method == HTTPMethod.PATCH);
         }
     );
 
