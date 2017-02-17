@@ -6,6 +6,7 @@
 		"libevent": "2.0.2+2.0.16",
 		"memutils": "0.4.8",
 		"openssl": "1.1.5+1.0.1g",
+		"requests": "0.4.0",
 		"vibe-d": "0.7.30"
 	}
 }

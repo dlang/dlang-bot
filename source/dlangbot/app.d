@@ -7,6 +7,7 @@ public import dlangbot.bugzilla : bugzillaURL;
 public import dlangbot.github   : githubAPIURL, githubAuth, hookSecret;
 public import dlangbot.travis   : travisAPIURL;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
+public import dlangbot.autotester : ghAutoTesterLogin, ghAutoTesterPassword;
 
 import std.datetime : Clock, Duration, minutes, seconds, SysTime;
 
@@ -42,6 +43,8 @@ shared static this()
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
     hookSecret = environment["GH_HOOK_SECRET"];
     travisAuth = "token " ~ environment["TRAVIS_TOKEN"];
+    ghAutoTesterLogin = environment["GH_AUTO_TESTER_LOGIN"];
+    ghAutoTesterPassword = environment["GH_AUTO_TESTER_PASSWORD"];
 
     // workaround for stupid openssl.conf on Heroku
     if (environment.get("DYNO") !is null)

@@ -40,6 +40,9 @@ shared static this()
     ghTestHookURL = testServerURL ~ "/github_hook";
     trelloTestHookURL = testServerURL ~ "/trello_hook";
 
+    ghAutoTesterLogin = "auto-tester-login";
+    ghAutoTesterPassword = "auto-tester-pw";
+
     import vibe.core.log;
     setLogLevel(LogLevel.info);
 
