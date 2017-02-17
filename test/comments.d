@@ -19,7 +19,6 @@ unittest
 ✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
 `.format(bugzillaURL);
             assert(req.json["body"].get!string == expectedComment);
-            res.writeVoidBody;
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
     );
@@ -68,7 +67,6 @@ unittest
          "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.DELETE);
-            res.writeVoidBody;
         }
     );
 
@@ -90,13 +88,11 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.DELETE);
             res.statusCode = 200;
-            res.writeVoidBody;
         },
         "/github/repos/dlang/phobos/issues/4921/comments",
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.DELETE);
-            res.writeVoidBody;
         }
     );
 

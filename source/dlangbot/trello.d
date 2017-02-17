@@ -4,8 +4,6 @@ string trelloAPIURL = "https://api.trello.com";
 string trelloSecret, trelloAuth;
 
 import dlangbot.bugzilla : Issue, IssueRef;
-import dlangbot.github : Comment;
-
 import std.algorithm, std.range;
 import std.format : format;
 
@@ -85,6 +83,8 @@ auto findTrelloCards(int issueID)
         .readJson["cards"][]
         .map!(c => TrelloCard(c["id"].get!string, issueID));
 }
+
+struct Comment { string url, body_; }
 
 Comment getTrelloBotComment(string cardID)
 {

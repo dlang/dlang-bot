@@ -15,7 +15,6 @@ unittest
             assert(req.json["text"] ==
 `- [Issue 16794 - dmd not working on Ubuntu 16.10 because of default PIE linking](https://issues.dlang.org/show_bug.cgi?id=16794)
 `);
-            res.writeVoidBody;
         }
     );
 
@@ -35,7 +34,6 @@ unittest
             assert(req.json["text"] ==
 `- [Issue 16794 - dmd not working on Ubuntu 16.10 because of default PIE linking](https://issues.dlang.org/show_bug.cgi?id=16794)
 `);
-            res.writeVoidBody;
         }
     );
 
@@ -55,7 +53,6 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);
             assert(req.json[0].get!string == "Bug fix");
-            res.writeVoidBody;
         },
         "/trello/1/search?query=name:%22Issue%2016794%22&"~trelloAuth,
         "/trello/1/cards/583f517a333add7c28e0cec7/actions?filter=commentCard&"~trelloAuth,
@@ -66,7 +63,6 @@ unittest
 `- [Issue 16794 - dmd not working on Ubuntu 16.10 because of default PIE linking](https://issues.dlang.org/show_bug.cgi?id=16794)
 - https://github.com/dlang/dmd/pull/6359
 `);
-            res.writeVoidBody;
         },
         "/trello/1/cards/583f517a333add7c28e0cec7?"~trelloAuth,
         "/trello/1/board/55586bf9fd02d8c66074321a/lists?"~trelloAuth,
@@ -90,7 +86,6 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);
             assert(req.json[0].get!string == "Bug fix");
-            res.writeVoidBody;
         },
         "/trello/1/search?query=name:%22Issue%2016794%22&"~trelloAuth,
         "/trello/1/cards/583f517a333add7c28e0cec7/actions?filter=commentCard&"~trelloAuth,
@@ -99,7 +94,6 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);
             assert(req.json["text"] == "- https://github.com/dlang/dmd/pull/6359\n");
-            res.writeVoidBody;
         },
         "/trello/1/cards/583f517a333add7c28e0cec7?"~trelloAuth,
         (ref Json j) { j["idList"] = "55586d9b810fb97f9459df7d"; },

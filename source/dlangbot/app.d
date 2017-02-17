@@ -8,12 +8,14 @@ public import dlangbot.github   : githubAPIURL, githubAuth, hookSecret;
 public import dlangbot.travis   : travisAPIURL;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
 
-import std.datetime : Clock, Duration, minutes, seconds, SysTime;
+string cronDailySecret;
+
+import std.datetime : Clock, days, Duration, minutes, seconds, SysTime;
 
 import vibe.core.log;
 import vibe.data.json;
 import vibe.http.client : HTTPClient;
-import vibe.http.common : HTTPMethod;
+import vibe.http.common : enforceBadRequest, enforceHTTP, HTTPMethod, HTTPStatus;
 import vibe.http.router : URLRouter;
 import vibe.http.server : HTTPServerRequest, HTTPServerResponse, HTTPServerSettings;
 import vibe.stream.operations : readAllUTF8;
@@ -23,6 +25,8 @@ bool runTrello = true;
 
 Duration timeBetweenFullPRChecks = 5.minutes; // this should never be larger 30 mins on heroku
 Throttler!(typeof(&searchForAutoMergePrs)) prThrottler;
+
+Duration prInactivityDur = 90.days; // PRs with no activity within X days will get flagged
 
 enum trelloHookURL = "https://dlang-bot.herokuapp.com/trello_hook";
 
@@ -42,6 +46,7 @@ shared static this()
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
     hookSecret = environment["GH_HOOK_SECRET"];
     travisAuth = "token " ~ environment["TRAVIS_TOKEN"];
+    cronDailySecret = environment["CRON_DAILY_SECRET"];
 
     // workaround for stupid openssl.conf on Heroku
     if (environment.get("DYNO") !is null)
@@ -68,6 +73,7 @@ void startServer(HTTPServerSettings settings)
         .post("/github_hook", &githubHook)
         .match(HTTPMethod.HEAD, "/trello_hook", (req, res) => res.writeVoidBody)
         .post("/trello_hook", &trelloHook)
+        .get("/cron_daily", &cronDaily)
         ;
 
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
@@ -155,7 +161,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
         case "opened", "reopened", "synchronize", "labeled", "edited":
 
             auto pullRequest = json["pull_request"].deserializeJson!PullRequest;
-            runTaskHelper(toDelegate(&handlePR), action, pullRequest);
+            runTaskHelper(&handlePR, action, &pullRequest);
             return res.writeBody("handled");
         default:
             return res.writeBody("ignored");
@@ -167,10 +173,29 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 
 //==============================================================================
 
-void handlePR(string action, PullRequest pr)
+void cronDaily(HTTPServerRequest req, HTTPServerResponse res)
+{
+    enforceBadRequest(req.query.length > 0, "No repo slugs provided");
+    enforceHTTP(req.query.get("secret") == cronDailySecret,
+                HTTPStatus.unauthorized, "Invalid or no secret provided");
+
+    foreach (ref slug; req.query.getAll("repo"))
+    {
+        logInfo("running cron.daily for: %s", slug);
+        runTaskHelper(&searchForInactivePrs, slug, prInactivityDur);
+    }
+
+    return res.writeBody("OK");
+}
+
+//==============================================================================
+
+void handlePR(string action, PullRequest* _pr)
 {
     import std.algorithm : any;
     import vibe.core.core : setTimer;
+
+    const PullRequest pr = *_pr;
 
     Json[] commits;
 

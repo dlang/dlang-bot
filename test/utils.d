@@ -11,6 +11,7 @@ public import vibe.http.server : HTTPServerRequest, HTTPServerResponse;
 public import std.functional : toDelegate;
 public import vibe.data.json : deserializeJson, Json;
 public import std.datetime : SysTime;
+public import std.algorithm;
 
 // existing dlang bot comment -> update comment
 
@@ -28,6 +29,7 @@ shared static this()
     githubAuth = "GH_DUMMY_AUTH_TOKEN";
     hookSecret = "GH_DUMMY_HOOK_SECRET";
     trelloAuth = "key=01234&token=abcde";
+    cronDailySecret = "dummyCronSecret";
 
     // start our hook server
     auto settings = new HTTPServerSettings;
@@ -91,10 +93,21 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
         assert(0, "Request for unexpected URL received: " ~ req.requestURL);
     }
 
-    if (expectation.reqHandler !is null)
-        return expectation.reqHandler(req, res);
-
     string filePath = buildPath(payloadDir, req.requestURL[1 .. $].replace("/", "_"));
+
+    if (expectation.reqHandler !is null)
+    {
+        scope(failure) {
+            writefln("Method: %s", req.method);
+            writefln("Json: %s", req.json);
+        }
+        expectation.reqHandler(req, res);
+        if (res.headerWritten)
+            return;
+        if (!filePath.exists)
+            return res.writeVoidBody;
+    }
+
     if (!filePath.exists)
     {
         assert(0, "Please create payload: " ~ filePath);
@@ -267,4 +280,27 @@ void postTrelloHook(string payload,
         writefln("Didn't request: %s", apiExpectations.map!(x => x.url));
     }
     assert(apiExpectations.length == 0);
+}
+
+void openUrl(string url, string expectedResponse,
+    int line = __LINE__, string file = __FILE__)
+{
+    import std.file : readText;
+    import std.path : buildPath;
+
+    logInfo("Starting test in %s:%d with url: %s", file, line, url);
+
+    auto req = requestHTTP(testServerURL ~ url, (scope req) {
+        req.method = HTTPMethod.GET;
+    });
+    scope(failure) {
+        if (req.statusCode != 200)
+            writeln(req.bodyReader.readAllUTF8);
+    }
+    assert(req.statusCode == 200);
+    scope(failure) {
+        writefln("Didn't request: %s", apiExpectations.map!(x => x.url));
+    }
+    assert(apiExpectations.length == 0);
+    assert(req.bodyReader.readAllUTF8 == expectedResponse);
 }
