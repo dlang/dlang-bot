@@ -267,6 +267,8 @@ Json[] getIssuesForLabel(string repoSlug, string label)
 
 void searchForAutoMergePrs(string repoSlug)
 {
+    import dlangbot.autotester : setAutoMerge;
+
     // the GitHub API doesn't allow a logical OR
     auto issues = getIssuesForLabel(repoSlug, "auto-merge").chain(getIssuesForLabel(repoSlug, "auto-merge-squash"));
     issues.sort!((a, b) => a["number"].get!int < b["number"].get!int);
@@ -282,8 +284,9 @@ void searchForAutoMergePrs(string repoSlug)
         pr.state = PullRequest.State.open;
         pr.title = issue["title"].get!string;
         if (auto method = autoMergeMethod(issue["labels"][]))
+        {
             pr.tryMerge(method);
+            setAutoMerge(repoSlug, prNumber);
+        }
     }
 }
-
-
