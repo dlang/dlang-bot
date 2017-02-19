@@ -60,6 +60,8 @@ Using this syntax is also very important because for the changelog generation, t
 git history will be used. Thus _only_ if the Dlang-Bot has detected an issue
 and commented on your PR it can become part of the changelog.
 
+In doubt, you can use e.g. [Regex101](https://regex101.com/r/aI0Rp6/2) to validate your commit message.
+
 ### Nerdy details
 
 - one can mention multiple issues in one commit and/or multiple commits
