@@ -4,6 +4,7 @@ import dlangbot.bugzilla, dlangbot.github, dlangbot.travis, dlangbot.trello,
        dlangbot.utils;
 
 public import dlangbot.bugzilla : bugzillaURL;
+public import dlangbot.ci       : dTestAPI, circleCiAPI, projectTesterAPI;
 public import dlangbot.github   : githubAPIURL, githubAuth, hookSecret;
 public import dlangbot.travis   : travisAPIURL;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
@@ -20,6 +21,7 @@ import vibe.stream.operations : readAllUTF8;
 
 bool runAsync = true;
 bool runTrello = true;
+bool runPRReview = true;
 
 Duration timeBetweenFullPRChecks = 5.minutes; // this should never be larger 30 mins on heroku
 Throttler!(typeof(&searchForAutoMergePrs)) prThrottler;
@@ -135,7 +137,11 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
         string state = json["state"].get!string;
         // no need to trigger the checker for failure/pending
         if (state == "success")
+        {
             prThrottler(repoSlug);
+            if (runPRReview)
+                checkPRForReviewNeed(repoSlug, json);
+        }
 
         return res.writeBody("handled");
     case "pull_request":

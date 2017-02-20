@@ -4,22 +4,31 @@ string travisAPIURL = "https://api.travis-ci.org";
 string travisAuth;
 
 import vibe.core.log;
+import vibe.http.client : requestHTTP, HTTPClientRequest;
+import vibe.http.common : HTTPMethod;
+
+import std.functional : toDelegate;
+import std.format : format;
+import std.variant : Nullable;
 
 //==============================================================================
 // Dedup Travis-CI builds
 //==============================================================================
 
+void travisAuthReq(scope HTTPClientRequest req)
+{
+    req.headers["Accept"] = "application/vnd.travis-ci.2+json";
+    req.headers["Authorization"] = travisAuth;
+}
+
 void cancelBuild(size_t buildId)
 {
-    import std.format : format;
-    import vibe.http.client : requestHTTP;
-    import vibe.http.common : HTTPMethod;
     import vibe.stream.operations : readAllUTF8;
 
     auto url = "%s/builds/%s/cancel".format(travisAPIURL, buildId);
     requestHTTP(url, (scope req) {
-        req.headers["Authorization"] = travisAuth;
         req.method = HTTPMethod.POST;
+        travisAuthReq(req);
     }, (scope res) {
         if (res.statusCode / 100 == 2)
             logInfo("Canceled Build %s\n", buildId);
@@ -32,9 +41,7 @@ void cancelBuild(size_t buildId)
 void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
 {
     import std.algorithm.iteration : filter;
-    import std.format : format;
     import std.range : drop;
-    import vibe.http.client : requestHTTP;
 
     if (action != "synchronize" && action != "merged")
         return;
@@ -49,10 +56,7 @@ void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
     }
 
     auto url = "%s/repos/%s/builds?event_type=pull_request".format(travisAPIURL, repoSlug);
-    auto activeBuildsForPR = requestHTTP(url, (scope req) {
-            req.headers["Authorization"] = travisAuth;
-            req.headers["Accept"] = "application/vnd.travis-ci.2+json";
-        })
+    auto activeBuildsForPR = requestHTTP(url, (&travisAuthReq).toDelegate)
         .readJson["builds"][]
         .filter!(b => activeState(b["state"].get!string))
         .filter!(b => b["pull_request_number"].get!uint == pullRequestNumber);
@@ -63,4 +67,16 @@ void dedupTravisBuilds(string action, string repoSlug, uint pullRequestNumber)
         cancelBuild(b["id"].get!size_t);
 }
 
+Nullable!uint getPRNumber(string repoSlug, ulong buildId)
+{
+    Nullable!uint pr;
 
+    auto url = "%s/repos/%s/builds/%s".format(travisAPIURL, repoSlug, buildId);
+    auto res = requestHTTP(url, (&travisAuthReq).toDelegate)
+                .readJson["build"];
+
+    if (res["event_type"] == "pull_request")
+        pr = res["pull_request_number"].get!uint;
+
+    return pr;
+}
