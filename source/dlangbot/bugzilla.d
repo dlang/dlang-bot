@@ -51,9 +51,9 @@ struct Issue
 {
     int id;
     string desc;
-    string bug_status;
+    string status;
     string resolution;
-    string bug_severity;
+    string severity;
     string priority;
 }
 

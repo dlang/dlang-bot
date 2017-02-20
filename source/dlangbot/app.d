@@ -176,7 +176,7 @@ void handlePR(string action, PullRequest* _pr)
     UserMessage[] msgs;
     if (action == "opened" || action == "synchronize")
     {
-        //msgs = pr.checkForWarnings;
+        msgs = pr.checkForWarnings(descs);
     }
 
     pr.updateGithubComment(comment, action, refs, descs, msgs);

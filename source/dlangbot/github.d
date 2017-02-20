@@ -8,7 +8,7 @@ import dlangbot.warnings : printMessages, UserMessage;
 
 import std.algorithm, std.range;
 import std.datetime;
-import std.format : format;
+import std.format : format, formattedWrite;
 import std.typecons : Tuple;
 
 import vibe.core.log;
@@ -21,26 +21,23 @@ import vibe.stream.operations : readAllUTF8;
 // Github comments
 //==============================================================================
 
-void printBugList(W, R1, R2)(W app, R1 refs, R2 descs)
+void printBugList(W)(W app, in IssueRef[] refs, in Issue[] descs)
 {
-
-    if (refs.length > 0)
+    auto combined = zip(refs.map!(r => r.id), refs.map!(r => r.fixed), descs.map!(d => d.desc));
+    app.put("Fix | Bugzilla | Description\n");
+    app.put("--- | --- | ---\n");
+    foreach (num, closed, desc; combined)
     {
-        auto combined = zip(refs.map!(r => r.id), refs.map!(r => r.fixed), descs.map!(d => d.desc));
-        app.put("Fix | Bugzilla | Description\n");
-        app.put("--- | --- | ---\n");
-        foreach (num, closed, desc; combined)
-        {
-            app.formattedWrite(
-                "%1$s | [%2$s](%4$s/show_bug.cgi?id=%2$s) | %3$s\n",
-                closed ? "✓" : "✗", num, desc, bugzillaURL);
-        }
+        app.formattedWrite(
+            "%1$s | [%2$s](%4$s/show_bug.cgi?id=%2$s) | %3$s\n",
+            closed ? "✓" : "✗", num, desc, bugzillaURL);
     }
 }
 
-string formatComment(R1, R2)(R1 refs, R2 descs, UserMessage[] msgs)
+string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs, in UserMessage[] msgs)
 {
     import std.array : appender;
+
     auto app = appender!string;
     
     app.formattedWrite(
@@ -67,7 +64,9 @@ Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) 
     }
     if (msgs.length)
     {
-        app ~= "### Warnings \n\n";
+        if (refs.length)
+            app ~= "\n";
+        app ~= "### Warnings\n\n";
         app.printMessages(msgs);
     }
     return app.data;
@@ -453,6 +452,7 @@ struct PullRequest
     static struct Branch
     {
         string sha;
+        string ref_;
         Repo repo;
     }
     Branch base, head;
