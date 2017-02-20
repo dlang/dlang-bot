@@ -237,7 +237,7 @@ void checkAndRemoveMergeLabels(Json[] labels, in ref PullRequest pr)
         .each!(l => pr.removeLabel(l));
 }
 
-void addLabels(in ref PullRequest pr, string[] labels)
+void addLabels(in ref PullRequest pr, inout string[] labels)
 {
     auto labelUrl = "%s/repos/%s/issues/%d/labels"
             .format(githubAPIURL, pr.repoSlug, pr.number);
@@ -286,4 +286,39 @@ void searchForAutoMergePrs(string repoSlug)
     }
 }
 
+/**
+Allows contributors to use [<label>] messages in the title.
+If they are part of a pre-defined, allowed list, the bot will add the
+respective label.
+*/
+void checkTitleForLabels(in ref PullRequest pr)
+{
+    import std.algorithm.iteration : splitter;
+    import std.regex;
+    import std.string : strip, toLower;
 
+    static labelRe = regex(`\[(.*)\]`);
+    string[] userLabels;
+    foreach (m; pr.title.matchAll(labelRe))
+    {
+        foreach (el; m[1].splitter(","))
+            userLabels ~= el;
+    }
+
+    const string[string] userLabelsMap = [
+        "trivial": "trivial",
+        "wip": "WIP"
+    ];
+
+    auto mappedLabels = userLabels
+                            .sort()
+                            .uniq
+                            .map!strip
+                            .map!toLower
+                            .filter!(l => l in userLabelsMap)
+                            .map!(l => userLabelsMap[l])
+                            .array;
+
+    if (mappedLabels.length)
+        pr.addLabels(mappedLabels);
+}

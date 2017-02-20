@@ -152,7 +152,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
             if (json["pull_request"]["merged"].get!bool)
                 action = "merged";
             goto case;
-        case "opened", "reopened", "synchronize", "labeled":
+        case "opened", "reopened", "synchronize", "labeled", "edited":
 
             auto pullRequest = json["pull_request"].deserializeJson!PullRequest;
             runTaskHelper(toDelegate(&handlePR), action, pullRequest);
@@ -186,6 +186,9 @@ void handlePR(string action, PullRequest pr)
                 commits = labelsAndCommits.commits;
         }
     }
+
+    if (action == "opened" || action == "edited")
+        checkTitleForLabels(pr);
 
     // we only query the commits once
     if (commits is null)

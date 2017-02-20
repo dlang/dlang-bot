@@ -86,3 +86,43 @@ unittest
         }
     );
 }
+
+// test whether users can label their PR via the title
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/dmd/pulls/6359/commits", (ref Json json) {
+            json = Json.emptyArray;
+        },
+        "/github/repos/dlang/dmd/issues/6359/comments",
+        "/github/repos/dlang/dmd/issues/6359/labels",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.POST);
+            assert(req.json.deserializeJson!(string[]) == ["trivial"]);
+            res.writeVoidBody;
+        }
+    );
+
+    postGitHubHook("dlang_dmd_open_6359.json", "pull_request",
+        (ref Json j, scope HTTPClientRequest req){
+            j["pull_request"]["title"] = "[Trivial] foo bar";
+        }
+    );
+}
+
+// test that not only a selection of labels is accepted
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/dmd/pulls/6359/commits", (ref Json json) {
+            json = Json.emptyArray;
+        },
+        "/github/repos/dlang/dmd/issues/6359/comments",
+    );
+
+    postGitHubHook("dlang_dmd_open_6359.json", "pull_request",
+        (ref Json j, scope HTTPClientRequest req){
+            j["pull_request"]["title"] = "[auto-merge] foo bar";
+        }
+    );
+}
