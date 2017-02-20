@@ -14,7 +14,9 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
             auto expectedComment =
-`Fix | Bugzilla | Description
+`### Bugzilla references
+
+Fix | Bugzilla | Description
 --- | --- | ---
 ✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
 `.format(bugzillaURL);
@@ -41,7 +43,9 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);
             auto expectedComment =
-`Fix | Bugzilla | Description
+`### Bugzilla references
+
+Fix | Bugzilla | Description
 --- | --- | ---
 ✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
 `.format(bugzillaURL);
