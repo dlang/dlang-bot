@@ -47,7 +47,15 @@ IssueRef[] getIssueRefs(Json[] commits)
     return issues;
 }
 
-struct Issue { int id; string desc; }
+struct Issue
+{
+    int id;
+    string desc;
+    string bug_status;
+    string resolution;
+    string bug_severity;
+    string priority;
+}
 
 // get pairs of (issue number, short descriptions) from bugzilla
 Issue[] getDescriptions(R)(R issueRefs)
@@ -58,7 +66,7 @@ Issue[] getDescriptions(R)(R issueRefs)
 
     if (issueRefs.empty)
         return null;
-    return "%s/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc"
+    return "%s/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority"
         .format(bugzillaURL, issueRefs.map!(r => r.id))
         .requestHTTP
         .bodyReader.readAllUTF8
@@ -67,5 +75,3 @@ Issue[] getDescriptions(R)(R issueRefs)
         .sort!((a, b) => a.id < b.id)
         .release;
 }
-
-

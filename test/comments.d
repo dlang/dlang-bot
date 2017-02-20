@@ -9,7 +9,7 @@ unittest
         "/github/repos/dlang/phobos/pulls/4921/commits",
         "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments",
-        "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc",
+        "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
@@ -37,7 +37,7 @@ unittest
         "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
             j = Json.emptyArray;
         },
-        "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc",
+        "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
         // no bug fix label, since Issues are only referenced but not fixed according to commit messages
         "/github/repos/dlang/phobos/issues/4921/comments",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
