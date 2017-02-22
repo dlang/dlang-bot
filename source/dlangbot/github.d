@@ -229,11 +229,11 @@ Json[] tryMerge(in ref PullRequest pr, MergeMethod method)
     return commits;
 }
 
-void checkAndRemoveMergeLabels(Json[] labels, in ref PullRequest pr)
+void checkAndRemoveLabels(Json[] labels, in ref PullRequest pr, in string[] toRemoveLabels)
 {
     labels
         .map!(l => l["name"].get!string)
-        .filter!(n => n.startsWith("auto-merge"))
+        .filter!(n => toRemoveLabels.canFind(n))
         .each!(l => pr.removeLabel(l));
 }
 

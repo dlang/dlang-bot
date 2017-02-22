@@ -181,7 +181,9 @@ void handlePR(string action, PullRequest pr)
             return;
         if (action == "synchronize")
         {
-            checkAndRemoveMergeLabels(labelsAndCommits.labels, pr);
+            enum toRemoveLabels = ["auto-merge", "auto-merge-squash",
+                                   "needs rebase", "needs work"];
+            checkAndRemoveLabels(labelsAndCommits.labels, pr, toRemoveLabels);
             if (labelsAndCommits.commits !is null)
                 commits = labelsAndCommits.commits;
         }
