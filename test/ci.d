@@ -43,6 +43,7 @@ unittest
 // send hooks
 unittest
 {
+    prThrottler.reset;
     runPRReview = true;
     scope(exit) runPRReview = false;
 
