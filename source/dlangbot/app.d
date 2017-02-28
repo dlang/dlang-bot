@@ -21,7 +21,7 @@ import vibe.stream.operations : readAllUTF8;
 bool runAsync = true;
 bool runTrello = true;
 
-Duration timeBetweenFullPRChecks = 5.minutes; // this should never be larger 30 mins on heroku
+Duration timeBetweenFullPRChecks = 1.minutes; // this should never be larger 30 mins on heroku
 Throttler!(typeof(&searchForAutoMergePrs)) prThrottler;
 
 enum trelloHookURL = "https://dlang-bot.herokuapp.com/trello_hook";
