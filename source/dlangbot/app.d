@@ -35,7 +35,6 @@ shared static this()
     auto settings = new HTTPServerSettings;
     settings.port = 8080;
     readOption("port|p", &settings.port, "Sets the port used for serving.");
-    startServer(settings);
 
     githubAuth = "token "~environment["GH_TOKEN"];
     trelloSecret = environment["TRELLO_SECRET"];
@@ -49,7 +48,10 @@ shared static this()
         HTTPClient.setTLSSetupCallback((ctx) {
             ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
         });
+        setLogLevel(LogLevel.debug_);
     }
+
+    startServer(settings);
 }
 
 void startServer(HTTPServerSettings settings)
