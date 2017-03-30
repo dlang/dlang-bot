@@ -3,6 +3,7 @@ import utils;
 // send pending status event -> no action
 unittest
 {
+    prThrottler.reset;
     setAPIExpectations();
 
     postGitHubHook("dlang_dmd_status_6324.json", "status");

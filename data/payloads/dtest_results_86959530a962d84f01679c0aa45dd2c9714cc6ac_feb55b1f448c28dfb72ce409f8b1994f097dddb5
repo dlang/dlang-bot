@@ -1,0 +1,11 @@
+<!doctype html>
+
+<link rel="stylesheet" href="/static/style.css" />
+
+<title>Test result - DAutoTest</title>
+
+<body>
+<h1>Test result</h1>
+
+<table><tr><td>Component</td><td>phobos</td></tr><tr><td>Pull request</td><td><a href="https://github.com/dlang/phobos/pull/5131">#5131</a></td></tr><tr><td>Base result</td><td><a href="../!base/">View</a></td></tr><tr><td>Status</td><td>error</td></tr><tr><td>Details</td><td>Merge failed</td></tr><tr><td>Build log</td><td><a href="build.log">View</a></td></tr><tr><td>Files</td><td><a href="file/web/index.html">Main page</a> &middot; <a href="file/web/phobos-prerelease/index.html">Phobos</a> &middot; <a href="file/web/library-prerelease/index.html">DDox</a> &middot; <a href="file/web/">All files</a></td></tr></table>
+</body>

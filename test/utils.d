@@ -11,6 +11,8 @@ public import vibe.http.server : HTTPServerRequest, HTTPServerResponse;
 public import std.functional : toDelegate;
 public import vibe.data.json : deserializeJson, Json;
 public import std.datetime : SysTime;
+public import std.stdio : writeln, writefln;
+public import std.format : format;
 
 // existing dlang bot comment -> update comment
 
@@ -65,6 +67,12 @@ void startFakeAPIServer()
     trelloAPIURL = fakeAPIServerURL ~ "/trello";
     travisAPIURL = fakeAPIServerURL ~ "/travis";
     bugzillaURL = fakeAPIServerURL ~ "/bugzilla";
+    dTestAPI = fakeAPIServerURL ~ "/dtest";
+    circleCiAPI = fakeAPIServerURL ~ "/circleci";
+    projectTesterAPI = fakeAPIServerURL ~ "/projecttester";
+
+    // only enable this for the specific CI tests (don't spam the other tests)
+    runPRReview = false;
 }
 
 // serves saved GitHub API payloads
@@ -95,6 +103,10 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
         return expectation.reqHandler(req, res);
 
     string filePath = buildPath(payloadDir, req.requestURL[1 .. $].replace("/", "_"));
+    // remove trailing slashes
+    if (filePath[$ - 1] == '_')
+       filePath = filePath.dropBackOne;
+
     if (!filePath.exists)
     {
         assert(0, "Please create payload: " ~ filePath);
@@ -112,9 +124,12 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
             if (expectation.jsonHandler !is null)
                 expectation.jsonHandler(payloadJson);
 
-            payload = payloadJson.toString;
+            return res.writeJsonBody(payloadJson);
         }
-        return res.writeBody(payload);
+        else
+        {
+            return res.writeBody(payload);
+        }
     }
 }
 
@@ -160,9 +175,14 @@ APIExpectation[] apiExpectations;
 
 void setAPIExpectations(Args...)(Args args)
 {
+    apiExpectations.length = 0;
+    addAPIExpectations(args);
+}
+
+void addAPIExpectations(Args...)(Args args)
+{
     import std.functional : toDelegate;
     import std.traits :  Parameters;
-    apiExpectations.length = 0;
     foreach (i, arg; args)
     {
         static if (is(Args[i] : string))

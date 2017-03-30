@@ -1,0 +1,11 @@
+<!doctype html>
+
+<link rel="stylesheet" href="/static/style.css" />
+
+<title>Test result - DAutoTest</title>
+
+<body>
+<h1>Test result</h1>
+
+<table><tr><td>Component</td><td>dmd</td></tr><tr><td>Pull request</td><td><a href="https://github.com/dlang/dmd/pull/6553">#6553</a></td></tr><tr><td>Base result</td><td><a href="../!base/">View</a></td></tr><tr><td>Status</td><td>success</td></tr><tr><td>Details</td><td>Documentation OK (no changes)</td></tr><tr><td>Build log</td><td><a href="build.log">View</a></td></tr><tr><td>Files</td><td><a href="file/web/index.html">Main page</a> &middot; <a href="file/web/phobos-prerelease/index.html">Phobos</a> &middot; <a href="file/web/library-prerelease/index.html">DDox</a> &middot; <a href="file/web/">All files</a></td></tr><tr><td>Changes</td><td><table class="changes"><tr><td>web/dlangspec.mobi</td><td>(binary file)</td><td><a href="../!base/file/web/dlangspec.mobi">Old</a> <a href="file/web/dlangspec.mobi">New</a> <a href="diff/web/dlangspec.mobi">Diff</a></td></tr><tr><td>web/dlangspec.pdf</td><td>(binary file)</td><td><a href="../!base/file/web/dlangspec.pdf">Old</a> <a href="file/web/dlangspec.pdf">New</a> <a href="diff/web/dlangspec.pdf">Diff</a></td></tr></table></td></tr></table>
+</body>

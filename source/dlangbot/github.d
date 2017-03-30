@@ -143,6 +143,14 @@ struct PullRequest
     string commitsURL() const { return "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, number); }
     string eventsURL() const { return "%s/repos/%s/issues/%d/events".format(githubAPIURL, repoSlug, number); }
     string htmlURL() const { return "https://github.com/%s/pull/%d".format(repoSlug, number); }
+
+    static PullRequest fetch(string repoSlug, uint number)
+    {
+        return ghGetRequest("%s/repos/%s/pulls/%d"
+                            .format(githubAPIURL, repoSlug, number))
+                .readJson
+                .deserializeJson!PullRequest;
+    }
 }
 
 alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");
@@ -321,4 +329,68 @@ void checkTitleForLabels(in ref PullRequest pr)
 
     if (mappedLabels.length)
         pr.addLabels(mappedLabels);
+}
+
+auto getPassingCiCount(string repoSlug, string sha)
+{
+    auto json = ghGetRequest("%s/repos/%s/status/%s"
+                            .format(githubAPIURL, repoSlug, sha))
+                .readJson["statuses"][];
+    return json.filter!((e){
+         if (e["state"] == "success")
+             switch (e["context"].get!string) {
+                 case "auto-tester":
+                 case "CyberShadow/DAutoTest":
+                 case "continuous-integration/travis-ci/pr":
+                 case "ci/circleci":
+                     return true;
+                 default:
+                     return false;
+             }
+         return false;
+    }).walkLength;
+}
+
+/**
+Marks a PR as reviewable if
+- there hasn't been a review yet
+- there is at least one successful CI
+*/
+void checkPRForReviewNeed(string repoSlug, Json statusPayload)
+{
+    import dlangbot.ci : getPRForStatus;
+
+    import std.stdio;
+    auto passingCi = getPassingCiCount(repoSlug, statusPayload["sha"].get!string);
+
+    auto prNumber = getPRForStatus(repoSlug,
+                                   statusPayload["target_url"].get!string,
+                                   statusPayload["context"].get!string);
+
+    if (!prNumber.isNull)
+    {
+        PullRequest pr = {number: prNumber};
+        pr.base.repo.fullName = repoSlug;
+        logInfo("repo(%s): found a valid PR number: %d", repoSlug, prNumber);
+        auto reviewsURL = "%s/repos/%s/pulls/%d/reviews"
+                          .format(githubAPIURL, repoSlug, prNumber);
+        auto reviews = requestHTTP(reviewsURL, (scope req) {
+                // custom media type is required during preview period:
+                // preview review api: https://developer.github.com/changes/2016-12-14-reviews-api
+                req.headers["Accept"] = "application/vnd.github.black-cat-preview+json";
+                req.headers["Authorization"] = githubAuth;
+            })
+            .readJson[];
+
+        if (reviews.length == 0 && passingCi >= 2)
+        {
+            logInfo("repo(%s): No review found", repoSlug);
+            // do the cool stuff here
+            pr.addLabels(["needs review"]);
+        }
+        else if (reviews.length > 0)
+        {
+            pr.removeLabel("needs review");
+        }
+    }
 }
