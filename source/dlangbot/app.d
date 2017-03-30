@@ -87,26 +87,6 @@ void startServer(HTTPServerSettings settings)
 // Github hook
 //==============================================================================
 
-auto getSignature(string data)
-{
-    import std.digest.digest, std.digest.hmac, std.digest.sha;
-    import std.string : representation;
-
-    auto hmac = HMAC!SHA1(hookSecret.representation);
-    hmac.put(data.representation);
-    return hmac.finish.toHexString!(LetterCase.lower);
-}
-
-Json verifyRequest(string signature, string data)
-{
-    import std.exception : enforce;
-    import std.string : chompPrefix;
-
-    enforce(getSignature(data) == signature.chompPrefix("sha1="),
-            "Hook signature mismatch");
-    return parseJsonString(data);
-}
-
 void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
 {
     import std.array : array;
@@ -130,6 +110,7 @@ void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
 void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 {
     import std.functional : toDelegate;
+    import dlangbot.github : verifyRequest;
 
     auto json = verifyRequest(req.headers["X-Hub-Signature"], req.bodyReader.readAllUTF8);
     switch (req.headers["X-GitHub-Event"])

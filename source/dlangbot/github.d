@@ -562,3 +562,27 @@ struct GHMerge
     string sha;
     @name("merge_method") @byName MergeMethod mergeMethod;
 }
+
+//==============================================================================
+// Github hook signature
+//==============================================================================
+
+auto getSignature(string data)
+{
+    import std.digest.digest, std.digest.hmac, std.digest.sha;
+    import std.string : representation;
+
+    auto hmac = HMAC!SHA1(hookSecret.representation);
+    hmac.put(data.representation);
+    return hmac.finish.toHexString!(LetterCase.lower);
+}
+
+Json verifyRequest(string signature, string data)
+{
+    import std.exception : enforce;
+    import std.string : chompPrefix;
+
+    enforce(getSignature(data) == signature.chompPrefix("sha1="),
+            "Hook signature mismatch");
+    return parseJsonString(data);
+}

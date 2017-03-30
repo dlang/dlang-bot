@@ -209,6 +209,7 @@ void postGitHubHook(string payload, string eventType = "pull_request",
 {
     import std.file : readText;
     import std.path : buildPath;
+    import dlangbot.github : getSignature;
 
     logInfo("Starting test in %s:%d with payload: %s", file, line, payload);
 
