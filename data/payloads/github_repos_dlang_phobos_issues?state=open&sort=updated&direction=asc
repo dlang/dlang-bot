@@ -1,0 +1,1890 @@
+[
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/2526",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/2526/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/2526/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/2526/events",
+    "html_url": "https://github.com/dlang/phobos/pull/2526",
+    "id": 43040386,
+    "number": 2526,
+    "title": "Simplify Visual C configuration for -m64/-m32mscoff builds",
+    "user": {
+      "login": "CyberShadow",
+      "id": 160894,
+      "avatar_url": "https://avatars.githubusercontent.com/u/160894?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/CyberShadow",
+      "html_url": "https://github.com/CyberShadow",
+      "followers_url": "https://api.github.com/users/CyberShadow/followers",
+      "following_url": "https://api.github.com/users/CyberShadow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/CyberShadow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/CyberShadow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/CyberShadow/subscriptions",
+      "organizations_url": "https://api.github.com/users/CyberShadow/orgs",
+      "repos_url": "https://api.github.com/users/CyberShadow/repos",
+      "events_url": "https://api.github.com/users/CyberShadow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/CyberShadow/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 119492872,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/blocked",
+        "name": "blocked",
+        "color": "e11d21",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 9,
+    "created_at": "2014-09-17T17:30:01Z",
+    "updated_at": "2016-03-30T06:19:52Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/2526",
+      "html_url": "https://github.com/dlang/phobos/pull/2526",
+      "diff_url": "https://github.com/dlang/phobos/pull/2526.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/2526.patch"
+    },
+    "body": "Ping @rainers \n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/3534",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/3534/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/3534/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/3534/events",
+    "html_url": "https://github.com/dlang/phobos/pull/3534",
+    "id": 99674638,
+    "number": 3534,
+    "title": "Add Specializations for SortedRange",
+    "user": {
+      "login": "nordlow",
+      "id": 829407,
+      "avatar_url": "https://avatars.githubusercontent.com/u/829407?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nordlow",
+      "html_url": "https://github.com/nordlow",
+      "followers_url": "https://api.github.com/users/nordlow/followers",
+      "following_url": "https://api.github.com/users/nordlow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nordlow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nordlow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nordlow/subscriptions",
+      "organizations_url": "https://api.github.com/users/nordlow/orgs",
+      "repos_url": "https://api.github.com/users/nordlow/repos",
+      "events_url": "https://api.github.com/users/nordlow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nordlow/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 119492872,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/blocked",
+        "name": "blocked",
+        "color": "e11d21",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 34,
+    "created_at": "2015-08-07T15:45:09Z",
+    "updated_at": "2016-04-29T13:58:08Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/3534",
+      "html_url": "https://github.com/dlang/phobos/pull/3534",
+      "diff_url": "https://github.com/dlang/phobos/pull/3534.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/3534.patch"
+    },
+    "body": "Add new predicate function `std.range.primitives.isSortedRange`: **DONE**\n\nAdd specializations for `SortedRange` in the followings algorithms:\n- `sort`: just return input argument if `pred` parameter matches: **DONE**\n- `sort`-alikes: just return input argument if `pred` parameter matches:\n- `isSorted`: return `true`: **DONE**\n- `find` and alikes, should do some kind of binary search. These could take an extra param `SearchPolicy` for sorted ranges that defaults to binary search.\n- Some of the functions that return a sub-range or a mutated range could probably be returning sorted ranges as well if its input is a sorted range, `remove`, `strip` and `split` at least could.\n- `minPos`: return input as is, if `pred` matches: **DONE**\n\nIn compliance with C++ STL also add\n- `minElement`: O(1) for `SortedRange`, O(n) otherwise: **DONE**\n- `maxElement`: O(1) for `SortedRange!BidirectionalRange`, O(n) otherwise: **DONE**\n- `minmaxElement`: O(1) for `SortedRange!BidirectionalRange`, O(n) otherwise.\n\nSee also: http://forum.dlang.org/post/yenezfjjteokzyvgmzcf@forum.dlang.org\nSee also: https://issues.dlang.org/show_bug.cgi?id=11667\nSee also: http://forum.dlang.org/post/mqskao$28vh$1@digitalmars.com\n\nSee also: http://en.cppreference.com/w/cpp/algorithm/min_element\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4551",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4551/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4551/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4551/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4551",
+    "id": 163571319,
+    "number": 4551,
+    "title": "prepare for fix of druntime issue 16230",
+    "user": {
+      "login": "aG0aep6G",
+      "id": 9287500,
+      "avatar_url": "https://avatars.githubusercontent.com/u/9287500?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/aG0aep6G",
+      "html_url": "https://github.com/aG0aep6G",
+      "followers_url": "https://api.github.com/users/aG0aep6G/followers",
+      "following_url": "https://api.github.com/users/aG0aep6G/following{/other_user}",
+      "gists_url": "https://api.github.com/users/aG0aep6G/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/aG0aep6G/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/aG0aep6G/subscriptions",
+      "organizations_url": "https://api.github.com/users/aG0aep6G/orgs",
+      "repos_url": "https://api.github.com/users/aG0aep6G/repos",
+      "events_url": "https://api.github.com/users/aG0aep6G/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/aG0aep6G/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 119492872,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/blocked",
+        "name": "blocked",
+        "color": "e11d21",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 1,
+    "created_at": "2016-07-03T17:23:28Z",
+    "updated_at": "2016-07-05T21:04:06Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4551",
+      "html_url": "https://github.com/dlang/phobos/pull/4551",
+      "diff_url": "https://github.com/dlang/phobos/pull/4551.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4551.patch"
+    },
+    "body": "[Issue 16230](https://issues.dlang.org/show_bug.cgi?id=16230) is being fixed in https://github.com/dlang/druntime/pull/1605. There, `atomicLoad`'s return type is changed to be `shared` for aggregates with indirections. So some casts need to be added where the result of `atomicLoad` used to be wrongly unshared.\n\n**https://github.com/dlang/druntime/pull/1605 should be reviewed and approved before this gets pulled.**\n\nI believe that the cast in std.experimental.logger.core is wrong. See [issue 16232](https://issues.dlang.org/show_bug.cgi?id=16232). But it's pre-existing condition, and I'm not sure how to fix it.\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/3620",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/3620/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/3620/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/3620/events",
+    "html_url": "https://github.com/dlang/phobos/pull/3620",
+    "id": 104221805,
+    "number": 3620,
+    "title": "fix Issue 13780 - Empty ParameterIdentifierTuple for function literal",
+    "user": {
+      "login": "luismarques",
+      "id": 171812,
+      "avatar_url": "https://avatars.githubusercontent.com/u/171812?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/luismarques",
+      "html_url": "https://github.com/luismarques",
+      "followers_url": "https://api.github.com/users/luismarques/followers",
+      "following_url": "https://api.github.com/users/luismarques/following{/other_user}",
+      "gists_url": "https://api.github.com/users/luismarques/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/luismarques/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/luismarques/subscriptions",
+      "organizations_url": "https://api.github.com/users/luismarques/orgs",
+      "repos_url": "https://api.github.com/users/luismarques/repos",
+      "events_url": "https://api.github.com/users/luismarques/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/luismarques/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 416188102,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Bug%20Fix",
+        "name": "Bug Fix",
+        "color": "0052cc",
+        "default": false
+      },
+      {
+        "id": 117785235,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/decision%20block",
+        "name": "decision block",
+        "color": "009800",
+        "default": false
+      },
+      {
+        "id": 416188433,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Enhancement",
+        "name": "Enhancement",
+        "color": "5319e7",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 15,
+    "created_at": "2015-09-01T09:12:34Z",
+    "updated_at": "2016-07-29T11:40:01Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/3620",
+      "html_url": "https://github.com/dlang/phobos/pull/3620",
+      "diff_url": "https://github.com/dlang/phobos/pull/3620.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/3620.patch"
+    },
+    "body": "ParameterIdentifierTuple intentionally did not accept function pointers and delegates. This surprised people, particularly when using function literals, as indicated in issue 13780. This commit changes that, allowing the issue to be closed.\n\nhttps://issues.dlang.org/show_bug.cgi?id=13780\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/3952",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/3952/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/3952/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/3952/events",
+    "html_url": "https://github.com/dlang/phobos/pull/3952",
+    "id": 128763945,
+    "number": 3952,
+    "title": "Fix Issue 15604 - std.array.array of structs with template opAssign and default initialised 'new'ed class member",
+    "user": {
+      "login": "John-Colvin",
+      "id": 1867189,
+      "avatar_url": "https://avatars.githubusercontent.com/u/1867189?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/John-Colvin",
+      "html_url": "https://github.com/John-Colvin",
+      "followers_url": "https://api.github.com/users/John-Colvin/followers",
+      "following_url": "https://api.github.com/users/John-Colvin/following{/other_user}",
+      "gists_url": "https://api.github.com/users/John-Colvin/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/John-Colvin/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/John-Colvin/subscriptions",
+      "organizations_url": "https://api.github.com/users/John-Colvin/orgs",
+      "repos_url": "https://api.github.com/users/John-Colvin/repos",
+      "events_url": "https://api.github.com/users/John-Colvin/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/John-Colvin/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 416188102,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Bug%20Fix",
+        "name": "Bug Fix",
+        "color": "0052cc",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 4,
+    "created_at": "2016-01-26T09:02:30Z",
+    "updated_at": "2016-07-29T11:49:06Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/3952",
+      "html_url": "https://github.com/dlang/phobos/pull/3952",
+      "diff_url": "https://github.com/dlang/phobos/pull/3952.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/3952.patch"
+    },
+    "body": "15604 is indicative of a larger problem, but this works around the issue here.\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4294",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4294/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4294/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4294/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4294",
+    "id": 153904476,
+    "number": 4294,
+    "title": "Fix Issue 16006 - Investigate adding fork() to std.process",
+    "user": {
+      "login": "CyberShadow",
+      "id": 160894,
+      "avatar_url": "https://avatars.githubusercontent.com/u/160894?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/CyberShadow",
+      "html_url": "https://github.com/CyberShadow",
+      "followers_url": "https://api.github.com/users/CyberShadow/followers",
+      "following_url": "https://api.github.com/users/CyberShadow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/CyberShadow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/CyberShadow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/CyberShadow/subscriptions",
+      "organizations_url": "https://api.github.com/users/CyberShadow/orgs",
+      "repos_url": "https://api.github.com/users/CyberShadow/repos",
+      "events_url": "https://api.github.com/users/CyberShadow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/CyberShadow/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 416188102,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Bug%20Fix",
+        "name": "Bug Fix",
+        "color": "0052cc",
+        "default": false
+      },
+      {
+        "id": 416200677,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/needs%20rebase",
+        "name": "needs rebase",
+        "color": "b60205",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 16,
+    "created_at": "2016-05-10T01:20:00Z",
+    "updated_at": "2016-07-29T11:56:34Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4294",
+      "html_url": "https://github.com/dlang/phobos/pull/4294",
+      "diff_url": "https://github.com/dlang/phobos/pull/4294.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4294.patch"
+    },
+    "body": "https://issues.dlang.org/show_bug.cgi?id=16006\n\nNeeds https://github.com/dlang/druntime/pull/1569\n\nCC @MartinNowak @schveiguy \n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4391",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4391/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4391/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4391/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4391",
+    "id": 158020360,
+    "number": 4391,
+    "title": "std.parallelism with selective scoped imports",
+    "user": {
+      "login": "burner",
+      "id": 13327,
+      "avatar_url": "https://avatars.githubusercontent.com/u/13327?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/burner",
+      "html_url": "https://github.com/burner",
+      "followers_url": "https://api.github.com/users/burner/followers",
+      "following_url": "https://api.github.com/users/burner/following{/other_user}",
+      "gists_url": "https://api.github.com/users/burner/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/burner/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/burner/subscriptions",
+      "organizations_url": "https://api.github.com/users/burner/orgs",
+      "repos_url": "https://api.github.com/users/burner/repos",
+      "events_url": "https://api.github.com/users/burner/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/burner/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 416200677,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/needs%20rebase",
+        "name": "needs rebase",
+        "color": "b60205",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 3,
+    "created_at": "2016-06-01T22:22:34Z",
+    "updated_at": "2016-07-29T12:26:59Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4391",
+      "html_url": "https://github.com/dlang/phobos/pull/4391",
+      "diff_url": "https://github.com/dlang/phobos/pull/4391.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4391.patch"
+    },
+    "body": ""
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4399",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4399/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4399/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4399/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4399",
+    "id": 158324131,
+    "number": 4399,
+    "title": "std.parallelism fatal flaw?",
+    "user": {
+      "login": "burner",
+      "id": 13327,
+      "avatar_url": "https://avatars.githubusercontent.com/u/13327?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/burner",
+      "html_url": "https://github.com/burner",
+      "followers_url": "https://api.github.com/users/burner/followers",
+      "following_url": "https://api.github.com/users/burner/following{/other_user}",
+      "gists_url": "https://api.github.com/users/burner/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/burner/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/burner/subscriptions",
+      "organizations_url": "https://api.github.com/users/burner/orgs",
+      "repos_url": "https://api.github.com/users/burner/repos",
+      "events_url": "https://api.github.com/users/burner/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/burner/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 117785287,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/needs%20work",
+        "name": "needs work",
+        "color": "f7c6c7",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 9,
+    "created_at": "2016-06-03T09:12:50Z",
+    "updated_at": "2016-07-29T12:27:54Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4399",
+      "html_url": "https://github.com/dlang/phobos/pull/4399",
+      "diff_url": "https://github.com/dlang/phobos/pull/4399.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4399.patch"
+    },
+    "body": "Big parts of the std.parallelism unittests where not run for a very long time. \nApparently they do not even compile anymore. This PR refactors the unittests \nso they are at least run once by default. While refactoring I found a couple of\nproblems with the unittests. Such as, local unittest function being unable to \naccess the current stackframe. This destroyed some constructs used by \nstd.parallelism.\n\nI'm a noob when it comes to std.parallelism. I found this bug while scoping\nimports. I need help on this!\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4035",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4035/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4035/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4035/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4035",
+    "id": 137747039,
+    "number": 4035,
+    "title": "Allow a generic function for std.variant.visit.",
+    "user": {
+      "login": "rcorre",
+      "id": 2496231,
+      "avatar_url": "https://avatars.githubusercontent.com/u/2496231?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/rcorre",
+      "html_url": "https://github.com/rcorre",
+      "followers_url": "https://api.github.com/users/rcorre/followers",
+      "following_url": "https://api.github.com/users/rcorre/following{/other_user}",
+      "gists_url": "https://api.github.com/users/rcorre/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/rcorre/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/rcorre/subscriptions",
+      "organizations_url": "https://api.github.com/users/rcorre/orgs",
+      "repos_url": "https://api.github.com/users/rcorre/repos",
+      "events_url": "https://api.github.com/users/rcorre/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/rcorre/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 416188433,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Enhancement",
+        "name": "Enhancement",
+        "color": "5319e7",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 22,
+    "created_at": "2016-03-02T01:48:40Z",
+    "updated_at": "2016-07-29T12:38:15Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4035",
+      "html_url": "https://github.com/dlang/phobos/pull/4035",
+      "diff_url": "https://github.com/dlang/phobos/pull/4035.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4035.patch"
+    },
+    "body": "If a lambda with a single generic parameter is provided as a handler\nto std.variant.visit, it is invoked for any type contained in the\nAlgebraic which does not have a handler for that type.\n\nThis allows something like:\n\n```\n// Assume Circle, Square, and Triangle all define center()\nAlgebraic!(Circle, Square, Triangle) someShape;\nauto center = someShape.visit!(x => x.center);\n```\n\nThis may be combined with explicitly typed handlers and a single\nfallback handler for an empty variant:\n\n```\nAlgebraic!(int, float, string) something;\nsomething.visit!((string s) => s.length, // called for string\n                 x          => x,        // called for int/float\n                 ()         => 0);       // called if empty\n```\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4397",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4397/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4397/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4397/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4397",
+    "id": 158322757,
+    "number": 4397,
+    "title": "Ddoc: add class \"simple-cheatsheet\"",
+    "user": {
+      "login": "aG0aep6G",
+      "id": 9287500,
+      "avatar_url": "https://avatars.githubusercontent.com/u/9287500?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/aG0aep6G",
+      "html_url": "https://github.com/aG0aep6G",
+      "followers_url": "https://api.github.com/users/aG0aep6G/followers",
+      "following_url": "https://api.github.com/users/aG0aep6G/following{/other_user}",
+      "gists_url": "https://api.github.com/users/aG0aep6G/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/aG0aep6G/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/aG0aep6G/subscriptions",
+      "organizations_url": "https://api.github.com/users/aG0aep6G/orgs",
+      "repos_url": "https://api.github.com/users/aG0aep6G/repos",
+      "events_url": "https://api.github.com/users/aG0aep6G/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/aG0aep6G/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 364675155,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/documentation",
+        "name": "documentation",
+        "color": "d4c5f9",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 10,
+    "created_at": "2016-06-03T09:05:15Z",
+    "updated_at": "2016-07-29T12:40:36Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4397",
+      "html_url": "https://github.com/dlang/phobos/pull/4397",
+      "diff_url": "https://github.com/dlang/phobos/pull/4397.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4397.patch"
+    },
+    "body": "So that DDOX can choose not to display them.\n\n.simple-cheatsheet tables play the same role as the listings that DDOX\ngenerates. Having them both, and right after another, is confusing for\nthe reader, and doesn't add any value.\n\nThere are similar tables in\n- std.experimental.ndslice.{iteration,selection},\n- std.format,\n- std.net.curl, and\n- std.range.primitives,\n  but they contain additional information or are embedded in text. So their\n  presence should be less confusing.\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4363",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4363/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4363/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4363/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4363",
+    "id": 156729373,
+    "number": 4363,
+    "title": "Add std.typecons.Rebindable!struct",
+    "user": {
+      "login": "ntrel",
+      "id": 1107820,
+      "avatar_url": "https://avatars.githubusercontent.com/u/1107820?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ntrel",
+      "html_url": "https://github.com/ntrel",
+      "followers_url": "https://api.github.com/users/ntrel/followers",
+      "following_url": "https://api.github.com/users/ntrel/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ntrel/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ntrel/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ntrel/subscriptions",
+      "organizations_url": "https://api.github.com/users/ntrel/orgs",
+      "repos_url": "https://api.github.com/users/ntrel/repos",
+      "events_url": "https://api.github.com/users/ntrel/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ntrel/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 416188433,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Enhancement",
+        "name": "Enhancement",
+        "color": "5319e7",
+        "default": false
+      },
+      {
+        "id": 117785393,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/needs%20review",
+        "name": "needs review",
+        "color": "5319e7",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 7,
+    "created_at": "2016-05-25T11:43:05Z",
+    "updated_at": "2016-07-29T12:58:41Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4363",
+      "html_url": "https://github.com/dlang/phobos/pull/4363",
+      "diff_url": "https://github.com/dlang/phobos/pull/4363.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4363.patch"
+    },
+    "body": "From the docs:\n\n\"Models safe reassignment of otherwise constant struct instances.\n\nA struct with a field of reference type cannot be assigned to a constant struct of the same type. `Rebindable!(const S)` allows assignment to a `const S` while enforcing only constant access to its fields.\n\n`Rebindable!(immutable S)` does the same but field access may create a temporary copy of `S` in order to enforce true immutability.\"\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4336",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4336/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4336/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4336/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4336",
+    "id": 155395644,
+    "number": 4336,
+    "title": "Begin replacing floatTraits pointer math with RealRep union",
+    "user": {
+      "login": "tsbockman",
+      "id": 1332026,
+      "avatar_url": "https://avatars.githubusercontent.com/u/1332026?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/tsbockman",
+      "html_url": "https://github.com/tsbockman",
+      "followers_url": "https://api.github.com/users/tsbockman/followers",
+      "following_url": "https://api.github.com/users/tsbockman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/tsbockman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/tsbockman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/tsbockman/subscriptions",
+      "organizations_url": "https://api.github.com/users/tsbockman/orgs",
+      "repos_url": "https://api.github.com/users/tsbockman/repos",
+      "events_url": "https://api.github.com/users/tsbockman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/tsbockman/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 236681734,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/math",
+        "name": "math",
+        "color": "eb6420",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 9,
+    "created_at": "2016-05-18T01:00:51Z",
+    "updated_at": "2016-08-13T07:13:11Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4336",
+      "html_url": "https://github.com/dlang/phobos/pull/4336",
+      "diff_url": "https://github.com/dlang/phobos/pull/4336.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4336.patch"
+    },
+    "body": "Pros:\n- Prepare the way for CTFE floating-point math by switching from explicit pointer reinterpretation to a `union`.\n- `union` code is easier to read and understand.\n- `union` code is also easier to write, thus freeing mental energy for performance optimizations.\n- Consolidate tons of near-duplicate code-paths into (usually) two: one for `ibmExtended`, and one for everything else.\n- Adding support for new IEEE-style floating-point types (such as `half` or `quad`) gets easier as more of `std.math` is converted to use `RealRep`. (`ucent` would help here, though.)\n- By the time all of `std.math` has been converted, I expect that (in net) `RealRep` will have reduced the total line count substantially.\n- It may be possible to replace some of the inline assembler with `RealRep` code; the codegen seems to be very clean, for the most part.\n\nCons:\n- Many large diffs (starting with this one) will be required to complete the conversion.\n- `std.math` will become substantially more dependant upon inlining for good performance.\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/3960",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/3960/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/3960/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/3960/events",
+    "html_url": "https://github.com/dlang/phobos/pull/3960",
+    "id": 129722763,
+    "number": 3960,
+    "title": "Issue 15621 - std.file.rename does not allow moving files to a different drive",
+    "user": {
+      "login": "yebblies",
+      "id": 580100,
+      "avatar_url": "https://avatars.githubusercontent.com/u/580100?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/yebblies",
+      "html_url": "https://github.com/yebblies",
+      "followers_url": "https://api.github.com/users/yebblies/followers",
+      "following_url": "https://api.github.com/users/yebblies/following{/other_user}",
+      "gists_url": "https://api.github.com/users/yebblies/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/yebblies/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/yebblies/subscriptions",
+      "organizations_url": "https://api.github.com/users/yebblies/orgs",
+      "repos_url": "https://api.github.com/users/yebblies/repos",
+      "events_url": "https://api.github.com/users/yebblies/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/yebblies/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 416188102,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Bug%20Fix",
+        "name": "Bug Fix",
+        "color": "0052cc",
+        "default": false
+      },
+      {
+        "id": 117785235,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/decision%20block",
+        "name": "decision block",
+        "color": "009800",
+        "default": false
+      },
+      {
+        "id": 416188433,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Enhancement",
+        "name": "Enhancement",
+        "color": "5319e7",
+        "default": false
+      },
+      {
+        "id": 416200677,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/needs%20rebase",
+        "name": "needs rebase",
+        "color": "b60205",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 16,
+    "created_at": "2016-01-29T10:09:07Z",
+    "updated_at": "2016-08-15T02:53:35Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/3960",
+      "html_url": "https://github.com/dlang/phobos/pull/3960",
+      "diff_url": "https://github.com/dlang/phobos/pull/3960.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/3960.patch"
+    },
+    "body": "I don't think it's possible to unittest this without making excessive assumptions.\n\nhttps://issues.dlang.org/show_bug.cgi?id=15621\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/2995",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/2995/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/2995/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/2995/events",
+    "html_url": "https://github.com/dlang/phobos/pull/2995",
+    "id": 57837885,
+    "number": 2995,
+    "title": "Parameterized unittests and benchmarks",
+    "user": {
+      "login": "burner",
+      "id": 13327,
+      "avatar_url": "https://avatars.githubusercontent.com/u/13327?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/burner",
+      "html_url": "https://github.com/burner",
+      "followers_url": "https://api.github.com/users/burner/followers",
+      "following_url": "https://api.github.com/users/burner/following{/other_user}",
+      "gists_url": "https://api.github.com/users/burner/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/burner/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/burner/subscriptions",
+      "organizations_url": "https://api.github.com/users/burner/orgs",
+      "repos_url": "https://api.github.com/users/burner/repos",
+      "events_url": "https://api.github.com/users/burner/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/burner/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 117785393,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/needs%20review",
+        "name": "needs review",
+        "color": "5319e7",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": {
+      "login": "andralex",
+      "id": 566679,
+      "avatar_url": "https://avatars.githubusercontent.com/u/566679?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/andralex",
+      "html_url": "https://github.com/andralex",
+      "followers_url": "https://api.github.com/users/andralex/followers",
+      "following_url": "https://api.github.com/users/andralex/following{/other_user}",
+      "gists_url": "https://api.github.com/users/andralex/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/andralex/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/andralex/subscriptions",
+      "organizations_url": "https://api.github.com/users/andralex/orgs",
+      "repos_url": "https://api.github.com/users/andralex/repos",
+      "events_url": "https://api.github.com/users/andralex/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/andralex/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "assignees": [
+      {
+        "login": "andralex",
+        "id": 566679,
+        "avatar_url": "https://avatars.githubusercontent.com/u/566679?v=3",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/andralex",
+        "html_url": "https://github.com/andralex",
+        "followers_url": "https://api.github.com/users/andralex/followers",
+        "following_url": "https://api.github.com/users/andralex/following{/other_user}",
+        "gists_url": "https://api.github.com/users/andralex/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/andralex/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/andralex/subscriptions",
+        "organizations_url": "https://api.github.com/users/andralex/orgs",
+        "repos_url": "https://api.github.com/users/andralex/repos",
+        "events_url": "https://api.github.com/users/andralex/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/andralex/received_events",
+        "type": "User",
+        "site_admin": false
+      }
+    ],
+    "milestone": null,
+    "comments": 58,
+    "created_at": "2015-02-16T18:36:18Z",
+    "updated_at": "2016-08-24T18:21:21Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/2995",
+      "html_url": "https://github.com/dlang/phobos/pull/2995",
+      "diff_url": "https://github.com/dlang/phobos/pull/2995.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/2995.patch"
+    },
+    "body": "Basically, Haskell Quickcheck with in build benchmarking for performance regression testing.\n\nIMO phobos is missing something like Quickfix (randomized test data generation). Additionally, it would be nice to use the tests as a way to measure the performance of the functions and the code generation over time. \n\nThe benchmark results are written to a file as csv. The program benchmarkplotter.d generates .dat and .gp files for all uniquely named benchmarks. gnuplot then generates a plot of the benchmark values over time. This could than be displayed on dlang.org to show our progress and be transparent about our performance.\n\nmake BUILD=benchmark enables all benchmarks. For more info see example in std/experimental/randomized_unittest_benchmark.d\n\n![alt text](http://s22.postimg.org/h62nvhnv5/string_last_Index_Of_wstring_dstring.png)\n\n``` d\n/// The following examples show an overview of the given functionalities.\nunittest\n{\n    void theFunctionToTest(int a, float b, string c)\n    {\n        // super expensive operation\n        auto rslt = (a + b) * c.length;\n\n        /* Pass the result to doNotOptimizeAway so the compiler\n        can not remove the expensive operation, and thereby falsify the\n        benchmark.\n        */\n        doNotOptimizeAway(rslt);\n\n        debug\n        {\n            /* As the paramters to the function assume random values,\n            $(D benchmark) allows to quickly test function with various input\n            values. As the verification of computed value or state will at to\n            the runtime of the function to benchmark, it makes sense to only\n            execute these verifications in debug mode.\n            */\n            assert(c.length ? true : true);\n        }\n    }\n\n    /* $(D benchmark) will run the function $(D theFunctionToTest) as often as\n    possible in 1 second. The function will be called with randomly selected\n    values for its parameters.\n    */\n    benchmark!theFunctionToTest();\n}\n```\n\ndub: https://github.com/burner/std.benchmark\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4762",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4762/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4762/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4762/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4762",
+    "id": 174887099,
+    "number": 4762,
+    "title": "add ADL example to std.traits.moduleName",
+    "user": {
+      "login": "WalterBright",
+      "id": 568298,
+      "avatar_url": "https://avatars.githubusercontent.com/u/568298?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/WalterBright",
+      "html_url": "https://github.com/WalterBright",
+      "followers_url": "https://api.github.com/users/WalterBright/followers",
+      "following_url": "https://api.github.com/users/WalterBright/following{/other_user}",
+      "gists_url": "https://api.github.com/users/WalterBright/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/WalterBright/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/WalterBright/subscriptions",
+      "organizations_url": "https://api.github.com/users/WalterBright/orgs",
+      "repos_url": "https://api.github.com/users/WalterBright/repos",
+      "events_url": "https://api.github.com/users/WalterBright/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/WalterBright/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 364675155,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/documentation",
+        "name": "documentation",
+        "color": "d4c5f9",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 1,
+    "created_at": "2016-09-03T08:54:52Z",
+    "updated_at": "2016-09-16T23:52:55Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4762",
+      "html_url": "https://github.com/dlang/phobos/pull/4762",
+      "diff_url": "https://github.com/dlang/phobos/pull/4762.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4762.patch"
+    },
+    "body": "Example shows how to do ADL lookup for those who want it.\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4876",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4876/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4876/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4876/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4876",
+    "id": 184712559,
+    "number": 4876,
+    "title": "Check for overflow in (make|extend|shrink)Array",
+    "user": {
+      "login": "JakobOvrum",
+      "id": 155856,
+      "avatar_url": "https://avatars.githubusercontent.com/u/155856?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/JakobOvrum",
+      "html_url": "https://github.com/JakobOvrum",
+      "followers_url": "https://api.github.com/users/JakobOvrum/followers",
+      "following_url": "https://api.github.com/users/JakobOvrum/following{/other_user}",
+      "gists_url": "https://api.github.com/users/JakobOvrum/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/JakobOvrum/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/JakobOvrum/subscriptions",
+      "organizations_url": "https://api.github.com/users/JakobOvrum/orgs",
+      "repos_url": "https://api.github.com/users/JakobOvrum/repos",
+      "events_url": "https://api.github.com/users/JakobOvrum/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/JakobOvrum/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 415516756,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/overflow",
+        "name": "overflow",
+        "color": "bfd4f2",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 2,
+    "created_at": "2016-10-23T20:10:06Z",
+    "updated_at": "2016-10-23T21:47:30Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4876",
+      "html_url": "https://github.com/dlang/phobos/pull/4876",
+      "diff_url": "https://github.com/dlang/phobos/pull/4876.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4876.patch"
+    },
+    "body": "These functions still have potential for overflow, this patch simply factors out a common multiplication into helpers with overflow checking.\n\nThe helper functions are akin to OpenBSD's `reallocarray` function.\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4878",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4878/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4878/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4878/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4878",
+    "id": 185189223,
+    "number": 4878,
+    "title": "[WIP] [DONOTPULL] Reference counted buffer",
+    "user": {
+      "login": "andralex",
+      "id": 566679,
+      "avatar_url": "https://avatars.githubusercontent.com/u/566679?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/andralex",
+      "html_url": "https://github.com/andralex",
+      "followers_url": "https://api.github.com/users/andralex/followers",
+      "following_url": "https://api.github.com/users/andralex/following{/other_user}",
+      "gists_url": "https://api.github.com/users/andralex/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/andralex/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/andralex/subscriptions",
+      "organizations_url": "https://api.github.com/users/andralex/orgs",
+      "repos_url": "https://api.github.com/users/andralex/repos",
+      "events_url": "https://api.github.com/users/andralex/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/andralex/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 415595086,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/WIP",
+        "name": "WIP",
+        "color": "fbca04",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 0,
+    "created_at": "2016-10-25T17:56:47Z",
+    "updated_at": "2016-11-04T15:59:48Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4878",
+      "html_url": "https://github.com/dlang/phobos/pull/4878",
+      "diff_url": "https://github.com/dlang/phobos/pull/4878.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4878.patch"
+    },
+    "body": "This is a work in progress, currently aimed at studying how safe reference counting works.\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4204",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4204/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4204/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4204/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4204",
+    "id": 148853180,
+    "number": 4204,
+    "title": "Fix Issue 10879 - std.variant Variant/Algebraic: Cant store static ar…",
+    "user": {
+      "login": "Biotronic",
+      "id": 253521,
+      "avatar_url": "https://avatars.githubusercontent.com/u/253521?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Biotronic",
+      "html_url": "https://github.com/Biotronic",
+      "followers_url": "https://api.github.com/users/Biotronic/followers",
+      "following_url": "https://api.github.com/users/Biotronic/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Biotronic/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Biotronic/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Biotronic/subscriptions",
+      "organizations_url": "https://api.github.com/users/Biotronic/orgs",
+      "repos_url": "https://api.github.com/users/Biotronic/repos",
+      "events_url": "https://api.github.com/users/Biotronic/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Biotronic/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 416188102,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Bug%20Fix",
+        "name": "Bug Fix",
+        "color": "0052cc",
+        "default": false
+      },
+      {
+        "id": 117785235,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/decision%20block",
+        "name": "decision block",
+        "color": "009800",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 6,
+    "created_at": "2016-04-16T13:38:09Z",
+    "updated_at": "2016-11-06T01:38:59Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4204",
+      "html_url": "https://github.com/dlang/phobos/pull/4204",
+      "diff_url": "https://github.com/dlang/phobos/pull/4204.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4204.patch"
+    },
+    "body": "…rays > 32(/16) bytes\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4920",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4920/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4920/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4920/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4920",
+    "id": 191503586,
+    "number": 4920,
+    "title": "Implement issue# 16744: TypeOf template helper.",
+    "user": {
+      "login": "jmdavis",
+      "id": 579956,
+      "avatar_url": "https://avatars.githubusercontent.com/u/579956?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jmdavis",
+      "html_url": "https://github.com/jmdavis",
+      "followers_url": "https://api.github.com/users/jmdavis/followers",
+      "following_url": "https://api.github.com/users/jmdavis/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jmdavis/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jmdavis/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jmdavis/subscriptions",
+      "organizations_url": "https://api.github.com/users/jmdavis/orgs",
+      "repos_url": "https://api.github.com/users/jmdavis/repos",
+      "events_url": "https://api.github.com/users/jmdavis/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jmdavis/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 4,
+    "created_at": "2016-11-24T12:02:56Z",
+    "updated_at": "2016-11-26T00:38:02Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4920",
+      "html_url": "https://github.com/dlang/phobos/pull/4920",
+      "diff_url": "https://github.com/dlang/phobos/pull/4920.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4920.patch"
+    },
+    "body": "typeof cannot be used directly with templates such as staticMap, because\r\nwe don't have the template equivalent of lambda functions. TypeOf is\r\ntherefore a template wrapper around typeof so that it can be used in\r\ncontexts that require a template."
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4936",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4936/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4936/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4936/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4936",
+    "id": 194224671,
+    "number": 4936,
+    "title": "Fix Issue 16745 - Add template helper for creating static arrays with the size inferred",
+    "user": {
+      "login": "John-Colvin",
+      "id": 1867189,
+      "avatar_url": "https://avatars.githubusercontent.com/u/1867189?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/John-Colvin",
+      "html_url": "https://github.com/John-Colvin",
+      "followers_url": "https://api.github.com/users/John-Colvin/followers",
+      "following_url": "https://api.github.com/users/John-Colvin/following{/other_user}",
+      "gists_url": "https://api.github.com/users/John-Colvin/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/John-Colvin/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/John-Colvin/subscriptions",
+      "organizations_url": "https://api.github.com/users/John-Colvin/orgs",
+      "repos_url": "https://api.github.com/users/John-Colvin/repos",
+      "events_url": "https://api.github.com/users/John-Colvin/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/John-Colvin/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 311499730,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/@andralex",
+        "name": "@andralex",
+        "color": "f7c6c7",
+        "default": false
+      },
+      {
+        "id": 117785235,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/decision%20block",
+        "name": "decision block",
+        "color": "009800",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 6,
+    "created_at": "2016-12-08T01:37:28Z",
+    "updated_at": "2016-12-08T23:27:37Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4936",
+      "html_url": "https://github.com/dlang/phobos/pull/4936",
+      "diff_url": "https://github.com/dlang/phobos/pull/4936.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4936.patch"
+    },
+    "body": ""
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4949",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4949/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4949/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4949/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4949",
+    "id": 195070382,
+    "number": 4949,
+    "title": "Replace use of onRangeError",
+    "user": {
+      "login": "andralex",
+      "id": 566679,
+      "avatar_url": "https://avatars.githubusercontent.com/u/566679?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/andralex",
+      "html_url": "https://github.com/andralex",
+      "followers_url": "https://api.github.com/users/andralex/followers",
+      "following_url": "https://api.github.com/users/andralex/following{/other_user}",
+      "gists_url": "https://api.github.com/users/andralex/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/andralex/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/andralex/subscriptions",
+      "organizations_url": "https://api.github.com/users/andralex/orgs",
+      "repos_url": "https://api.github.com/users/andralex/repos",
+      "events_url": "https://api.github.com/users/andralex/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/andralex/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 0,
+    "created_at": "2016-12-12T19:58:46Z",
+    "updated_at": "2016-12-12T19:58:46Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4949",
+      "html_url": "https://github.com/dlang/phobos/pull/4949",
+      "diff_url": "https://github.com/dlang/phobos/pull/4949.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4949.patch"
+    },
+    "body": "This needs to be in in order to support non-pure onRangeError."
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4900",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4900/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4900/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4900/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4900",
+    "id": 189117852,
+    "number": 4900,
+    "title": "[docs] Improve docs for std.conv.to",
+    "user": {
+      "login": "ntrel",
+      "id": 1107820,
+      "avatar_url": "https://avatars.githubusercontent.com/u/1107820?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ntrel",
+      "html_url": "https://github.com/ntrel",
+      "followers_url": "https://api.github.com/users/ntrel/followers",
+      "following_url": "https://api.github.com/users/ntrel/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ntrel/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ntrel/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ntrel/subscriptions",
+      "organizations_url": "https://api.github.com/users/ntrel/orgs",
+      "repos_url": "https://api.github.com/users/ntrel/repos",
+      "events_url": "https://api.github.com/users/ntrel/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ntrel/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 2,
+    "created_at": "2016-11-14T13:54:59Z",
+    "updated_at": "2016-12-15T12:07:55Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4900",
+      "html_url": "https://github.com/dlang/phobos/pull/4900",
+      "diff_url": "https://github.com/dlang/phobos/pull/4900.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4900.patch"
+    },
+    "body": "* Document overloads of `to` which take a radix - see last commit.\r\n\r\nNote: This continues the work done in #4208."
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4954",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4954/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4954/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4954/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4954",
+    "id": 195177809,
+    "number": 4954,
+    "title": "Update std.traits to reflect renaming of TypeTuple to AliasSeq",
+    "user": {
+      "login": "wilzbach",
+      "id": 4370550,
+      "avatar_url": "https://avatars.githubusercontent.com/u/4370550?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/wilzbach",
+      "html_url": "https://github.com/wilzbach",
+      "followers_url": "https://api.github.com/users/wilzbach/followers",
+      "following_url": "https://api.github.com/users/wilzbach/following{/other_user}",
+      "gists_url": "https://api.github.com/users/wilzbach/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/wilzbach/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/wilzbach/subscriptions",
+      "organizations_url": "https://api.github.com/users/wilzbach/orgs",
+      "repos_url": "https://api.github.com/users/wilzbach/repos",
+      "events_url": "https://api.github.com/users/wilzbach/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/wilzbach/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": {
+      "login": "MartinNowak",
+      "id": 288976,
+      "avatar_url": "https://avatars.githubusercontent.com/u/288976?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MartinNowak",
+      "html_url": "https://github.com/MartinNowak",
+      "followers_url": "https://api.github.com/users/MartinNowak/followers",
+      "following_url": "https://api.github.com/users/MartinNowak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MartinNowak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MartinNowak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MartinNowak/subscriptions",
+      "organizations_url": "https://api.github.com/users/MartinNowak/orgs",
+      "repos_url": "https://api.github.com/users/MartinNowak/repos",
+      "events_url": "https://api.github.com/users/MartinNowak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MartinNowak/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "assignees": [
+      {
+        "login": "MartinNowak",
+        "id": 288976,
+        "avatar_url": "https://avatars.githubusercontent.com/u/288976?v=3",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/MartinNowak",
+        "html_url": "https://github.com/MartinNowak",
+        "followers_url": "https://api.github.com/users/MartinNowak/followers",
+        "following_url": "https://api.github.com/users/MartinNowak/following{/other_user}",
+        "gists_url": "https://api.github.com/users/MartinNowak/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/MartinNowak/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/MartinNowak/subscriptions",
+        "organizations_url": "https://api.github.com/users/MartinNowak/orgs",
+        "repos_url": "https://api.github.com/users/MartinNowak/repos",
+        "events_url": "https://api.github.com/users/MartinNowak/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/MartinNowak/received_events",
+        "type": "User",
+        "site_admin": false
+      }
+    ],
+    "milestone": null,
+    "comments": 6,
+    "created_at": "2016-12-13T07:05:30Z",
+    "updated_at": "2016-12-19T13:48:11Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4954",
+      "html_url": "https://github.com/dlang/phobos/pull/4954",
+      "diff_url": "https://github.com/dlang/phobos/pull/4954.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4954.patch"
+    },
+    "body": "Revived #3756 as is (just rebased to latest Master)."
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4965",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4965/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4965/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4965/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4965",
+    "id": 196290187,
+    "number": 4965,
+    "title": "[WIP] Big O attribute notation",
+    "user": {
+      "login": "andralex",
+      "id": 566679,
+      "avatar_url": "https://avatars.githubusercontent.com/u/566679?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/andralex",
+      "html_url": "https://github.com/andralex",
+      "followers_url": "https://api.github.com/users/andralex/followers",
+      "following_url": "https://api.github.com/users/andralex/following{/other_user}",
+      "gists_url": "https://api.github.com/users/andralex/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/andralex/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/andralex/subscriptions",
+      "organizations_url": "https://api.github.com/users/andralex/orgs",
+      "repos_url": "https://api.github.com/users/andralex/repos",
+      "events_url": "https://api.github.com/users/andralex/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/andralex/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 2,
+    "created_at": "2016-12-18T18:19:14Z",
+    "updated_at": "2016-12-19T17:43:32Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4965",
+      "html_url": "https://github.com/dlang/phobos/pull/4965",
+      "diff_url": "https://github.com/dlang/phobos/pull/4965.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4965.patch"
+    },
+    "body": "Associated article: http://erdani.com/d/bigo.html"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4257",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4257/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4257/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4257/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4257",
+    "id": 151676492,
+    "number": 4257,
+    "title": "std.algorithm.search: expose extremum",
+    "user": {
+      "login": "wilzbach",
+      "id": 4370550,
+      "avatar_url": "https://avatars.githubusercontent.com/u/4370550?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/wilzbach",
+      "html_url": "https://github.com/wilzbach",
+      "followers_url": "https://api.github.com/users/wilzbach/followers",
+      "following_url": "https://api.github.com/users/wilzbach/following{/other_user}",
+      "gists_url": "https://api.github.com/users/wilzbach/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/wilzbach/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/wilzbach/subscriptions",
+      "organizations_url": "https://api.github.com/users/wilzbach/orgs",
+      "repos_url": "https://api.github.com/users/wilzbach/repos",
+      "events_url": "https://api.github.com/users/wilzbach/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/wilzbach/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 14,
+    "created_at": "2016-04-28T15:43:36Z",
+    "updated_at": "2016-12-24T14:56:54Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4257",
+      "html_url": "https://github.com/dlang/phobos/pull/4257",
+      "diff_url": "https://github.com/dlang/phobos/pull/4257.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4257.patch"
+    },
+    "body": "On #4221 the consensus was that extremum is rarely needed, hence we set it to `private`.\n\nIt seems like @9il just found a nice use case for extremum, `std.math.cmp`:\n\n```\nassert([-2.0, 2, 4].reduce!`cmp(a, b) ? a : b` == -2.0);\nassert([-2.0, 2, 4].reduce!`cmp(a, b) ? b : a` == 4.0);\n```\n\nWell it's also possible to use `reduce`:\n\n```\nassert([-1., 0, 1].extremum!cmp == 1.0);\nassert([-1., 0, 1].extremum!`cmp(a, b) < 0` == -1.0);\n```\n\nHowever it gets neat, if map is needed:\n\n```\nassert([-1., 0, 1].enumerate.extremum!cmp == tuple(2, 1.0));\nassert([-1., 0, 1].enumerate.extremum!`cmp(a, b) < 0` == tuple(0, -1.0));\n```\n\nI added a small goodie that checks whether the first template function can be used as an mapping function (unary function) and otherwise it falls back to the selector (binary function).\n\nAdditionally I added more tests.\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/3948",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/3948/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/3948/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/3948/events",
+    "html_url": "https://github.com/dlang/phobos/pull/3948",
+    "id": 128023471,
+    "number": 3948,
+    "title": "new function: std.file.copyRecurse",
+    "user": {
+      "login": "aG0aep6G",
+      "id": 9287500,
+      "avatar_url": "https://avatars.githubusercontent.com/u/9287500?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/aG0aep6G",
+      "html_url": "https://github.com/aG0aep6G",
+      "followers_url": "https://api.github.com/users/aG0aep6G/followers",
+      "following_url": "https://api.github.com/users/aG0aep6G/following{/other_user}",
+      "gists_url": "https://api.github.com/users/aG0aep6G/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/aG0aep6G/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/aG0aep6G/subscriptions",
+      "organizations_url": "https://api.github.com/users/aG0aep6G/orgs",
+      "repos_url": "https://api.github.com/users/aG0aep6G/repos",
+      "events_url": "https://api.github.com/users/aG0aep6G/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/aG0aep6G/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 117785287,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/needs%20work",
+        "name": "needs work",
+        "color": "f7c6c7",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 17,
+    "created_at": "2016-01-21T21:28:56Z",
+    "updated_at": "2016-12-26T06:04:19Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/3948",
+      "html_url": "https://github.com/dlang/phobos/pull/3948",
+      "diff_url": "https://github.com/dlang/phobos/pull/3948.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/3948.patch"
+    },
+    "body": "For when you need to copy a directory.\n\nPossible issues:\n- Timestamps and attributes are not copied for symlinks. See NOTEs in the code.\n- Copying stops on the first error. No way to ignore errors and just copy as much as possible.\n- Creation times are not preserved (Windows).\n- Asserting that there are no symlinks on Windows, because `symlink` is Posix-only. But `attrIsSymlink` can apparently be true on Windows.\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4953",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4953/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4953/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4953/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4953",
+    "id": 195174240,
+    "number": 4953,
+    "title": "append to an array by emplacement",
+    "user": {
+      "login": "wilzbach",
+      "id": 4370550,
+      "avatar_url": "https://avatars.githubusercontent.com/u/4370550?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/wilzbach",
+      "html_url": "https://github.com/wilzbach",
+      "followers_url": "https://api.github.com/users/wilzbach/followers",
+      "following_url": "https://api.github.com/users/wilzbach/following{/other_user}",
+      "gists_url": "https://api.github.com/users/wilzbach/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/wilzbach/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/wilzbach/subscriptions",
+      "organizations_url": "https://api.github.com/users/wilzbach/orgs",
+      "repos_url": "https://api.github.com/users/wilzbach/repos",
+      "events_url": "https://api.github.com/users/wilzbach/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/wilzbach/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 2,
+    "created_at": "2016-12-13T06:37:47Z",
+    "updated_at": "2016-12-26T23:52:15Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4953",
+      "html_url": "https://github.com/dlang/phobos/pull/4953",
+      "diff_url": "https://github.com/dlang/phobos/pull/4953.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4953.patch"
+    },
+    "body": "Reboot of @cyisfor's #4116 (with tabs -> spaces and smaller style fixes)"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4265",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4265/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4265/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4265/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4265",
+    "id": 151909003,
+    "number": 4265,
+    "title": "std.algorithm.searching: no mapping-specialization for extremum",
+    "user": {
+      "login": "wilzbach",
+      "id": 4370550,
+      "avatar_url": "https://avatars.githubusercontent.com/u/4370550?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/wilzbach",
+      "html_url": "https://github.com/wilzbach",
+      "followers_url": "https://api.github.com/users/wilzbach/followers",
+      "following_url": "https://api.github.com/users/wilzbach/following{/other_user}",
+      "gists_url": "https://api.github.com/users/wilzbach/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/wilzbach/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/wilzbach/subscriptions",
+      "organizations_url": "https://api.github.com/users/wilzbach/orgs",
+      "repos_url": "https://api.github.com/users/wilzbach/repos",
+      "events_url": "https://api.github.com/users/wilzbach/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/wilzbach/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 311499730,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/@andralex",
+        "name": "@andralex",
+        "color": "f7c6c7",
+        "default": false
+      },
+      {
+        "id": 117785235,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/decision%20block",
+        "name": "decision block",
+        "color": "009800",
+        "default": false
+      },
+      {
+        "id": 416188433,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Enhancement",
+        "name": "Enhancement",
+        "color": "5319e7",
+        "default": false
+      },
+      {
+        "id": 416187218,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/optimization",
+        "name": "optimization",
+        "color": "1d76db",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": {
+      "login": "andralex",
+      "id": 566679,
+      "avatar_url": "https://avatars.githubusercontent.com/u/566679?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/andralex",
+      "html_url": "https://github.com/andralex",
+      "followers_url": "https://api.github.com/users/andralex/followers",
+      "following_url": "https://api.github.com/users/andralex/following{/other_user}",
+      "gists_url": "https://api.github.com/users/andralex/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/andralex/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/andralex/subscriptions",
+      "organizations_url": "https://api.github.com/users/andralex/orgs",
+      "repos_url": "https://api.github.com/users/andralex/repos",
+      "events_url": "https://api.github.com/users/andralex/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/andralex/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "assignees": [
+      {
+        "login": "andralex",
+        "id": 566679,
+        "avatar_url": "https://avatars.githubusercontent.com/u/566679?v=3",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/andralex",
+        "html_url": "https://github.com/andralex",
+        "followers_url": "https://api.github.com/users/andralex/followers",
+        "following_url": "https://api.github.com/users/andralex/following{/other_user}",
+        "gists_url": "https://api.github.com/users/andralex/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/andralex/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/andralex/subscriptions",
+        "organizations_url": "https://api.github.com/users/andralex/orgs",
+        "repos_url": "https://api.github.com/users/andralex/repos",
+        "events_url": "https://api.github.com/users/andralex/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/andralex/received_events",
+        "type": "User",
+        "site_admin": false
+      }
+    ],
+    "milestone": null,
+    "comments": 28,
+    "created_at": "2016-04-29T16:15:33Z",
+    "updated_at": "2016-12-27T06:11:13Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4265",
+      "html_url": "https://github.com/dlang/phobos/pull/4265",
+      "diff_url": "https://github.com/dlang/phobos/pull/4265.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4265.patch"
+    },
+    "body": "As #4257 (exposing the extremum function) depends on andralex, I thought I separate the optimization for the noop-function case in a separate PR. Here it goes. The idea is to reduce the unnecessary element and function call if no mapping is specifiecd, e.g. from:\n\n```\nMapType mapElement = mapFun(r[i]);\nif (selectorFun(mapElement, extremeElementMapped))\n{\n   extremeElement = r[i];\n   extremeElementMapped = mapElement;\n}\n```\n\nthis PR reduces it down to:\n\n```\nif (selectorFun(r[i], extremeElement))\n{\n   extremeElement = r[i];\n}\n```\n\nMoreover a small goodie was added that checks whether the first template function can be used as an mapping function (unary function) and otherwise it falls back to the selector (binary function). Useful in terms of #4257\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/4248",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/4248/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/4248/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/4248/events",
+    "html_url": "https://github.com/dlang/phobos/pull/4248",
+    "id": 151282568,
+    "number": 4248,
+    "title": "std.algorithm.searching: minmaxElement",
+    "user": {
+      "login": "wilzbach",
+      "id": 4370550,
+      "avatar_url": "https://avatars.githubusercontent.com/u/4370550?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/wilzbach",
+      "html_url": "https://github.com/wilzbach",
+      "followers_url": "https://api.github.com/users/wilzbach/followers",
+      "following_url": "https://api.github.com/users/wilzbach/following{/other_user}",
+      "gists_url": "https://api.github.com/users/wilzbach/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/wilzbach/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/wilzbach/subscriptions",
+      "organizations_url": "https://api.github.com/users/wilzbach/orgs",
+      "repos_url": "https://api.github.com/users/wilzbach/repos",
+      "events_url": "https://api.github.com/users/wilzbach/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/wilzbach/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 119492872,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/blocked",
+        "name": "blocked",
+        "color": "e11d21",
+        "default": false
+      },
+      {
+        "id": 117785236,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/dependency",
+        "name": "dependency",
+        "color": "fbca04",
+        "default": false
+      },
+      {
+        "id": 416188433,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/Enhancement",
+        "name": "Enhancement",
+        "color": "5319e7",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 27,
+    "created_at": "2016-04-27T02:17:08Z",
+    "updated_at": "2016-12-27T22:01:11Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/4248",
+      "html_url": "https://github.com/dlang/phobos/pull/4248",
+      "diff_url": "https://github.com/dlang/phobos/pull/4248.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/4248.patch"
+    },
+    "body": "follow-up to #4221 \nAn efficient combination of `{min,max}Element`.\n\nCan be found in C++ as well:\n\nhttp://en.cppreference.com/w/cpp/algorithm/minmax_element\n\nPing @nordlow.\n"
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/3373",
+    "repository_url": "https://api.github.com/repos/dlang/phobos",
+    "labels_url": "https://api.github.com/repos/dlang/phobos/issues/3373/labels{/name}",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/issues/3373/comments",
+    "events_url": "https://api.github.com/repos/dlang/phobos/issues/3373/events",
+    "html_url": "https://github.com/dlang/phobos/pull/3373",
+    "id": 85483473,
+    "number": 3373,
+    "title": "Variadic std.algorithm.comparison.equal()",
+    "user": {
+      "login": "nordlow",
+      "id": 829407,
+      "avatar_url": "https://avatars.githubusercontent.com/u/829407?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nordlow",
+      "html_url": "https://github.com/nordlow",
+      "followers_url": "https://api.github.com/users/nordlow/followers",
+      "following_url": "https://api.github.com/users/nordlow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nordlow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nordlow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nordlow/subscriptions",
+      "organizations_url": "https://api.github.com/users/nordlow/orgs",
+      "repos_url": "https://api.github.com/users/nordlow/repos",
+      "events_url": "https://api.github.com/users/nordlow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nordlow/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "labels": [
+      {
+        "id": 416200677,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/needs%20rebase",
+        "name": "needs rebase",
+        "color": "b60205",
+        "default": false
+      },
+      {
+        "id": 117785393,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/needs%20review",
+        "name": "needs review",
+        "color": "5319e7",
+        "default": false
+      },
+      {
+        "id": 117785287,
+        "url": "https://api.github.com/repos/dlang/phobos/labels/needs%20work",
+        "name": "needs work",
+        "color": "f7c6c7",
+        "default": false
+      }
+    ],
+    "state": "open",
+    "locked": false,
+    "assignee": null,
+    "assignees": [
+
+    ],
+    "milestone": null,
+    "comments": 16,
+    "created_at": "2015-06-05T09:37:17Z",
+    "updated_at": "2016-12-30T00:22:51Z",
+    "closed_at": null,
+    "pull_request": {
+      "url": "https://api.github.com/repos/dlang/phobos/pulls/3373",
+      "html_url": "https://github.com/dlang/phobos/pull/3373",
+      "diff_url": "https://github.com/dlang/phobos/pull/3373.diff",
+      "patch_url": "https://github.com/dlang/phobos/pull/3373.patch"
+    },
+    "body": "All unittests in `std/algorithm/comparison.d` pass.\n\nExtra set of unittests tests all variants of this new variadic implementation when number of arguments >= 2.\n\nHowever one unittest in `std/exception.d` fails.\n\nCan anybody explain why?\n\nSee also: http://forum.dlang.org/post/ovzgklbezgdkxhljfshj@forum.dlang.org\n"
+  }
+]

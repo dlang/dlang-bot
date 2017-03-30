@@ -46,7 +46,6 @@ unittest
             assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
                    "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
             res.statusCode = 405;
-            res.writeVoidBody;
         }
     );
 
@@ -76,7 +75,6 @@ unittest
             assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
                    "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
             res.statusCode = 200;
-            res.writeVoidBody;
         }
     );
 

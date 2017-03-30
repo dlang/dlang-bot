@@ -4,7 +4,7 @@ import dlangbot.app : runAsync;
 
 import std.datetime : Duration;
 
-auto runTaskHelper(Fun, Args...)(Fun fun, Args args)
+auto runTaskHelper(Fun, Args...)(Fun fun, auto ref Args args)
 {
     import std.functional : toDelegate;
     import vibe.core.core : runTask;

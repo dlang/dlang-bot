@@ -6,6 +6,7 @@ string githubAuth, hookSecret;
 import dlangbot.bugzilla : bugzillaURL, Issue, IssueRef;
 
 import std.algorithm, std.range;
+import std.datetime;
 import std.format : format;
 import std.typecons : Tuple;
 
@@ -38,17 +39,15 @@ string formatComment(R1, R2)(R1 refs, R2 descs)
     return app.data;
 }
 
-struct Comment { string url, body_; }
-
-Comment getBotComment(in ref PullRequest pr)
+GHComment getBotComment(in ref PullRequest pr)
 {
     // the bot may post multiple comments (mention-bot & bugzilla links)
     auto res = ghGetRequest(pr.commentsURL)
         .readJson[]
         .find!(c => c["user"]["login"] == "dlang-bot" && c["body"].get!string.canFind("Bugzilla"));
     if (res.length)
-        return deserializeJson!Comment(res[0]);
-    return Comment();
+        return deserializeJson!GHComment(res[0]);
+    return GHComment();
 }
 
 auto ghGetRequest(string url)
@@ -58,7 +57,15 @@ auto ghGetRequest(string url)
     });
 }
 
-void ghSendRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
+auto ghGetRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
+{
+    return requestHTTP(url, (scope req) {
+        req.headers["Authorization"] = githubAuth;
+        userReq(req);
+    });
+}
+
+auto ghSendRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
 {
     HTTPMethod method;
     requestHTTP(url, (scope req) {
@@ -87,14 +94,12 @@ auto ghSendRequest(T...)(HTTPMethod method, string url, T arg)
     }, url);
 }
 
-void updateGithubComment(in ref PullRequest pr, in ref Comment comment, string action, IssueRef[] refs, Issue[] descs)
+void updateGithubComment(in ref PullRequest pr, in ref GHComment comment, string action, IssueRef[] refs, Issue[] descs)
 {
     logDebug("%s", refs);
     if (refs.empty)
     {
-        if (comment.url.length) // delete any existing comment
-            ghSendRequest(HTTPMethod.DELETE, comment.url);
-        return;
+        return comment.remove();
     }
     logDebug("%s", descs);
     assert(refs.map!(r => r.id).equal(descs.map!(d => d.id)));
@@ -105,9 +110,9 @@ void updateGithubComment(in ref PullRequest pr, in ref Comment comment, string a
     if (msg != comment.body_)
     {
         if (comment.url.length)
-            ghSendRequest(HTTPMethod.PATCH, comment.url, ["body" : msg]);
+            comment.update(msg);
         else if (action != "closed" && action != "merged")
-            ghSendRequest(HTTPMethod.POST, pr.commentsURL, ["body" : msg]);
+            comment.post(pr, msg);
     }
 }
 
@@ -115,35 +120,6 @@ void updateGithubComment(in ref PullRequest pr, in ref Comment comment, string a
 //==============================================================================
 // Github Auto-merge
 //==============================================================================
-
-struct PullRequest
-{
-    import std.typecons : Nullable;
-
-    static struct Repo
-    {
-        @name("full_name") string fullName;
-    }
-    static struct Branch
-    {
-        Repo repo;
-    }
-    Branch base, head;
-    enum State { open, closed }
-    @byName State state;
-    uint number;
-    string title;
-    Nullable!bool mergeable;
-
-    string baseRepoSlug() const { return base.repo.fullName; }
-    string headRepoSlug() const { return head.repo.fullName; }
-    alias repoSlug = baseRepoSlug;
-    bool isOpen() const { return state == State.open; }
-    string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
-    string commitsURL() const { return "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, number); }
-    string eventsURL() const { return "%s/repos/%s/issues/%d/events".format(githubAPIURL, repoSlug, number); }
-    string htmlURL() const { return "https://github.com/%s/pull/%d".format(repoSlug, number); }
-}
 
 alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");
 enum MergeMethod { none = 0, merge, squash, rebase }
@@ -173,8 +149,7 @@ MergeMethod autoMergeMethod(Json[] labels)
 
 auto handleGithubLabel(in ref PullRequest pr)
 {
-    auto url = "%s/repos/%s/issues/%d/labels".format(githubAPIURL, pr.repoSlug, pr.number);
-    auto labels = ghGetRequest(url).readJson[];
+    auto labels = ghGetRequest(pr.labelsURL).readJson[];
 
     Json[] commits;
     if (auto method = labels.autoMergeMethod)
@@ -210,21 +185,12 @@ Json[] tryMerge(in ref PullRequest pr, MergeMethod method)
     if (!events.empty)
         author = getUserEmail(events.front["actor"]["login"].get!string);
 
-    auto reqInput = [
-        "commit_message": "%s\nmerged-on-behalf-of: %s".format(pr.title, author),
-        "sha": commits[$ - 1]["sha"].get!string,
-        "merge_method": method.to!string,
-    ];
-
-
-    auto prUrl = "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, pr.repoSlug, pr.number);
-    ghSendRequest((scope req){
-        req.method = HTTPMethod.PUT;
-        // custom media type is required during preview period:
-        // https://developer.github.com/changes/2016-09-26-pull-request-merge-api-update/
-        req.headers["Accept"] = "application/vnd.github.polaris-preview+json";
-        req.writeJsonBody(reqInput);
-    }, prUrl);
+    GHMerge mergeInput = {
+        commitMessage: "%s\nmerged-on-behalf-of: %s".format(pr.title, author),
+        sha: commits[$ - 1]["sha"].get!string,
+        mergeMethod: method
+    };
+    pr.postMerge(mergeInput);
 
     return commits;
 }
@@ -239,16 +205,17 @@ void checkAndRemoveLabels(Json[] labels, in ref PullRequest pr, in string[] toRe
 
 void addLabels(in ref PullRequest pr, inout string[] labels)
 {
-    auto labelUrl = "%s/repos/%s/issues/%d/labels"
-            .format(githubAPIURL, pr.repoSlug, pr.number);
-    ghSendRequest(HTTPMethod.POST, labelUrl, labels);
+    ghSendRequest(HTTPMethod.POST, pr.labelsURL, labels);
 }
 
 void removeLabel(in ref PullRequest pr, string label)
 {
-    auto labelUrl = "%s/repos/%s/issues/%d/labels/%s"
-        .format(githubAPIURL, pr.repoSlug, pr.number, label);
-    ghSendRequest(HTTPMethod.DELETE, labelUrl);
+    ghSendRequest(HTTPMethod.DELETE, pr.labelsURL ~ "/" ~ label);
+}
+
+void replaceLabels(in ref PullRequest pr, string[] labels)
+{
+    ghSendRequest(HTTPMethod.PUT, pr.labelsURL, labels);
 }
 
 string getUserEmail(string login)
@@ -265,12 +232,20 @@ Json[] getIssuesForLabel(string repoSlug, string label)
                 .format(githubAPIURL, repoSlug, label)).readJson[];
 }
 
-void searchForAutoMergePrs(string repoSlug)
+auto getIssuesForLabels(string repoSlug, const string[] labels)
 {
     // the GitHub API doesn't allow a logical OR
-    auto issues = getIssuesForLabel(repoSlug, "auto-merge").chain(getIssuesForLabel(repoSlug, "auto-merge-squash"));
+    Json[] issues;
+    foreach (label; labels)
+        issues ~= getIssuesForLabel(repoSlug, label);
     issues.sort!((a, b) => a["number"].get!int < b["number"].get!int);
-    foreach (issue; issues.uniq!((a, b) => a["number"].get!int == b["number"].get!int))
+    return issues.uniq!((a, b) => a["number"].get!int == b["number"].get!int);
+}
+
+void searchForAutoMergePrs(string repoSlug)
+{
+    static immutable labels = ["auto-merge", "auto-merge-squash"];
+    foreach (issue; getIssuesForLabels(repoSlug, labels))
     {
         auto prNumber = issue["number"].get!uint;
         if ("pull_request" !in issue)
@@ -321,4 +296,269 @@ void checkTitleForLabels(in ref PullRequest pr)
 
     if (mappedLabels.length)
         pr.addLabels(mappedLabels);
+}
+
+//==============================================================================
+// Search for inactive PRs
+//==============================================================================
+
+// range-based page loader for the GH API
+private struct AllPages
+{
+    private string url;
+    private string link = "next";
+
+    // does not cache
+    Json front() {
+        scope req = ghGetRequest(url);
+        link = req.headers.get("Link");
+        return req.readJson;
+    }
+    void popFront()
+    {
+        import std.utf : byCodeUnit;
+        url = link[1..$].byCodeUnit.until(">").array;
+    }
+    bool empty()
+    {
+        return !link.canFind("next");
+    }
+}
+
+auto ghGetAllPages(string url)
+{
+    return AllPages(url);
+}
+
+void searchForInactivePrs(string repoSlug, Duration dur)
+{
+    auto now = Clock.currTime;
+    // "updated" sorting is broken for PRs
+    // As we need to load the PR itself anyways, we load all issues as
+    // (1) the GitHubIssue object is smaller
+    // (2) the GitHubIssue object contains respective labels of an issue
+    auto pages = ghGetAllPages("%s/repos/%s/issues?state=open&sort=updated&direction=asc"
+                        .format(githubAPIURL, repoSlug));
+
+    int loadedPages;
+    foreach (page; pages)
+    {
+        foreach (i, issue; page[])
+        {
+            auto labels = issue["labels"][].map!(l => l["name"].get!string).array.sort();
+            string[] sendLabels;
+            string[] removeLabels;
+
+            // only the detailed PR page contains the mergeable state
+            const pr = ghGetRequest(issue["pull_request"]["url"].get!string)
+                        .readJson.deserializeJson!PullRequest;
+            auto timeDiff = now - pr.updatedAt;
+
+            // label inactive PR
+            if (timeDiff > dur)
+                sendLabels ~= "stalled";
+            else
+                removeLabels ~= "stalled";
+
+            // label PR with merge-conflicts
+            if (!pr.mergeable.isNull && !pr.mergeable.get)
+                sendLabels ~= "needs rebase";
+            else
+                removeLabels ~= "needs rebase";
+
+            // label PR with persistent CI failures
+            auto status = pr.status;
+            auto failCount = status.filter!((e){
+                if (e.state == GHCiStatus.State.failure ||
+                    e.state == GHCiStatus.State.error)
+                    switch (e.context) {
+                        case "auto-tester":
+                        case "CyberShadow/DAutoTest":
+                        case "continuous-integration/travis-ci/pr":
+                        case "ci/circleci":
+                            return true;
+                        default:
+                            return false;
+                    }
+                return false;
+            }).walkLength;
+            if (failCount >= 2)
+                sendLabels ~= "needs work";
+
+            auto putLabels = labels.chain(sendLabels).sort.uniq
+                                .filter!(l => !removeLabels.canFind(l)).array;
+
+            if (!labels.equal(putLabels))
+                pr.replaceLabels(putLabels);
+
+            // limit search for local testing
+            version(unittest)
+            if (i >= 3)
+                return;
+        }
+        loadedPages += page[].length;
+    }
+    logInfo("ended cron.daily for repo: %s (pages: %d)", repoSlug, loadedPages);
+}
+
+//==============================================================================
+// Github API objects
+//==============================================================================
+
+struct PullRequest
+{
+    import std.typecons : Nullable;
+
+    static struct Repo
+    {
+        @name("full_name") string fullName;
+    }
+    static struct Branch
+    {
+        string sha;
+        Repo repo;
+    }
+    Branch base, head;
+    enum State { open, closed }
+    enum MergeableState { clean, dirty, unstable, unknown }
+    @byName State state;
+    uint number;
+    string title;
+    @optional Nullable!bool mergeable;
+    @optional @byName Nullable!MergeableState mergeable_state;
+    @name("created_at") SysTime createdAt;
+    @name("updated_at") SysTime updatedAt;
+    bool locked;
+
+    GHUser user;
+    Nullable!GHUser assignee;
+    GHUser[] assignees;
+
+    string baseRepoSlug() const { return base.repo.fullName; }
+    string headRepoSlug() const { return head.repo.fullName; }
+    alias repoSlug = baseRepoSlug;
+    bool isOpen() const { return state == State.open; }
+
+    string htmlURL() const { return "https://github.com/%s/pull/%d".format(repoSlug, number); }
+    string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
+    string commitsURL() const { return "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, number); }
+    string eventsURL() const { return "%s/repos/%s/issues/%d/events".format(githubAPIURL, repoSlug, number); }
+    string labelsURL() const { return "%s/repos/%s/issues/%d/labels".format(githubAPIURL, repoSlug, number); }
+    string reviewsURL() const { return "%s/repos/%s/pulls/%d/reviews".format(githubAPIURL, repoSlug, number); }
+    string mergeURL() const { return "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, repoSlug, number); }
+    string statusURL() const { return "%s/repos/%s/status/%s".format(githubAPIURL, repoSlug, head.sha); }
+
+    GHComment[] comments() const {
+        return ghGetRequest(commentsURL)
+                .readJson
+                .deserializeJson!(GHComment[]);
+    }
+    GHCommit[] commits() const {
+        return ghGetRequest(commitsURL)
+                .readJson
+                .deserializeJson!(GHCommit[]);
+    }
+    GHReview[] reviews() const {
+        return ghGetRequest((scope req) {
+            // custom media type is required during preview period:
+            // preview review api: https://developer.github.com/changes/2016-12-14-reviews-api
+            req.headers["Accept"] = "application/vnd.github.black-cat-preview+json";
+        }, reviewsURL)
+            .readJson
+            .deserializeJson!(GHReview[]);
+    }
+    GHCiStatus[] status() const {
+        return ghGetRequest(statusURL)
+                .readJson["statuses"]
+                .deserializeJson!(GHCiStatus[]);
+    }
+
+    void postMerge(in ref GHMerge merge) const
+    {
+        ghSendRequest((scope req){
+            req.method = HTTPMethod.PUT;
+            // custom media type is required during preview period:
+            // https://developer.github.com/changes/2016-09-26-pull-request-merge-api-update/
+            req.headers["Accept"] = "application/vnd.github.polaris-preview+json";
+            req.writeJsonBody(merge);
+        }, mergeURL);
+    }
+}
+
+static struct GHUser
+{
+    string login;
+    ulong id;
+}
+
+struct GHComment
+{
+    @name("created_at") SysTime createdAt;
+    @name("updated_at") SysTime updatedAt;
+    GHUser user;
+    string body_;
+    string url;
+
+    static void post(in ref PullRequest pr, string msg)
+    {
+        ghSendRequest(HTTPMethod.POST, pr.commentsURL, ["body" : msg]);
+    }
+
+    void update(string msg) const
+    {
+        ghSendRequest(HTTPMethod.PATCH, url, ["body" : msg]);
+    }
+
+    void remove() const
+    {
+        if (url.length) // delete any existing comment
+            ghSendRequest(HTTPMethod.DELETE, url);
+    }
+}
+
+struct GHReview
+{
+    GHUser user;
+    @name("commit_id") string commitId;
+    string body_;
+    enum State { APPROVED, CHANGES_REQUESTED, COMMENTED }
+    @byName State state;
+}
+
+struct GHCommit
+{
+    string sha;
+    static struct CommitAuthor
+    {
+        string name;
+        string email;
+        SysTime date;
+    }
+    static struct Commit
+    {
+        CommitAuthor author;
+        CommitAuthor committer;
+        string message;
+    }
+    Commit commit;
+    GHUser author;
+    GHUser committer;
+}
+
+struct GHCiStatus
+{
+    enum State { success, error, failure, pending }
+    @byName State state;
+    string description;
+    @name("target_url") string targetUrl;
+    string context; // "CyberShadow/DAutoTest", "Project Tester",
+                    // "ci/circleci", "auto-tester", "codecov/project",
+                    // "codecov/patch", "continuous-integration/travis-ci/pr"
+}
+
+struct GHMerge
+{
+    @name("commit_message") string commitMessage;
+    string sha;
+    @name("merge_method") @byName MergeMethod mergeMethod;
 }
