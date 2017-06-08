@@ -1,11 +1,10 @@
 module dlangbot.app;
 
-import dlangbot.bugzilla, dlangbot.github, dlangbot.travis, dlangbot.trello,
+import dlangbot.bugzilla, dlangbot.github, dlangbot.trello,
        dlangbot.utils;
 
 public import dlangbot.bugzilla : bugzillaURL;
 public import dlangbot.github   : githubAPIURL, githubAuth, hookSecret;
-public import dlangbot.travis   : travisAPIURL;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
 
 string cronDailySecret;
@@ -45,7 +44,6 @@ shared static this()
     trelloSecret = environment["TRELLO_SECRET"];
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
     hookSecret = environment["GH_HOOK_SECRET"];
-    travisAuth = "token " ~ environment["TRAVIS_TOKEN"];
     cronDailySecret = environment["CRON_DAILY_SECRET"];
 
     // workaround for stupid openssl.conf on Heroku
@@ -214,7 +212,4 @@ void handlePR(string action, PullRequest* _pr)
 
     if (runTrello)
         updateTrelloCard(action, pr.htmlURL, refs, descs);
-
-    // wait until builds for the current push are created
-    setTimer(30.seconds, { dedupTravisBuilds(action, pr.repoSlug, pr.number); });
 }
