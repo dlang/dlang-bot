@@ -10,8 +10,6 @@ Features
 
 - [Automated bugzilla, github, and trello references](#automated-references)
 - [Auto-merging approved & passing PRs](#auto-merge)
-- [Canceling stale Travis-CI builds](#canceling-stale)
-
 
 <a name="automated-references" />
 
@@ -101,10 +99,3 @@ _Note_: at the moment the Dlang-Bot doesn't store _any_ authentication token, so
 it can't perform actions on behalf of others.
 
 <a name="canceling-state" />
-
-Canceling stale Travis-CI builds
---------------------------------
-
-To avoid wasteful resource consumption with Travis CI,
-the Dlang-Bot will automatically cancel the previous, possibly running build of
-a PR on a new commit event (push or synchronization by a user).

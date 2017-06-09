@@ -65,7 +65,6 @@ void startFakeAPIServer()
 
     githubAPIURL = fakeAPIServerURL ~ "/github";
     trelloAPIURL = fakeAPIServerURL ~ "/trello";
-    travisAPIURL = fakeAPIServerURL ~ "/travis";
     bugzillaURL = fakeAPIServerURL ~ "/bugzilla";
 }
 
