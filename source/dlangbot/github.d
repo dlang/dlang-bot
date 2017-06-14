@@ -420,7 +420,7 @@ struct PullRequest
     }
     Branch base, head;
     enum State { open, closed }
-    enum MergeableState { clean, dirty, unstable, unknown }
+    enum MergeableState { clean, dirty, unstable, blocked, unknown }
     @byName State state;
     uint number;
     string title;
