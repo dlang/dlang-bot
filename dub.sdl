@@ -4,7 +4,7 @@ copyright "Copyright © 2015, Martin Nowak"
 authors "Martin Nowak"
 dependency "vibe-d" version="~>0.7.30"
 configuration "default" {
-	versions "VibeDefaultMain"
+	versions "VibeCustomMain"
 	targetType "executable"
 }
 configuration "unittest" {

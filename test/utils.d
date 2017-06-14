@@ -29,7 +29,6 @@ shared static this()
     githubAuth = "GH_DUMMY_AUTH_TOKEN";
     hookSecret = "GH_DUMMY_HOOK_SECRET";
     trelloAuth = "key=01234&token=abcde";
-    cronDailySecret = "dummyCronSecret";
 
     // start our hook server
     auto settings = new HTTPServerSettings;
