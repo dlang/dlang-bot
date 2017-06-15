@@ -123,9 +123,12 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
             if (expectation.jsonHandler !is null)
                 expectation.jsonHandler(payloadJson);
 
-            payload = payloadJson.toString;
+            return res.writeJsonBody(payloadJson);
         }
-        return res.writeBody(payload);
+        else
+        {
+            return res.writeBody(payload);
+        }
     }
 }
 
