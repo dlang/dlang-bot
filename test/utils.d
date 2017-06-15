@@ -170,18 +170,19 @@ struct APIExpectation
     }
 }
 
-APIExpectation[] apiExpectations;
+__gshared APIExpectation[] apiExpectations;
 
 void setAPIExpectations(Args...)(Args args)
 {
     import std.functional : toDelegate;
     import std.traits :  Parameters;
+    synchronized {
     apiExpectations.length = 0;
     foreach (i, arg; args)
     {
         static if (is(Args[i] : string))
         {
-            apiExpectations ~= APIExpectation(arg);
+                apiExpectations ~= APIExpectation(arg);
         }
         else
         {
@@ -201,6 +202,7 @@ void setAPIExpectations(Args...)(Args args)
             assert(apiExpectations[$ - 1].jsonHandler is null ||
                    apiExpectations[$ - 1].reqHandler is null, "Either provide a reqHandler or a jsonHandler");
         }
+    }
     }
 }
 
