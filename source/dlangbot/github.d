@@ -39,7 +39,7 @@ string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs
     import std.array : appender;
 
     auto app = appender!string;
-    
+
     app.formattedWrite(
 `Thanks for your pull request, @%s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
 
@@ -151,12 +151,6 @@ void updateGithubComment(in ref PullRequest pr, in ref GHComment comment,
 // Github Auto-merge
 //==============================================================================
 
-    static struct User
-    {
-        string login;
-    }
-
-    User user;
 alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");
 enum MergeMethod { none = 0, merge, squash, rebase }
 
