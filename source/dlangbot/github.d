@@ -20,21 +20,45 @@ import vibe.stream.operations : readAllUTF8;
 // Github comments
 //==============================================================================
 
-string formatComment(R1, R2)(R1 refs, R2 descs)
+string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs)
 {
     import std.array : appender;
     import std.format : formattedWrite;
 
-    auto combined = zip(refs.map!(r => r.id), refs.map!(r => r.fixed), descs.map!(d => d.desc));
     auto app = appender!string();
-    app.put("Fix | Bugzilla | Description\n");
-    app.put("--- | --- | ---\n");
+    app.formattedWrite(
+`Thanks for your pull request, @%s!  We are looking
+forward to reviewing it, and you should be hearing from
+a maintainer soon.
 
-    foreach (num, closed, desc; combined)
+Some things that can help to speed things up:
+
+- smaller, focused PRs are easier to review than big ones
+
+- try not to mix up refactoring or style changes with bug
+  fixes or feature enhancements
+
+- provide helpful commit messages explaining the rationale
+  behind each change
+
+Bear in mind that large or tricky changes may require multiple
+rounds of review and revision.
+
+Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) for more information.
+
+`, pr.user.login, pr.repoSlug);
+
+    if (refs.length > 0)
     {
-        app.formattedWrite(
-            "%1$s | [%2$s](%4$s/show_bug.cgi?id=%2$s) | %3$s\n",
-            closed ? "✓" : "✗", num, desc, bugzillaURL);
+        auto combined = zip(refs.map!(r => r.id), refs.map!(r => r.fixed), descs.map!(d => d.desc));
+        app.put("Fix | Bugzilla | Description\n");
+        app.put("--- | --- | ---\n");
+        foreach (num, closed, desc; combined)
+        {
+            app.formattedWrite(
+                "%1$s | [%2$s](%4$s/show_bug.cgi?id=%2$s) | %3$s\n",
+                closed ? "✓" : "✗", num, desc, bugzillaURL);
+        }
     }
     return app.data;
 }
@@ -97,14 +121,10 @@ auto ghSendRequest(T...)(HTTPMethod method, string url, T arg)
 void updateGithubComment(in ref PullRequest pr, in ref GHComment comment, string action, IssueRef[] refs, Issue[] descs)
 {
     logDebug("%s", refs);
-    if (refs.empty)
-    {
-        return comment.remove();
-    }
     logDebug("%s", descs);
     assert(refs.map!(r => r.id).equal(descs.map!(d => d.id)));
 
-    auto msg = formatComment(refs, descs);
+    auto msg = pr.formatComment(refs, descs);
     logDebug("%s", msg);
 
     if (msg != comment.body_)
@@ -121,6 +141,12 @@ void updateGithubComment(in ref PullRequest pr, in ref GHComment comment, string
 // Github Auto-merge
 //==============================================================================
 
+    static struct User
+    {
+        string login;
+    }
+
+    User user;
 alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");
 enum MergeMethod { none = 0, merge, squash, rebase }
 
