@@ -27,22 +27,17 @@ string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs
 
     auto app = appender!string();
     app.formattedWrite(
-`Thanks for your pull request, @%s!  We are looking
-forward to reviewing it, and you should be hearing from
-a maintainer soon.
+`Thanks for your pull request, @%s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
 
 Some things that can help to speed things up:
 
 - smaller, focused PRs are easier to review than big ones
 
-- try not to mix up refactoring or style changes with bug
-  fixes or feature enhancements
+- try not to mix up refactoring or style changes with bug fixes or feature enhancements
 
-- provide helpful commit messages explaining the rationale
-  behind each change
+- provide helpful commit messages explaining the rationale behind each change
 
-Bear in mind that large or tricky changes may require multiple
-rounds of review and revision.
+Bear in mind that large or tricky changes may require multiple rounds of review and revision.
 
 Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) for more information.
 
