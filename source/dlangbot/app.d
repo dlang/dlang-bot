@@ -64,7 +64,7 @@ void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
     import dlangbot.trello : verifyRequest;
 
     auto json = verifyRequest(req.headers["X-Trello-Webhook"], req.bodyReader.readAllUTF8, trelloHookURL);
-    logDebug("trelloHook %s", json);
+    logDebug("trelloHook: %s", json);
     auto action = json["action"]["type"].get!string;
     switch (action)
     {
@@ -84,6 +84,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     import dlangbot.github : verifyRequest;
 
     auto json = verifyRequest(req.headers["X-Hub-Signature"], req.bodyReader.readAllUTF8);
+    logDebug("githubHook: %s", json);
     switch (req.headers["X-GitHub-Event"])
     {
     case "ping":
@@ -91,6 +92,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     case "status":
         string repoSlug = json["name"].get!string;
         string state = json["state"].get!string;
+        logDebug("[github/pull_request](%s): state=%s, sha=%s, url=%s", repoSlug, state, json["sha"], json["target_url"]);
         // no need to trigger the checker for failure/pending
         if (state == "success")
             prThrottler(repoSlug);
@@ -99,7 +101,8 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     case "pull_request":
 
         auto action = json["action"].get!string;
-        logDebug("#%s %s", json["number"], action);
+        string repoSlug = json["repository"]["full_name"].get!string;
+        logDebug("[github/pull_request](%s/%s): action=%s", repoSlug, json["number"], action);
 
         switch (action)
         {
@@ -153,6 +156,7 @@ void handlePR(string action, PullRequest* _pr)
             return;
         if (action == "synchronize")
         {
+            logDebug("[github/handlePR](%s): checkAndRemoveLabels", _pr.pid);
             enum toRemoveLabels = ["auto-merge", "auto-merge-squash",
                                    "needs rebase", "needs work"];
             checkAndRemoveLabels(labelsAndCommits.labels, pr, toRemoveLabels);
@@ -182,10 +186,16 @@ void handlePR(string action, PullRequest* _pr)
     pr.updateGithubComment(comment, action, refs, descs, msgs);
 
     if (refs.any!(r => r.fixed) && comment.body_.length == 0)
+    {
+        logDebug("[github/handlePR](%s): adding bug fix label", _pr.pid);
         pr.addLabels(["Bug fix"]);
+    }
 
     if (runTrello)
+    {
+        logDebug("[github/handlePR](%s): updating trello card", _pr.pid);
         updateTrelloCard(action, pr.htmlURL, refs, descs);
+    }
 }
 
 //==============================================================================
