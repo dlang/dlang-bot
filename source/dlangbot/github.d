@@ -338,7 +338,8 @@ private struct AllPages
     void popFront()
     {
         import std.utf : byCodeUnit;
-        url = link[1..$].byCodeUnit.until(">").array;
+        if (link)
+            url = link[1..$].byCodeUnit.until(">").array;
     }
     bool empty()
     {
@@ -373,19 +374,30 @@ void searchForInactivePrs(string repoSlug, Duration dur)
             // only the detailed PR page contains the mergeable state
             const pr = ghGetRequest(issue["pull_request"]["url"].get!string)
                         .readJson.deserializeJson!PullRequest;
-            auto timeDiff = now - pr.updatedAt;
+
+            // fetch the recent comments
+            // TODO: direction doesn't seem to work here
+            // https://developer.github.com/v3/issues/comments/#list-comments-in-a-repository
+            const lastComment = ghGetRequest(pr.commentsURL)
+                                .readJson[$ - 1].deserializeJson!GHComment;
+
+            auto timeDiff = now - lastComment.updatedAt;
 
             // label inactive PR
+            // be careful labeling changes the last updatedAt timestamp
             if (timeDiff > dur)
                 sendLabels ~= "stalled";
             else
                 removeLabels ~= "stalled";
 
             // label PR with merge-conflicts
-            if (!pr.mergeable.isNull && !pr.mergeable.get)
-                sendLabels ~= "needs rebase";
-            else
-                removeLabels ~= "needs rebase";
+            if (!pr.mergeable.isNull)
+            {
+                if (pr.mergeable.get)
+                    removeLabels ~= "needs rebase";
+                else
+                    sendLabels ~= "needs rebase";
+            }
 
             // label PR with persistent CI failures
             auto status = pr.status;

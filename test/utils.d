@@ -206,6 +206,14 @@ void setAPIExpectations(Args...)(Args args)
     }
 }
 
+void checkAPIExpectations()
+{
+    scope(failure) {
+        writefln("Didn't request: %s", apiExpectations.map!(x => x.url));
+    }
+    assert(apiExpectations.length == 0);
+}
+
 void postGitHubHook(string payload, string eventType = "pull_request",
     void delegate(ref Json j, scope HTTPClientRequest req) postprocess = null,
     int line = __LINE__, string file = __FILE__)
@@ -241,10 +249,7 @@ void postGitHubHook(string payload, string eventType = "pull_request",
     }
     assert(req.statusCode == 200);
     assert(req.bodyReader.readAllUTF8 == "handled");
-    scope(failure) {
-        writefln("Didn't request: %s", apiExpectations.map!(x => x.url));
-    }
-    assert(apiExpectations.length == 0);
+    checkAPIExpectations;
 }
 
 void postTrelloHook(string payload,
@@ -280,10 +285,7 @@ void postTrelloHook(string payload,
     }
     assert(req.statusCode == 200);
     assert(req.bodyReader.readAllUTF8 == "handled");
-    scope(failure) {
-        writefln("Didn't request: %s", apiExpectations.map!(x => x.url));
-    }
-    assert(apiExpectations.length == 0);
+    checkAPIExpectations;
 }
 
 void openUrl(string url, string expectedResponse,
@@ -302,9 +304,6 @@ void openUrl(string url, string expectedResponse,
             writeln(req.bodyReader.readAllUTF8);
     }
     assert(req.statusCode == 200);
-    scope(failure) {
-        writefln("Didn't request: %s", apiExpectations.map!(x => x.url));
-    }
-    assert(apiExpectations.length == 0);
+    checkAPIExpectations;
     assert(req.bodyReader.readAllUTF8 == expectedResponse);
 }

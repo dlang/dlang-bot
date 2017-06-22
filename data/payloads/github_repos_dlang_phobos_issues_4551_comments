@@ -1,0 +1,30 @@
+[
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/issues/comments/230164534",
+    "html_url": "https://github.com/dlang/phobos/pull/4551#issuecomment-230164534",
+    "issue_url": "https://api.github.com/repos/dlang/phobos/issues/4551",
+    "id": 230164534,
+    "user": {
+      "login": "dlang-bot",
+      "id": 15698993,
+      "avatar_url": "https://avatars0.githubusercontent.com/u/15698993?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/dlang-bot",
+      "html_url": "https://github.com/dlang-bot",
+      "followers_url": "https://api.github.com/users/dlang-bot/followers",
+      "following_url": "https://api.github.com/users/dlang-bot/following{/other_user}",
+      "gists_url": "https://api.github.com/users/dlang-bot/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/dlang-bot/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/dlang-bot/subscriptions",
+      "organizations_url": "https://api.github.com/users/dlang-bot/orgs",
+      "repos_url": "https://api.github.com/users/dlang-bot/repos",
+      "events_url": "https://api.github.com/users/dlang-bot/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/dlang-bot/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "created_at": "2016-07-03T17:23:31Z",
+    "updated_at": "2016-07-03T17:23:31Z",
+    "body": "| Fix | Bugzilla | Description |\n| --- | --- | --- |\n| ✗ | [16230](https://issues.dlang.org/show_bug.cgi?id=16230) | core.atomic.atomicLoad removes shared from aggregate types too eagerly |\n"
+  }
+]
