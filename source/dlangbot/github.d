@@ -63,7 +63,7 @@ GHComment getBotComment(in ref PullRequest pr)
     // the bot may post multiple comments (mention-bot & bugzilla links)
     auto res = ghGetRequest(pr.commentsURL)
         .readJson[]
-        .find!(c => c["user"]["login"] == "dlang-bot" && c["body"].get!string.canFind("Bugzilla"));
+        .find!(c => c["user"]["login"] == "dlang-bot");
     if (res.length)
         return deserializeJson!GHComment(res[0]);
     return GHComment();
