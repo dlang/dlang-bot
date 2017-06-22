@@ -130,7 +130,7 @@ auto ghSendRequest(T...)(HTTPMethod method, string url, T arg)
 void updateGithubComment(in ref PullRequest pr, in ref GHComment comment,
                          string action, IssueRef[] refs, Issue[] descs, UserMessage[] msgs)
 {
-    logDebug("%s", refs);
+    logDebug("[github/updateGithubComment](%s): %s", pr.pid, refs);
     logDebug("%s", descs);
     assert(refs.map!(r => r.id).equal(descs.map!(d => d.id)));
 
@@ -496,6 +496,12 @@ struct PullRequest
     string reviewsURL() const { return "%s/repos/%s/pulls/%d/reviews".format(githubAPIURL, repoSlug, number); }
     string mergeURL() const { return "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, repoSlug, number); }
     string statusURL() const { return "%s/repos/%s/status/%s".format(githubAPIURL, repoSlug, head.sha); }
+
+    string pid() const
+    {
+        import std.conv : text;
+        return text(repoSlug, "/", number);
+    }
 
     GHComment[] comments() const {
         return ghGetRequest(commentsURL)
