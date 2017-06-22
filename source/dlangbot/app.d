@@ -140,6 +140,7 @@ void handlePR(string action, PullRequest* _pr)
 {
     import std.algorithm : any;
     import vibe.core.core : setTimer;
+    import dlangbot.warnings : checkForWarnings, UserMessage;
 
     const PullRequest pr = *_pr;
 
@@ -172,7 +173,13 @@ void handlePR(string action, PullRequest* _pr)
     auto descs = getDescriptions(refs);
     auto comment = pr.getBotComment;
 
-    pr.updateGithubComment(comment, action, refs, descs);
+    UserMessage[] msgs;
+    if (action == "opened" || action == "synchronize")
+    {
+        msgs = pr.checkForWarnings(descs);
+    }
+
+    pr.updateGithubComment(comment, action, refs, descs, msgs);
 
     if (refs.any!(r => r.fixed) && comment.body_.length == 0)
         pr.addLabels(["Bug fix"]);

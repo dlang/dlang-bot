@@ -1,0 +1,2 @@
+bug_id,"short_desc","bug_status","resolution","bug_severity","priority"
+8573,"A simpler Phobos function that returns the index of the mix or max item","NEW","---","enhancement","P2"

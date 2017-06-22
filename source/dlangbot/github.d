@@ -4,10 +4,11 @@ string githubAPIURL = "https://api.github.com";
 string githubAuth, hookSecret;
 
 import dlangbot.bugzilla : bugzillaURL, Issue, IssueRef;
+import dlangbot.warnings : printMessages, UserMessage;
 
 import std.algorithm, std.range;
 import std.datetime;
-import std.format : format;
+import std.format : format, formattedWrite;
 import std.typecons : Tuple;
 
 import vibe.core.log;
@@ -20,12 +21,25 @@ import vibe.stream.operations : readAllUTF8;
 // Github comments
 //==============================================================================
 
-string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs)
+void printBugList(W)(W app, in IssueRef[] refs, in Issue[] descs)
+{
+    auto combined = zip(refs.map!(r => r.id), refs.map!(r => r.fixed), descs.map!(d => d.desc));
+    app.put("Fix | Bugzilla | Description\n");
+    app.put("--- | --- | ---\n");
+    foreach (num, closed, desc; combined)
+    {
+        app.formattedWrite(
+            "%1$s | [%2$s](%4$s/show_bug.cgi?id=%2$s) | %3$s\n",
+            closed ? "✓" : "✗", num, desc, bugzillaURL);
+    }
+}
+
+string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs, in UserMessage[] msgs)
 {
     import std.array : appender;
-    import std.format : formattedWrite;
 
-    auto app = appender!string();
+    auto app = appender!string;
+    
     app.formattedWrite(
 `Thanks for your pull request, @%s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
 
@@ -43,17 +57,17 @@ Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) 
 
 `, pr.user.login, pr.repoSlug);
 
-    if (refs.length > 0)
+    if (refs.length)
     {
-        auto combined = zip(refs.map!(r => r.id), refs.map!(r => r.fixed), descs.map!(d => d.desc));
-        app.put("Fix | Bugzilla | Description\n");
-        app.put("--- | --- | ---\n");
-        foreach (num, closed, desc; combined)
-        {
-            app.formattedWrite(
-                "%1$s | [%2$s](%4$s/show_bug.cgi?id=%2$s) | %3$s\n",
-                closed ? "✓" : "✗", num, desc, bugzillaURL);
-        }
+        app ~= "### Bugzilla references\n\n";
+        app.printBugList(refs, descs);
+    }
+    if (msgs.length)
+    {
+        if (refs.length)
+            app ~= "\n";
+        app ~= "### Warnings\n\n";
+        app.printMessages(msgs);
     }
     return app.data;
 }
@@ -113,13 +127,14 @@ auto ghSendRequest(T...)(HTTPMethod method, string url, T arg)
     }, url);
 }
 
-void updateGithubComment(in ref PullRequest pr, in ref GHComment comment, string action, IssueRef[] refs, Issue[] descs)
+void updateGithubComment(in ref PullRequest pr, in ref GHComment comment,
+                         string action, IssueRef[] refs, Issue[] descs, UserMessage[] msgs)
 {
     logDebug("%s", refs);
     logDebug("%s", descs);
     assert(refs.map!(r => r.id).equal(descs.map!(d => d.id)));
 
-    auto msg = pr.formatComment(refs, descs);
+    auto msg = pr.formatComment(refs, descs, msgs);
     logDebug("%s", msg);
 
     if (msg != comment.body_)
@@ -449,6 +464,7 @@ struct PullRequest
     static struct Branch
     {
         string sha;
+        string ref_;
         Repo repo;
     }
     Branch base, head;
