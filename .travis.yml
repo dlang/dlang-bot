@@ -10,6 +10,8 @@ d:
  - ldc
 
 matrix:
+  allow_failures:
+    - d: ldc
   include:
     - d: dmd-2.070.2 # the deployment compiler
       env: COVERAGE=true
