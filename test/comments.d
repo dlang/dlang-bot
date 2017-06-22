@@ -68,6 +68,34 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
             auto body_= req.json["body"].get!string;
+            assert(body_.canFind("@andralex"));
+            assert(!body_.canFind("Fix | Bugzilla"), "Shouldn't contain bug header");
+            assert(!body_.canFind("/show_bug.cgi?id="), "Shouldn't contain a Bugzilla reference");
+        }
+    );
+
+    postGitHubHook("dlang_phobos_synchronize_4921.json");
+}
+
+// existing dlang bot comment, but no commits that reference a issue
+// -> update comment (without references to Bugzilla)
+// test that we don't create a duplicate comment
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
+            j = Json.emptyArray;
+         },
+        "/github/repos/dlang/phobos/issues/4921/labels",
+         "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
+            // any arbitrary comment should be removed
+            j[0]["body"] = "Foo bar";
+         },
+         "/github/repos/dlang/phobos/issues/comments/262784442",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.PATCH);
+            auto body_= req.json["body"].get!string;
+            assert(body_.canFind("@andralex"));
             assert(!body_.canFind("Fix | Bugzilla"), "Shouldn't contain bug header");
             assert(!body_.canFind("/show_bug.cgi?id="), "Shouldn't contain a Bugzilla reference");
         }
