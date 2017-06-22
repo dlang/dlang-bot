@@ -3,11 +3,15 @@ os:
  - linux
 language: d
 d:
+ - dmd-nightly
  - dmd-beta
  - dmd
+ - ldc-beta
  - ldc
 
 matrix:
+  allow_failures:
+    - d: ldc
   include:
     - d: dmd-2.070.2 # the deployment compiler
       env: COVERAGE=true

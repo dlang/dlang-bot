@@ -29,7 +29,6 @@ shared static this()
     githubAuth = "GH_DUMMY_AUTH_TOKEN";
     hookSecret = "GH_DUMMY_HOOK_SECRET";
     trelloAuth = "key=01234&token=abcde";
-    cronDailySecret = "dummyCronSecret";
 
     // start our hook server
     auto settings = new HTTPServerSettings;
@@ -124,9 +123,12 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
             if (expectation.jsonHandler !is null)
                 expectation.jsonHandler(payloadJson);
 
-            payload = payloadJson.toString;
+            return res.writeJsonBody(payloadJson);
         }
-        return res.writeBody(payload);
+        else
+        {
+            return res.writeBody(payload);
+        }
     }
 }
 
@@ -168,18 +170,19 @@ struct APIExpectation
     }
 }
 
-APIExpectation[] apiExpectations;
+__gshared APIExpectation[] apiExpectations;
 
 void setAPIExpectations(Args...)(Args args)
 {
     import std.functional : toDelegate;
     import std.traits :  Parameters;
+    synchronized {
     apiExpectations.length = 0;
     foreach (i, arg; args)
     {
         static if (is(Args[i] : string))
         {
-            apiExpectations ~= APIExpectation(arg);
+                apiExpectations ~= APIExpectation(arg);
         }
         else
         {
@@ -199,6 +202,7 @@ void setAPIExpectations(Args...)(Args args)
             assert(apiExpectations[$ - 1].jsonHandler is null ||
                    apiExpectations[$ - 1].reqHandler is null, "Either provide a reqHandler or a jsonHandler");
         }
+    }
     }
 }
 

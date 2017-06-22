@@ -7,10 +7,10 @@ public import dlangbot.bugzilla : bugzillaURL;
 public import dlangbot.github   : githubAPIURL, githubAuth, hookSecret;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
 
-string cronDailySecret;
-
 import std.datetime : Clock, days, Duration, minutes, seconds, SysTime;
 
+import vibe.core.args;
+import vibe.core.core;
 import vibe.core.log;
 import vibe.data.json;
 import vibe.http.client : HTTPClient;
@@ -29,32 +29,6 @@ Duration prInactivityDur = 90.days; // PRs with no activity within X days will g
 
 enum trelloHookURL = "https://dlang-bot.herokuapp.com/trello_hook";
 
-version(unittest){} else
-shared static this()
-{
-    import std.process : environment;
-    import vibe.core.args : readOption;
-
-    auto settings = new HTTPServerSettings;
-    settings.port = 8080;
-    readOption("port|p", &settings.port, "Sets the port used for serving.");
-    startServer(settings);
-
-    githubAuth = "token "~environment["GH_TOKEN"];
-    trelloSecret = environment["TRELLO_SECRET"];
-    trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
-    hookSecret = environment["GH_HOOK_SECRET"];
-    cronDailySecret = environment["CRON_DAILY_SECRET"];
-
-    // workaround for stupid openssl.conf on Heroku
-    if (environment.get("DYNO") !is null)
-    {
-        HTTPClient.setTLSSetupCallback((ctx) {
-            ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
-        });
-    }
-}
-
 void startServer(HTTPServerSettings settings)
 {
     import vibe.core.core : vibeVersionString;
@@ -71,7 +45,6 @@ void startServer(HTTPServerSettings settings)
         .post("/github_hook", &githubHook)
         .match(HTTPMethod.HEAD, "/trello_hook", (req, res) => res.writeVoidBody)
         .post("/trello_hook", &trelloHook)
-        .get("/cron_daily", &cronDaily)
         ;
 
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
@@ -152,19 +125,13 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 
 //==============================================================================
 
-void cronDaily(HTTPServerRequest req, HTTPServerResponse res)
+void cronDaily()
 {
-    enforceBadRequest(req.query.length > 0, "No repo slugs provided");
-    enforceHTTP(req.query.get("secret") == cronDailySecret,
-                HTTPStatus.unauthorized, "Invalid or no secret provided");
-
-    foreach (ref slug; req.query.getAll("repo"))
+    foreach (repo; ["dlang/phobos"])
     {
-        logInfo("running cron.daily for: %s", slug);
-        runTaskHelper(&searchForInactivePrs, slug, prInactivityDur);
+        logInfo("running cron.daily for: %s", repo);
+        searchForInactivePrs(repo, prInactivityDur);
     }
-
-    return res.writeBody("OK");
 }
 
 //==============================================================================
@@ -212,4 +179,40 @@ void handlePR(string action, PullRequest* _pr)
 
     if (runTrello)
         updateTrelloCard(action, pr.htmlURL, refs, descs);
+}
+
+//==============================================================================
+
+version (unittest) {}
+else void main(string[] args)
+{
+    import std.process : environment;
+    import vibe.core.args : readOption;
+
+    githubAuth = "token "~environment["GH_TOKEN"];
+    trelloSecret = environment["TRELLO_SECRET"];
+    trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
+    hookSecret = environment["GH_HOOK_SECRET"];
+
+    // workaround for stupid openssl.conf on Heroku
+    if (environment.get("DYNO") !is null)
+    {
+        HTTPClient.setTLSSetupCallback((ctx) {
+            ctx.useTrustedCertificateFile("/etc/ssl/certs/ca-certificates.crt");
+        });
+    }
+
+    bool runDailyCron;
+    auto settings = new HTTPServerSettings;
+    settings.port = 8080;
+    readOption("port|p", &settings.port, "Sets the port used for serving.");
+    readOption("cron-daily", &runDailyCron, "Run daily cron tasks.");
+    if (!finalizeCommandLineOptions())
+        return;
+    if (runDailyCron)
+        return cronDaily();
+
+    startServer(settings);
+    lowerPrivileges();
+    runEventLoop();
 }

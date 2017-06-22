@@ -47,5 +47,6 @@ unittest
         },
     );
 
-    openUrl("/cron_daily?repo=dlang/phobos&secret=" ~ cronDailySecret, "OK");
+    import dlangbot.app : cronDaily;
+    cronDaily();
 }
