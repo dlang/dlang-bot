@@ -40,6 +40,20 @@ string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs
 
     auto app = appender!string;
 
+    bool isMember = ghGetRequest(pr.membersURL)
+        .readJson
+        .deserializeJson!(GHUser[])
+        .canFind!(l => l.login == pr.user.login);
+
+    if (isMember)
+    {
+        app.formattedWrite(
+`Thanks for your pull request, @%s!
+`, pr.user.login, pr.repoSlug);
+    }
+    else
+    {
+
     app.formattedWrite(
 `Thanks for your pull request, @%s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
 
@@ -56,6 +70,7 @@ Bear in mind that large or tricky changes may require multiple rounds of review 
 Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) for more information.
 
 `, pr.user.login, pr.repoSlug);
+    }
 
     if (refs.length)
     {
@@ -454,6 +469,7 @@ struct PullRequest
     static struct Repo
     {
         @name("full_name") string fullName;
+        GHUser owner;
     }
     static struct Branch
     {
@@ -490,6 +506,7 @@ struct PullRequest
     string reviewsURL() const { return "%s/repos/%s/pulls/%d/reviews".format(githubAPIURL, repoSlug, number); }
     string mergeURL() const { return "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, repoSlug, number); }
     string statusURL() const { return "%s/repos/%s/status/%s".format(githubAPIURL, repoSlug, head.sha); }
+    string membersURL() const { return "%s/orgs/%s/public_members".format(githubAPIURL, base.repo.owner.login); }
 
     string pid() const
     {
@@ -538,6 +555,10 @@ static struct GHUser
 {
     string login;
     ulong id;
+    @name("avatar_url") string avatarURL;
+    @name("gravatar_id") string gravatarId;
+    string type;
+    @name("site_admin") bool siteAdmin;
 }
 
 struct GHComment

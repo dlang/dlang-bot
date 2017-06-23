@@ -47,6 +47,7 @@ unittest
         "/github/repos/dlang/dmd/pulls/6359/commits",
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/github/orgs/dlang/public_members",
         "/github/repos/dlang/dmd/issues/6359/comments",
         // action: add bug fix label
         "/github/repos/dlang/dmd/issues/6359/labels",
@@ -80,6 +81,7 @@ unittest
         "/github/repos/dlang/dmd/pulls/6359/commits",
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/github/orgs/dlang/public_members",
         "/github/repos/dlang/dmd/issues/6359/comments",
         // action: add bug fix label
         "/github/repos/dlang/dmd/issues/6359/labels",
