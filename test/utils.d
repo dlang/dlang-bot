@@ -22,6 +22,17 @@ string trelloTestHookURL;
 string payloadDir = "./data/payloads";
 string hookDir = "./data/hooks";
 
+/// Tries to find a free port
+ushort getFreePort()
+{
+    import std.conv : to;
+    import std.socket : AddressFamily, InternetAddress, Socket, SocketType;
+    auto s = new Socket(AddressFamily.INET, SocketType.STREAM);
+    scope(exit) s.close;
+    s.bind(new InternetAddress(0));
+    return s.localAddress.toPortString.to!ushort;
+}
+
 version(unittest)
 shared static this()
 {
@@ -32,7 +43,7 @@ shared static this()
 
     // start our hook server
     auto settings = new HTTPServerSettings;
-    settings.port = 9000;
+    settings.port = getFreePort;
     startServer(settings);
     startFakeAPIServer();
 
@@ -51,7 +62,7 @@ void startFakeAPIServer()
 {
     // start a fake API server
     auto fakeSettings = new HTTPServerSettings;
-    fakeSettings.port = 9001;
+    fakeSettings.port = getFreePort;
     fakeSettings.bindAddresses = ["0.0.0.0"];
     fakeSettings.options = HTTPServerOption.defaults & HTTPServerOption.parseJsonBody;
     auto router = new URLRouter;
