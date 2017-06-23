@@ -94,6 +94,7 @@ unittest
         },
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/comments",
+        "/github/orgs/dlang/public_members",
         "/github/repos/dlang/dmd/issues/6359/labels",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.method == HTTPMethod.POST);
@@ -118,6 +119,7 @@ unittest
         },
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/comments",
+        "/github/orgs/dlang/public_members",
     );
 
     postGitHubHook("dlang_dmd_open_6359.json", "pull_request",
