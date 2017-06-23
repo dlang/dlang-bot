@@ -130,9 +130,9 @@ void updateGithubComment(in ref PullRequest pr, in ref GHComment comment,
 
 alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");
 
-string labelName(MergeMethod method)
+string labelName(GHMerge.MergeMethod method)
 {
-    final switch (method) with (MergeMethod)
+    final switch (method) with (GHMerge.MergeMethod)
     {
     case none: return null;
     case merge: return "auto-merge";
@@ -141,16 +141,19 @@ string labelName(MergeMethod method)
     }
 }
 
-MergeMethod autoMergeMethod(Json[] labels)
+GHMerge.MergeMethod autoMergeMethod(Json[] labels)
 {
-    auto labelNames = labels.map!(l => l["name"].get!string);
-    if (labelNames.canFind!(l => l == "auto-merge"))
-        return MergeMethod.merge;
-    else if (labelNames.canFind!(l => l == "auto-merge-squash"))
-        return MergeMethod.squash;
-    else if (labelNames.canFind!(l => l == "auto-merge-rebase"))
-        return MergeMethod.rebase;
-    return MergeMethod.none;
+    with (GHMerge.MergeMethod)
+    {
+        auto labelNames = labels.map!(l => l["name"].get!string);
+        if (labelNames.canFind!(l => l == "auto-merge"))
+            return merge;
+        else if (labelNames.canFind!(l => l == "auto-merge-squash"))
+            return squash;
+        else if (labelNames.canFind!(l => l == "auto-merge-rebase"))
+            return rebase;
+        return none;
+    }
 }
 
 auto handleGithubLabel(in ref PullRequest pr)
@@ -164,7 +167,7 @@ auto handleGithubLabel(in ref PullRequest pr)
     return LabelsAndCommits(labels, commits);
 }
 
-Json[] tryMerge(in ref PullRequest pr, MergeMethod method)
+Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
 {
     import std.conv : to;
 
