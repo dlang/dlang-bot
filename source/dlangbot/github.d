@@ -57,11 +57,26 @@ Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) 
 
 `, pr.user.login, pr.repoSlug);
 
-    if (refs.length)
+    static immutable bugzillaReferences = ["dlang/dmd", "dlang/druntime", "dlang/phobos",
+                     "dlang/dlang.org", "dlang/tools", "dlang/installer"];
+
+    // markdown doesn't support breaking of long lines, hence plain, old HTML is used
+    if (bugzillaReferences.canFind(pr.repoSlug))
     {
-        app ~= "### Bugzilla references\n\n";
-        app.printBugList(refs, descs);
+        app ~= "\n### Bugzilla references\n\n";
+        if (refs.length)
+            app.printBugList(refs, descs);
+        else
+            app.formattedWrite(
+`Your PR doesn't reference any Bugzilla issue.
+<p>
+If your PR contains non-trivial changes, please
+<a href="https://github.com/dlang-bots/dlang-bot#automated-references">reference a Bugzilla issue</a>
+or create a <a href="https://github.com/%s/blob/master/changelog">manual changelog</a>.
+</p>
+`, pr.repoSlug);
     }
+
     if (msgs.length)
     {
         if (refs.length)
