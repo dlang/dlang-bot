@@ -112,6 +112,39 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
+// existing dlang bot comment + enhancement bugzilla labels
+// -> test that we add an enhancement label (not bug fix)
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
+            j[0]["commit"]["message"] = "Fix Issue 8573";
+        },
+         "/github/repos/dlang/phobos/issues/4921/comments",
+        "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            res.writeBody(
+`bug_id,"short_desc","bug_status","resolution","bug_severity","priority"
+8573,"A simpler Phobos function that returns the index of the mix or max item","NEW","---","enhancement","P2"`);
+        },
+        "/github/repos/dlang/phobos/issues/4921/labels",
+        "/github/orgs/dlang/public_members",
+        "/github/repos/dlang/phobos/issues/comments/262784442",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.PATCH);
+            auto body_= req.json["body"].get!string;
+            assert(body_.canFind("@andralex"));
+        },
+        "/github/repos/dlang/phobos/issues/4921/labels",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.json[].equal(["Enhancement"]));
+        },
+        "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+    );
+
+    postGitHubHook("dlang_phobos_synchronize_4921.json");
+}
+
 // existing dlang bot comment -> update comment
 // auto-merge label -> remove (due to synchronization)
 unittest
@@ -170,9 +203,7 @@ unittest
         // no bug fix label, since Issues are only referenced but not fixed according to commit messages
         "/github/repos/dlang/phobos/issues/4921/comments",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            import std.stdio;
             assert(req.method == HTTPMethod.POST);
-            writeln(req.json["body"]);
             auto expectedComment =
 `### Bugzilla references
 
@@ -184,7 +215,6 @@ Fix | Bugzilla | Description
 
 - Regression fixes should always target stable
 `.format(bugzillaURL);
-            writeln(expectedComment);
             assert(req.json["body"].get!string.canFind(expectedComment));
             res.writeVoidBody;
         },
