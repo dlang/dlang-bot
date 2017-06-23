@@ -254,10 +254,9 @@ struct GHCiStatus
                     // "codecov/patch", "continuous-integration/travis-ci/pr"
 }
 
-enum MergeMethod { none = 0, merge, squash, rebase }
-
 struct GHMerge
 {
+    enum MergeMethod { none = 0, merge, squash, rebase }
     @name("commit_message") string commitMessage;
     string sha;
     @name("merge_method") @byName MergeMethod mergeMethod;
