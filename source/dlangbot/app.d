@@ -4,7 +4,7 @@ import dlangbot.bugzilla, dlangbot.github, dlangbot.trello,
        dlangbot.utils;
 
 public import dlangbot.bugzilla : bugzillaURL;
-public import dlangbot.github   : githubAPIURL, githubAuth, hookSecret;
+public import dlangbot.github_api   : githubAPIURL, githubAuth, hookSecret;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
 
 import std.datetime : Clock, days, Duration, minutes, seconds, SysTime;
