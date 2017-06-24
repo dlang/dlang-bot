@@ -53,11 +53,10 @@ string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs
     }
     else
     {
-
-    app.formattedWrite(
+        app.formattedWrite(
 `Thanks for your pull request, @%s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
 
-Some things that can help to speed things up:
+Some tips to help speed things up:
 
 - smaller, focused PRs are easier to review than big ones
 
@@ -67,9 +66,8 @@ Some things that can help to speed things up:
 
 Bear in mind that large or tricky changes may require multiple rounds of review and revision.
 
-Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) for more information.
-
-`, pr.user.login, pr.repoSlug);
+Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) for more information.`,
+                           pr.user.login, pr.repoSlug);
     }
 
     static immutable bugzillaReferences = ["dlang/dmd", "dlang/druntime", "dlang/phobos",
