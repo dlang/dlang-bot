@@ -117,7 +117,15 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
                 action = "merged";
             goto case;
         case "opened", "reopened", "synchronize", "labeled", "edited":
-
+            if (action == "labeled")
+            {
+                if (json["label"]["name"].get!string == "bot-rebase")
+                {
+                    import dlangbot.git : rebase;
+                    runTaskHelper(&rebase, &pullRequest);
+                    return res.writeBody("handled");
+                }
+            }
             runTaskHelper(&handlePR, action, &pullRequest);
             return res.writeBody("handled");
         default:
