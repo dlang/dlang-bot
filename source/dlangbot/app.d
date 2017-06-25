@@ -185,10 +185,23 @@ void handlePR(string action, PullRequest* _pr)
 
     pr.updateGithubComment(comment, action, refs, descs, msgs);
 
-    if (refs.any!(r => r.fixed) && comment.body_.length == 0)
+    if (refs.any!(r => r.fixed))
     {
-        logDebug("[github/handlePR](%s): adding bug fix label", _pr.pid);
-        pr.addLabels(["Bug fix"]);
+        import std.algorithm : canFind, filter, map, sort, uniq;
+        import std.array : array;
+        // references are already sorted by id
+        auto bugzillaIds = refs.map!(r => r.id).uniq;
+        auto bugzillSeverities = descs
+            .filter!(d => bugzillaIds.canFind(d.id))
+            .map!(i => i.severity);
+        logDebug("[github/handlePR](%s): trying to add bug fix label", _pr.pid);
+        string[] labels;
+        if (bugzillSeverities.canFind("enhancement"))
+            labels ~= "Enhancement";
+        else
+            labels ~= "Bug fix";
+
+        pr.addLabels(labels);
     }
 
     if (runTrello)
