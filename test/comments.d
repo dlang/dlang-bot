@@ -9,7 +9,7 @@ unittest
         "/github/repos/dlang/phobos/pulls/4921/commits",
         "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments",
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
         "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
@@ -38,7 +38,7 @@ unittest
         "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
             j = Json.emptyArray;
         },
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
         "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
         // no bug fix label, since Issues are only referenced but not fixed according to commit messages
         "/github/repos/dlang/phobos/issues/4921/comments",
@@ -70,7 +70,7 @@ unittest
          },
         "/github/repos/dlang/phobos/issues/4921/labels",
          "/github/repos/dlang/phobos/issues/4921/comments",
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
          "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
@@ -98,7 +98,7 @@ unittest
             // any arbitrary comment should be removed
             j[0]["body"] = "Foo bar";
          },
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
          "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
@@ -129,7 +129,7 @@ unittest
         },
         "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/labels",
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
@@ -160,7 +160,7 @@ unittest
         "/github/repos/dlang/phobos/issues/4921/labels", (ref Json j) {
             j[0]["name"] = "Enhancement";
         },
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
@@ -196,7 +196,7 @@ unittest
             res.statusCode = 200;
         },
         "/github/repos/dlang/phobos/issues/4921/comments",
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
@@ -212,7 +212,7 @@ unittest
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4963/commits",
         "/github/repos/dlang/phobos/issues/4963/comments",
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
     );
 
     postGitHubHook("dlang_phobos_merged_4963.json");
@@ -233,7 +233,7 @@ unittest
 `bug_id,"short_desc","bug_status","resolution","bug_severity","priority"
 8573,"A simpler Phobos function that returns the index of the mix or max item","NEW","---","regression","P2"`);
         },
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
         // no bug fix label, since Issues are only referenced but not fixed according to commit messages
         "/github/repos/dlang/phobos/issues/4921/comments",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
@@ -267,7 +267,7 @@ unittest
          },
         "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments",
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);

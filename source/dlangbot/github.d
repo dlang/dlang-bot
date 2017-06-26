@@ -36,7 +36,7 @@ string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs
 
     auto app = appender!string;
 
-    bool isMember = ghGetRequest(pr.membersURL)
+    bool isMember = ghGetRequest(pr.membersURL ~ "?per_page=100")
         .readJson
         .deserializeJson!(GHUser[])
         .canFind!(l => l.login == pr.user.login);
