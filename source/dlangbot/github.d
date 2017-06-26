@@ -79,8 +79,8 @@ Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) 
             app.formattedWrite(
 `Your PR doesn't reference any Bugzilla issue.
 
-If your PR contains non-trivial changes, please [reference a Bugzilla issue](https://github.com/dlang-bots/dlang-bot#automated-references) or create a [manual changelog](https://github.com/%s/blob/master/changelog).
-`, pr.repoSlug);
+If your PR contains non-trivial changes, please [reference a Bugzilla issue](https://github.com/dlang-bots/dlang-bot#automated-references) or create a [manual changelog](https://github.com/%s/blob/master/%s).
+`, pr.repoSlug, pr.repoSlug == "dlang/dlang.org" ? "language-changelog" : "changelog");
     }
 
     if (msgs.length)
