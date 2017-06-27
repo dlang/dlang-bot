@@ -31,3 +31,6 @@ docs/
 *.lst
 
 # End of https://www.gitignore.io/api/d
+
+# Config environment file
+/.env
