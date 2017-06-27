@@ -121,6 +121,17 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
         default:
             return res.writeBody("ignored");
         }
+    case "pull_request_review":
+        runTaskHelper({
+            import std.algorithm : among, filter;
+            string repoSlug = json["repository"]["full_name"].get!string;
+            logDebug("[github/pull_request_review](%s/%s): state=%s", repoSlug, json["review"]["state"]);
+            auto pullRequest = json["pull_request"].deserializeJson!PullRequest;
+            auto labels = ghGetRequest(pullRequest.labelsURL).readJson[];
+            if (auto method = autoMergeMethod(labels))
+                pullRequest.tryMerge(method);
+        });
+        return res.writeBody("handled");
     default:
         return res.writeVoidBody();
     }
