@@ -1,0 +1,16 @@
+[
+  {
+    "id": 502721264,
+    "url": "https://api.github.com/repos/dlang/phobos/labels/auto-merge",
+    "name": "auto-merge",
+    "color": "d3d3d3",
+    "default": false
+  },
+  {
+    "id": 416188102,
+    "url": "https://api.github.com/repos/dlang/phobos/labels/Bug%20Fix",
+    "name": "Bug Fix",
+    "color": "0052cc",
+    "default": false
+  }
+]

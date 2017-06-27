@@ -1,0 +1,72 @@
+[
+  {
+    "sha": "0fb66f092b897b55318509c6582008b3f912311a",
+    "commit": {
+      "author": {
+        "name": "Sophie Kirschner",
+        "email": "pineapplemachine@gmail.com",
+        "date": "2017-02-10T16:20:45Z"
+      },
+      "committer": {
+        "name": "ZombineDev",
+        "email": "petar.p.kirov@gmail.com",
+        "date": "2017-06-27T14:16:55Z"
+      },
+      "message": "Fix issue 17562 - tan returning -nan for inputs where abs(x) >= 2^63\n\nThe fptan instruction pushes a 1.0 onto the FPU register stack after a\nsuccessful operation, but when abs(input) >= 2^63 the C2 flag is set to\nindicate that the input was out of bounds, and it doesn't push the 1.0.\n\nPrior to this PR, the top value of the FPU stack was popped irrespective\nof whether C2 was set, which in the case of an out-of-bounds input\ncaused the input to be removed from the stack and ultimately resulted in\nan incorrect return value of -nan. This PR changes this behavior, only\npopping after fptan when C2 was not set.\n\nSee: http://x86.renejeschke.de/html/file_module_x86_id_109.html\n\n* Added unit tests for handling out-of-range inputs of fptan",
+      "tree": {
+        "sha": "c9eed9526fc5e0ecf8cd1630a334f3f3b0a95c9d",
+        "url": "https://api.github.com/repos/dlang/phobos/git/trees/c9eed9526fc5e0ecf8cd1630a334f3f3b0a95c9d"
+      },
+      "url": "https://api.github.com/repos/dlang/phobos/git/commits/0fb66f092b897b55318509c6582008b3f912311a",
+      "comment_count": 0
+    },
+    "url": "https://api.github.com/repos/dlang/phobos/commits/0fb66f092b897b55318509c6582008b3f912311a",
+    "html_url": "https://github.com/dlang/phobos/commit/0fb66f092b897b55318509c6582008b3f912311a",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/commits/0fb66f092b897b55318509c6582008b3f912311a/comments",
+    "author": {
+      "login": "pineapplemachine",
+      "id": 7266412,
+      "avatar_url": "https://avatars1.githubusercontent.com/u/7266412?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/pineapplemachine",
+      "html_url": "https://github.com/pineapplemachine",
+      "followers_url": "https://api.github.com/users/pineapplemachine/followers",
+      "following_url": "https://api.github.com/users/pineapplemachine/following{/other_user}",
+      "gists_url": "https://api.github.com/users/pineapplemachine/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/pineapplemachine/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/pineapplemachine/subscriptions",
+      "organizations_url": "https://api.github.com/users/pineapplemachine/orgs",
+      "repos_url": "https://api.github.com/users/pineapplemachine/repos",
+      "events_url": "https://api.github.com/users/pineapplemachine/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/pineapplemachine/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "ZombineDev",
+      "id": 3475150,
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3475150?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ZombineDev",
+      "html_url": "https://github.com/ZombineDev",
+      "followers_url": "https://api.github.com/users/ZombineDev/followers",
+      "following_url": "https://api.github.com/users/ZombineDev/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ZombineDev/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ZombineDev/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ZombineDev/subscriptions",
+      "organizations_url": "https://api.github.com/users/ZombineDev/orgs",
+      "repos_url": "https://api.github.com/users/ZombineDev/repos",
+      "events_url": "https://api.github.com/users/ZombineDev/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ZombineDev/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "b5d6ac136e36a739f6f285b1d722b8f91d23d45f",
+        "url": "https://api.github.com/repos/dlang/phobos/commits/b5d6ac136e36a739f6f285b1d722b8f91d23d45f",
+        "html_url": "https://github.com/dlang/phobos/commit/b5d6ac136e36a739f6f285b1d722b8f91d23d45f"
+      }
+    ]
+  }
+]
