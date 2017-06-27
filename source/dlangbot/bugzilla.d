@@ -40,6 +40,7 @@ IssueRef[] getIssueRefs(Json[] commits)
 {
     auto issues = commits
         .map!(c => c["commit"]["message"].get!string.matchIssueRefs)
+        .array
         .joiner
         .array;
     issues.multiSort!((a, b) => a.id < b.id, (a, b) => a.fixed > b.fixed);
