@@ -128,7 +128,7 @@ void updateGithubComment(in ref PullRequest pr, in ref GHComment comment,
 // Github Auto-merge
 //==============================================================================
 
-alias LabelsAndCommits = Tuple!(Json[], "labels", Json[], "commits");
+alias LabelsAndCommits = Tuple!(GHLabel[], "labels", Json[], "commits");
 
 string labelName(GHMerge.MergeMethod method)
 {
@@ -141,11 +141,11 @@ string labelName(GHMerge.MergeMethod method)
     }
 }
 
-GHMerge.MergeMethod autoMergeMethod(Json[] labels)
+GHMerge.MergeMethod autoMergeMethod(GHLabel[] labels)
 {
     with (GHMerge.MergeMethod)
     {
-        auto labelNames = labels.map!(l => l["name"].get!string);
+        auto labelNames = labels.map!(l => l.name);
         if (labelNames.canFind!(l => l == "auto-merge"))
             return merge;
         else if (labelNames.canFind!(l => l == "auto-merge-squash"))
@@ -158,7 +158,7 @@ GHMerge.MergeMethod autoMergeMethod(Json[] labels)
 
 auto handleGithubLabel(in ref PullRequest pr)
 {
-    auto labels = ghGetRequest(pr.labelsURL).readJson[];
+    auto labels = pr.labels;
 
     Json[] commits;
     if (auto method = labels.autoMergeMethod)
@@ -204,10 +204,10 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
     return commits;
 }
 
-void checkAndRemoveLabels(Json[] labels, in ref PullRequest pr, in string[] toRemoveLabels)
+void checkAndRemoveLabels(GHLabel[] labels, in ref PullRequest pr, in string[] toRemoveLabels)
 {
     labels
-        .map!(l => l["name"].get!string)
+        .map!(l => l.name)
         .filter!(n => toRemoveLabels.canFind(n))
         .each!(l => pr.removeLabel(l));
 }
@@ -235,20 +235,22 @@ string getUserEmail(string login)
     return "%s <%s>".format(name, email);
 }
 
-Json[] getIssuesForLabel(string repoSlug, string label)
+GHIssue[] getIssuesForLabel(string repoSlug, string label)
 {
     return ghGetRequest("%s/repos/%s/issues?state=open&labels=%s"
-                .format(githubAPIURL, repoSlug, label)).readJson[];
+                .format(githubAPIURL, repoSlug, label))
+                .readJson
+                .deserializeJson!(GHIssue[]);
 }
 
 auto getIssuesForLabels(string repoSlug, const string[] labels)
 {
     // the GitHub API doesn't allow a logical OR
-    Json[] issues;
+    GHIssue[] issues;
     foreach (label; labels)
         issues ~= getIssuesForLabel(repoSlug, label);
-    issues.sort!((a, b) => a["number"].get!int < b["number"].get!int);
-    return issues.uniq!((a, b) => a["number"].get!int == b["number"].get!int);
+    issues.sort!((a, b) => a.number < b.number);
+    return issues.uniq!((a, b) => a.number == b.number);
 }
 
 void searchForAutoMergePrs(string repoSlug)
@@ -256,16 +258,11 @@ void searchForAutoMergePrs(string repoSlug)
     static immutable labels = ["auto-merge", "auto-merge-squash"];
     foreach (issue; getIssuesForLabels(repoSlug, labels))
     {
-        auto prNumber = issue["number"].get!uint;
-        if ("pull_request" !in issue)
+        if (!issue.isPullRequest)
             continue;
 
-        PullRequest pr;
-        pr.base.repo.fullName = repoSlug;
-        pr.number = prNumber;
-        pr.state = PullRequest.State.open;
-        pr.title = issue["title"].get!string;
-        if (auto method = autoMergeMethod(issue["labels"][]))
+        auto pr = issue.toPullRequest;
+        if (auto method = autoMergeMethod(issue.labels))
             pr.tryMerge(method);
     }
 }
@@ -324,14 +321,14 @@ void searchForInactivePrs(string repoSlug, Duration dur)
     int loadedPages;
     foreach (page; pages)
     {
-        foreach (i, issue; page[])
+        foreach (i, issue; page[].map!(issue => issue.deserializeJson!GHIssue).enumerate)
         {
-            auto labels = issue["labels"][].map!(l => l["name"].get!string).array.sort();
+            auto labels = issue.labels.map!(l => l.name).array.sort();
             string[] sendLabels;
             string[] removeLabels;
 
             // only the detailed PR page contains the mergeable state
-            const pr = ghGetRequest(issue["pull_request"]["url"].get!string)
+            const pr = ghGetRequest(issue.pullRequestURL)
                         .readJson.deserializeJson!PullRequest;
 
             // fetch the recent comments
