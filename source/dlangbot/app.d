@@ -141,7 +141,7 @@ void cronDaily()
 
 void handlePR(string action, PullRequest* _pr)
 {
-    import std.algorithm : any;
+    import std.algorithm : among, any;
     import vibe.core.core : setTimer;
     import dlangbot.warnings : checkForWarnings, UserMessage;
 
@@ -183,7 +183,8 @@ void handlePR(string action, PullRequest* _pr)
         msgs = pr.checkForWarnings(descs);
     }
 
-    pr.updateGithubComment(comment, action, refs, descs, msgs);
+    if (pr.base.repo.owner.login.among("dlang", "dlang-bots"))
+        pr.updateGithubComment(comment, action, refs, descs, msgs);
 
     if (refs.any!(r => r.fixed))
     {
