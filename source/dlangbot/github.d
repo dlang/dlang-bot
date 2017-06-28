@@ -212,9 +212,13 @@ void checkAndRemoveLabels(Json[] labels, in ref PullRequest pr, in string[] toRe
         .each!(l => pr.removeLabel(l));
 }
 
-void addLabels(in ref PullRequest pr, inout string[] labels)
+void addLabels(in ref PullRequest pr, in string[] newLabels)
 {
-    ghSendRequest(HTTPMethod.POST, pr.labelsURL, labels);
+    auto labels = ghGetRequest(pr.labelsURL)
+                    .readJson[]
+                    .map!(l => l["name"].get!string);
+    auto toBeAdded = newLabels.filter!(l => !labels.canFind(l)).array;
+    ghSendRequest(HTTPMethod.POST, pr.labelsURL, toBeAdded);
 }
 
 void removeLabel(in ref PullRequest pr, string label)

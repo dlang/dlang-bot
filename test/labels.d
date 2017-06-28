@@ -96,6 +96,7 @@ unittest
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/orgs/dlang/public_members",
         "/github/repos/dlang/dmd/issues/6359/labels",
+        "/github/repos/dlang/dmd/issues/6359/labels",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.method == HTTPMethod.POST);
             assert(req.json.deserializeJson!(string[]) == ["trivial"]);
