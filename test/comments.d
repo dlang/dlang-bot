@@ -167,12 +167,6 @@ unittest
             auto body_= req.json["body"].get!string;
             assert(body_.canFind("@andralex"));
         },
-        "/github/repos/dlang/phobos/issues/4921/labels",
-        (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            import std.stdio;
-            writeln(req.json);
-            assert(req.json[].length == 0);
-        },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
     );
 
