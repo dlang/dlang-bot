@@ -1,0 +1,212 @@
+[
+  {
+    "sha": "4a5d2b3b189f072e9bd0b1779a7d585e3945921b",
+    "commit": {
+      "author": {
+        "name": "Sönke Ludwig",
+        "email": "sludwig@rejectedsoftware.com",
+        "date": "2017-06-28T12:50:49Z"
+      },
+      "committer": {
+        "name": "Martin Nowak",
+        "email": "code@dawg.eu",
+        "date": "2017-06-28T23:45:01Z"
+      },
+      "message": "Fix issue 17564: Eliminate \"static this\" for theAllocator\n\nThis switches to lazy initialization of theAllocator, so that accessing it form within `shared static this` works as expected.",
+      "tree": {
+        "sha": "b490839e4489d62864e0aa8aab9e308a535a8ad8",
+        "url": "https://api.github.com/repos/dlang/phobos/git/trees/b490839e4489d62864e0aa8aab9e308a535a8ad8"
+      },
+      "url": "https://api.github.com/repos/dlang/phobos/git/commits/4a5d2b3b189f072e9bd0b1779a7d585e3945921b",
+      "comment_count": 0
+    },
+    "url": "https://api.github.com/repos/dlang/phobos/commits/4a5d2b3b189f072e9bd0b1779a7d585e3945921b",
+    "html_url": "https://github.com/dlang/phobos/commit/4a5d2b3b189f072e9bd0b1779a7d585e3945921b",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/commits/4a5d2b3b189f072e9bd0b1779a7d585e3945921b/comments",
+    "author": {
+      "login": "s-ludwig",
+      "id": 1645969,
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1645969?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/s-ludwig",
+      "html_url": "https://github.com/s-ludwig",
+      "followers_url": "https://api.github.com/users/s-ludwig/followers",
+      "following_url": "https://api.github.com/users/s-ludwig/following{/other_user}",
+      "gists_url": "https://api.github.com/users/s-ludwig/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/s-ludwig/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/s-ludwig/subscriptions",
+      "organizations_url": "https://api.github.com/users/s-ludwig/orgs",
+      "repos_url": "https://api.github.com/users/s-ludwig/repos",
+      "events_url": "https://api.github.com/users/s-ludwig/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/s-ludwig/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "MartinNowak",
+      "id": 288976,
+      "avatar_url": "https://avatars3.githubusercontent.com/u/288976?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MartinNowak",
+      "html_url": "https://github.com/MartinNowak",
+      "followers_url": "https://api.github.com/users/MartinNowak/followers",
+      "following_url": "https://api.github.com/users/MartinNowak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MartinNowak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MartinNowak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MartinNowak/subscriptions",
+      "organizations_url": "https://api.github.com/users/MartinNowak/orgs",
+      "repos_url": "https://api.github.com/users/MartinNowak/repos",
+      "events_url": "https://api.github.com/users/MartinNowak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MartinNowak/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "e59ce8853127ae4d743eefae8ce249a2b8f942ff",
+        "url": "https://api.github.com/repos/dlang/phobos/commits/e59ce8853127ae4d743eefae8ce249a2b8f942ff",
+        "html_url": "https://github.com/dlang/phobos/commit/e59ce8853127ae4d743eefae8ce249a2b8f942ff"
+      }
+    ]
+  },
+  {
+    "sha": "67e33d774848c6d863c0dbe655045897f3eb6b8f",
+    "commit": {
+      "author": {
+        "name": "Sönke Ludwig",
+        "email": "sludwig@rejectedsoftware.com",
+        "date": "2017-06-28T13:41:09Z"
+      },
+      "committer": {
+        "name": "Martin Nowak",
+        "email": "code@dawg.eu",
+        "date": "2017-06-28T23:45:01Z"
+      },
+      "message": "Make _threadAllocator private.",
+      "tree": {
+        "sha": "b940d1b3758888f0d948bc13eb42e6a7479ab36d",
+        "url": "https://api.github.com/repos/dlang/phobos/git/trees/b940d1b3758888f0d948bc13eb42e6a7479ab36d"
+      },
+      "url": "https://api.github.com/repos/dlang/phobos/git/commits/67e33d774848c6d863c0dbe655045897f3eb6b8f",
+      "comment_count": 0
+    },
+    "url": "https://api.github.com/repos/dlang/phobos/commits/67e33d774848c6d863c0dbe655045897f3eb6b8f",
+    "html_url": "https://github.com/dlang/phobos/commit/67e33d774848c6d863c0dbe655045897f3eb6b8f",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/commits/67e33d774848c6d863c0dbe655045897f3eb6b8f/comments",
+    "author": {
+      "login": "s-ludwig",
+      "id": 1645969,
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1645969?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/s-ludwig",
+      "html_url": "https://github.com/s-ludwig",
+      "followers_url": "https://api.github.com/users/s-ludwig/followers",
+      "following_url": "https://api.github.com/users/s-ludwig/following{/other_user}",
+      "gists_url": "https://api.github.com/users/s-ludwig/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/s-ludwig/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/s-ludwig/subscriptions",
+      "organizations_url": "https://api.github.com/users/s-ludwig/orgs",
+      "repos_url": "https://api.github.com/users/s-ludwig/repos",
+      "events_url": "https://api.github.com/users/s-ludwig/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/s-ludwig/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "MartinNowak",
+      "id": 288976,
+      "avatar_url": "https://avatars3.githubusercontent.com/u/288976?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MartinNowak",
+      "html_url": "https://github.com/MartinNowak",
+      "followers_url": "https://api.github.com/users/MartinNowak/followers",
+      "following_url": "https://api.github.com/users/MartinNowak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MartinNowak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MartinNowak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MartinNowak/subscriptions",
+      "organizations_url": "https://api.github.com/users/MartinNowak/orgs",
+      "repos_url": "https://api.github.com/users/MartinNowak/repos",
+      "events_url": "https://api.github.com/users/MartinNowak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MartinNowak/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "4a5d2b3b189f072e9bd0b1779a7d585e3945921b",
+        "url": "https://api.github.com/repos/dlang/phobos/commits/4a5d2b3b189f072e9bd0b1779a7d585e3945921b",
+        "html_url": "https://github.com/dlang/phobos/commit/4a5d2b3b189f072e9bd0b1779a7d585e3945921b"
+      }
+    ]
+  },
+  {
+    "sha": "b8b60fb34784f464cf8e6654548d120a87ea5172",
+    "commit": {
+      "author": {
+        "name": "Martin Nowak",
+        "email": "code@dawg.eu",
+        "date": "2017-06-29T00:08:44Z"
+      },
+      "committer": {
+        "name": "Martin Nowak",
+        "email": "code@dawg.eu",
+        "date": "2017-06-29T00:08:44Z"
+      },
+      "message": "avoid redundant TLS reads",
+      "tree": {
+        "sha": "01de3bd9f33554a47ce69bd2c88afb2e6cfda826",
+        "url": "https://api.github.com/repos/dlang/phobos/git/trees/01de3bd9f33554a47ce69bd2c88afb2e6cfda826"
+      },
+      "url": "https://api.github.com/repos/dlang/phobos/git/commits/b8b60fb34784f464cf8e6654548d120a87ea5172",
+      "comment_count": 0
+    },
+    "url": "https://api.github.com/repos/dlang/phobos/commits/b8b60fb34784f464cf8e6654548d120a87ea5172",
+    "html_url": "https://github.com/dlang/phobos/commit/b8b60fb34784f464cf8e6654548d120a87ea5172",
+    "comments_url": "https://api.github.com/repos/dlang/phobos/commits/b8b60fb34784f464cf8e6654548d120a87ea5172/comments",
+    "author": {
+      "login": "MartinNowak",
+      "id": 288976,
+      "avatar_url": "https://avatars3.githubusercontent.com/u/288976?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MartinNowak",
+      "html_url": "https://github.com/MartinNowak",
+      "followers_url": "https://api.github.com/users/MartinNowak/followers",
+      "following_url": "https://api.github.com/users/MartinNowak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MartinNowak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MartinNowak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MartinNowak/subscriptions",
+      "organizations_url": "https://api.github.com/users/MartinNowak/orgs",
+      "repos_url": "https://api.github.com/users/MartinNowak/repos",
+      "events_url": "https://api.github.com/users/MartinNowak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MartinNowak/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "MartinNowak",
+      "id": 288976,
+      "avatar_url": "https://avatars3.githubusercontent.com/u/288976?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MartinNowak",
+      "html_url": "https://github.com/MartinNowak",
+      "followers_url": "https://api.github.com/users/MartinNowak/followers",
+      "following_url": "https://api.github.com/users/MartinNowak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MartinNowak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MartinNowak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MartinNowak/subscriptions",
+      "organizations_url": "https://api.github.com/users/MartinNowak/orgs",
+      "repos_url": "https://api.github.com/users/MartinNowak/repos",
+      "events_url": "https://api.github.com/users/MartinNowak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MartinNowak/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "67e33d774848c6d863c0dbe655045897f3eb6b8f",
+        "url": "https://api.github.com/repos/dlang/phobos/commits/67e33d774848c6d863c0dbe655045897f3eb6b8f",
+        "html_url": "https://github.com/dlang/phobos/commit/67e33d774848c6d863c0dbe655045897f3eb6b8f"
+      }
+    ]
+  }
+]
