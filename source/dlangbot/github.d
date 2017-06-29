@@ -218,7 +218,11 @@ void addLabels(in ref PullRequest pr, in string[] newLabels)
                     .readJson[]
                     .map!(l => l["name"].get!string);
     auto toBeAdded = newLabels.filter!(l => !labels.canFind(l)).array;
-    ghSendRequest(HTTPMethod.POST, pr.labelsURL, toBeAdded);
+    if (toBeAdded.length > 0)
+    {
+        logInfo("[github/handlePR](%s): adding labels: %s", pr.pid, toBeAdded);
+        ghSendRequest(HTTPMethod.POST, pr.labelsURL, toBeAdded);
+    }
 }
 
 void removeLabel(in ref PullRequest pr, string label)
