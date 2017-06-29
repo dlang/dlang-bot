@@ -47,7 +47,7 @@ unittest
         "/github/repos/dlang/dmd/pulls/6359/commits",
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/labels",
         // action: add bug fix label
@@ -72,7 +72,7 @@ unittest
         "/trello/1/cards/583f517a333add7c28e0cec7/pos?value=bottom&"~trelloAuth,
     );
 
-    postGitHubHook("dlang_dmd_open_6359.json");
+    //postGitHubHook("dlang_dmd_open_6359.json");
 }
 
 // no existing dlang bot comment -> create comment
@@ -82,7 +82,7 @@ unittest
         "/github/repos/dlang/dmd/pulls/6359/commits",
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/labels",
         // action: add bug fix label
@@ -104,5 +104,5 @@ unittest
         "/trello/1/board/55586bf9fd02d8c66074321a/lists?"~trelloAuth,
     );
 
-    postGitHubHook("dlang_dmd_open_6359.json");
+    //postGitHubHook("dlang_dmd_open_6359.json");
 }

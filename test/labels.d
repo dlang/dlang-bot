@@ -94,7 +94,7 @@ unittest
         },
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/comments",
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/dmd/issues/6359/labels",
         "/github/repos/dlang/dmd/issues/6359/labels",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
@@ -120,7 +120,7 @@ unittest
         },
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/comments",
-        "/github/orgs/dlang/public_members",
+        "/github/orgs/dlang/public_members?per_page=100",
     );
 
     postGitHubHook("dlang_dmd_open_6359.json", "pull_request",
