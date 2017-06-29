@@ -214,11 +214,18 @@ void checkAndRemoveLabels(Json[] labels, in ref PullRequest pr, in string[] toRe
 
 void addLabels(in ref PullRequest pr, in string[] newLabels)
 {
-    auto labels = ghGetRequest(pr.labelsURL)
+    import std.uni : icmp;
+    auto existingLabels = ghGetRequest(pr.labelsURL)
                     .readJson[]
                     .map!(l => l["name"].get!string);
-    auto toBeAdded = newLabels.filter!(l => !labels.canFind(l)).array;
-    ghSendRequest(HTTPMethod.POST, pr.labelsURL, toBeAdded);
+    auto toBeAdded = newLabels
+        .filter!(l => existingLabels.filter!(a => a.icmp(l) == 0).empty);
+
+    if (!toBeAdded.empty)
+    {
+        logInfo("[github/handlePR](%s): adding labels: %s", pr.pid, toBeAdded);
+        ghSendRequest(HTTPMethod.POST, pr.labelsURL, toBeAdded.array);
+    }
 }
 
 void removeLabel(in ref PullRequest pr, string label)
