@@ -72,7 +72,7 @@ unittest
         "/trello/1/cards/583f517a333add7c28e0cec7/pos?value=bottom&"~trelloAuth,
     );
 
-    //postGitHubHook("dlang_dmd_open_6359.json");
+    postGitHubHook("dlang_dmd_open_6359.json");
 }
 
 // no existing dlang bot comment -> create comment
@@ -104,5 +104,5 @@ unittest
         "/trello/1/board/55586bf9fd02d8c66074321a/lists?"~trelloAuth,
     );
 
-    //postGitHubHook("dlang_dmd_open_6359.json");
+    postGitHubHook("dlang_dmd_open_6359.json");
 }
