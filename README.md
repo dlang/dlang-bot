@@ -10,6 +10,13 @@ Features
 
 - [Automated bugzilla, github, and trello references](#automated-references)
 - [Auto-merging approved & passing PRs](#auto-merge)
+- [Warn about common mistakes](#warn-common-mistakes)
+- [Find stalled PRs](#stalled-prs)
+- [Allow PR submitters to label their PRs](#user-tagging)
+- [Send contributing advice message](#hello-contributor)
+- [Auto-label PRs](#auto-labelling)
+- [Using the Dlang-Bot for your project](#dlang-bot-for-your-project)
+- [Missing a feature?](#missing-a-feature)
 
 <a name="automated-references" />
 
@@ -98,4 +105,79 @@ automatically remove set all auto-merge labels from the PR
 _Note_: at the moment the Dlang-Bot doesn't store _any_ authentication token, so
 it can't perform actions on behalf of others.
 
-<a name="canceling-state" />
+<a name="warn-common-mistakes" />
+
+Warn about common mistakes
+--------------------------
+
+The Dlang-Bot will try to detect common mistakes and warn the contributor.
+Currently implemented:
+- Regression fixes doesn't target `stable`
+
+![image](https://user-images.githubusercontent.com/4370550/27756953-604dfb36-5dfc-11e7-9d15-6ed8f747dada.png)
+
+<a name="stalled-prs" />
+
+Find stalled PRs
+----------------
+
+The Dlang-Bot goes over all pull requests every day and will label PRs:
+
+- ["stalled"](https://github.com/dlang/phobos/issues?q=is%3Aopen+is%3Apr+label%3Astalled) (PR has had no activity within 60 days)
+- ["needs rebase"](https://github.com/dlang/phobos/issues?q=is%3Aopen+is%3Apr+label%3A%22needs+rebase%22) (PR has a merge conflict)
+- ["needs work"](https://github.com/dlang/phobos/issues?q=is%3Aopen+is%3Apr+label%3A%22needs+work%22) (PR has more than two failing CI providers)
+
+Currently this feature is in alpha-mode and only enabled for Phobos.
+
+<a name="user-tagging" />
+
+Allow PR submitters to label their PRs
+---------------------------------------
+
+Dlang-Bot detects a pre-defined set of labels in the `[]` part of PR title and will label the PRs accordingly.
+Multiple labels are supported.
+
+![image](https://user-images.githubusercontent.com/4370550/27757037-4d116368-5dfd-11e7-8df4-1446473f9d01.png)
+
+![image](https://user-images.githubusercontent.com/4370550/27757033-3ea63a7e-5dfd-11e7-95ab-c0f36521dc63.png)
+
+Currently the hard-coded set of detected labels is:
+- WIP
+- trivial
+
+<a name="hello-contributor" />
+
+Send contributing advice message
+---------------------------------
+
+For all repos in the `dlang` organization (and `dlang-bots`) Dlang-Bot provides contributing advice on a new PR:
+
+![image](https://user-images.githubusercontent.com/4370550/27757092-c237063e-5dfd-11e7-8aab-7e655aea3ac8.png)
+
+<a name="auto-labelling" />
+
+Auto-label PRs
+---------------
+
+If a PR contains [Bugzilla references](#automated-references), the Dlang-Bot will automatically add a respective label:
+
+![image](https://user-images.githubusercontent.com/4370550/27757121-1aa8a6f6-5dfe-11e7-97ad-240756f0c608.png)
+
+Of course, other issue types can be detected as well:
+
+![image](https://user-images.githubusercontent.com/4370550/27757177-bb944cdc-5dfe-11e7-8c40-26a7eb536700.png)
+
+<a name="#dlang-bot-for-your-project" />
+
+Using the Dlang-Bot for your project
+------------------------------------
+
+The Dlang-Bot is run on Heroku and [deploying your fork](https://tour.dlang.org/tour/en/vibed/deploy-on-heroku) should be pretty straightforward. Just remember to set all environment variables.
+Alternatively feel free to ping and we can add your project to our hosted Dlang-Bot.
+
+<a name="missing-a-feature" />
+
+Missing a feature?
+------------------
+
+Is there a feature that you would love the Dlang-Bot to do? Then don't hesistate to let us know and [open a new issue](https://github.com/dlang-bots/dlang-bot/issues/new).
