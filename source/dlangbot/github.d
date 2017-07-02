@@ -132,8 +132,6 @@ void updateGithubComment(in ref PullRequest pr, in ref GHComment comment,
 // Github Auto-merge
 //==============================================================================
 
-alias LabelsAndCommits = Tuple!(GHLabel[], "labels", Json[], "commits");
-
 string labelName(GHMerge.MergeMethod method)
 {
     final switch (method) with (GHMerge.MergeMethod)
@@ -158,17 +156,6 @@ GHMerge.MergeMethod autoMergeMethod(GHLabel[] labels)
             return rebase;
         return none;
     }
-}
-
-auto handleGithubLabel(in ref PullRequest pr)
-{
-    auto labels = pr.labels;
-
-    Json[] commits;
-    if (auto method = labels.autoMergeMethod)
-        commits = pr.tryMerge(method);
-
-    return LabelsAndCommits(labels, commits);
 }
 
 Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
