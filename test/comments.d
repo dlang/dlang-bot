@@ -239,16 +239,16 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);
             auto expectedComment =
-`### Bugzilla references
+"### Bugzilla references
 
 Fix | Bugzilla | Description
 --- | --- | ---
 ✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
 
-### Warnings
+### ⚠️⚠️⚠️ Warnings ⚠️⚠️⚠️
 
-- Regression fixes should always target stable
-`.format(bugzillaURL);
+- Regression or critical bug fixes should always target the `stable` branch. [Learn more](https://wiki.dlang.org/Starting_as_a_Contributor#Stable_Branch)
+".format(bugzillaURL);
             assert(req.json["body"].get!string.canFind(expectedComment));
             res.writeVoidBody;
         },

@@ -35,7 +35,8 @@ void checkBugzilla(in ref PullRequest pr, ref UserMessage[] msgs, in Issue[] bug
                                                       "blocker", "regression")))
         {
             msgs ~= UserMessage(UserMessage.Type.Warning,
-                "Regression fixes should always target stable");
+                "Regression or critical bug fixes should always target the `stable` branch." ~
+                " [Learn more](https://wiki.dlang.org/Starting_as_a_Contributor#Stable_Branch)");
         }
     }
 }
