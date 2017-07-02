@@ -49,12 +49,14 @@ unittest
         "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
         "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/dmd/issues/6359/comments",
-        "/github/repos/dlang/dmd/issues/6359/labels",
+        "/github/repos/dlang/dmd/issues/6359/labels", (ref Json j){
+            j = Json.emptyArray;
+        },
         // action: add bug fix label
         "/github/repos/dlang/dmd/issues/6359/labels",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);
-            assert(req.json[0].get!string == "Bug fix");
+            assert(req.json[0].get!string == "Bug Fix");
         },
         "/trello/1/search?query=name:%22Issue%2016794%22&"~trelloAuth,
         "/trello/1/cards/583f517a333add7c28e0cec7/actions?filter=commentCard&"~trelloAuth,
@@ -84,12 +86,14 @@ unittest
         "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
         "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/dmd/issues/6359/comments",
-        "/github/repos/dlang/dmd/issues/6359/labels",
+        "/github/repos/dlang/dmd/issues/6359/labels", (ref Json j){
+            j = Json.emptyArray;
+        },
         // action: add bug fix label
         "/github/repos/dlang/dmd/issues/6359/labels",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);
-            assert(req.json[0].get!string == "Bug fix");
+            assert(req.json[0].get!string == "Bug Fix");
         },
         "/trello/1/search?query=name:%22Issue%2016794%22&"~trelloAuth,
         "/trello/1/cards/583f517a333add7c28e0cec7/actions?filter=commentCard&"~trelloAuth,

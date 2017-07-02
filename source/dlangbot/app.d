@@ -200,7 +200,7 @@ void handlePR(string action, PullRequest* _pr)
         if (bugzillSeverities.canFind("enhancement"))
             labels ~= "Enhancement";
         else
-            labels ~= "Bug fix";
+            labels ~= "Bug Fix";
 
         pr.addLabels(labels);
     }

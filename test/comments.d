@@ -68,7 +68,10 @@ unittest
         "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
             j = Json.emptyArray;
          },
-        "/github/repos/dlang/phobos/issues/4921/labels",
+        "/github/repos/dlang/phobos/issues/4921/labels", (ref Json j) {
+            // ignore casing
+            j[0]["name"] = "bug fix";
+        },
          "/github/repos/dlang/phobos/issues/4921/comments",
         "/github/orgs/dlang/public_members?per_page=100",
          "/github/repos/dlang/phobos/issues/comments/262784442",
@@ -128,7 +131,9 @@ unittest
 8573,"A simpler Phobos function that returns the index of the mix or max item","NEW","---","enhancement","P2"`);
         },
         "/github/repos/dlang/phobos/issues/4921/labels",
-        "/github/repos/dlang/phobos/issues/4921/labels",
+        "/github/repos/dlang/phobos/issues/4921/labels", (ref Json j) {
+            j = Json.emptyArray;
+        },
         "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
@@ -166,12 +171,6 @@ unittest
             assert(req.method == HTTPMethod.PATCH);
             auto body_= req.json["body"].get!string;
             assert(body_.canFind("@andralex"));
-        },
-        "/github/repos/dlang/phobos/issues/4921/labels",
-        (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            import std.stdio;
-            writeln(req.json);
-            assert(req.json[].length == 0);
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
     );
@@ -278,4 +277,59 @@ unittest
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
+}
+
+// check that the bot doesn't send duplicate labels (#112)
+// phobos/pull/5519 has the "Bug Fix" label already
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/pulls/5519/commits",
+        "/github/repos/dlang/phobos/issues/5519/labels",
+        "/github/repos/dlang/phobos/issues/5519/labels/auto-merge",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.DELETE);
+            res.statusCode = 200;
+        },
+        "/github/repos/dlang/phobos/issues/5519/events",
+        "/github/users/MartinNowak",
+        "/github/repos/dlang/phobos/pulls/5519/merge",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            res.statusCode = 200;
+        },
+        "/bugzilla/buglist.cgi?bug_id=17564&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/github/repos/dlang/phobos/issues/5519/comments",
+        "/github/orgs/dlang/public_members?per_page=100",
+        "/github/repos/dlang/phobos/issues/comments/311653375",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.PATCH);
+        },
+        "/github/repos/dlang/phobos/issues/5519/labels",
+        "/trello/1/search?query=name:%22Issue%2017564%22&"~trelloAuth,
+    );
+
+    postGitHubHook("dlang_phobos_synchronize_5519.json");
+}
+
+// check that the bot doesn't send duplicate labels (#112)
+// phobos/pull/5519 has the "Bug Fix" label already
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/pulls/5519/commits",
+        "/bugzilla/buglist.cgi?bug_id=17564&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/github/repos/dlang/phobos/issues/5519/comments",
+        "/github/orgs/dlang/public_members?per_page=100",
+        "/github/repos/dlang/phobos/issues/comments/311653375",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.PATCH);
+        },
+        "/github/repos/dlang/phobos/issues/5519/labels",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.GET);
+        },
+        "/trello/1/search?query=name:%22Issue%2017564%22&"~trelloAuth,
+    );
+
+    postGitHubHook("dlang_phobos_edit_5519.json");
 }
