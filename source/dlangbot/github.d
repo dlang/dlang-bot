@@ -107,6 +107,10 @@ GHComment getBotComment(in ref PullRequest pr)
 void updateGithubComment(in ref PullRequest pr, in ref GHComment comment,
                          string action, IssueRef[] refs, Issue[] descs, UserMessage[] msgs)
 {
+    // The history should be preserved and modifications after a merge/closed event are seldomly seen
+    if (pr.state == GHState.closed)
+        return;
+
     logDebug("[github/updateGithubComment](%s): %s", pr.pid, refs);
     logDebug("%s", descs);
     assert(refs.map!(r => r.id).equal(descs.map!(d => d.id)));
