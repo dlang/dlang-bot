@@ -87,7 +87,7 @@ If your PR contains non-trivial changes, please [reference a Bugzilla issue](htt
     {
         if (refs.length)
             app ~= "\n";
-        app ~= "### Warnings\n\n";
+        app ~= "### ⚠️⚠️⚠️ Warnings ⚠️⚠️⚠️\n\n";
         app.printMessages(msgs);
     }
     return app.data;
