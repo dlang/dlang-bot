@@ -129,3 +129,24 @@ unittest
         }
     );
 }
+
+// reproduce behavior of vibe-d/vibe-core/22
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/vibe-d/vibe-core/pulls/22/commits",
+        "/github/repos/vibe-d/vibe-core/issues/22/labels",
+        "/github/repos/vibe-d/vibe-core/issues/22/events",
+        "/github/users/wilzbach",
+        "/github/repos/vibe-d/vibe-core/pulls/22/merge",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.json["sha"] == "04b3575c14dc7ad9971e19f153f3e3d712c1bdde");
+            assert(req.json["merge_method"] == "merge");
+            assert(req.json["commit_message"] == "Remove deprecated stdc import\n" ~
+                    "merged-on-behalf-of: Sebastian Wilzbach <wilzbach@users.noreply.github.com>");
+            res.statusCode = 200;
+        }
+    );
+
+    postGitHubHook("vibe-d_vibe-core_label_22.json");
+}
