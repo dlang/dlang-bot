@@ -41,6 +41,10 @@ It would comment on GitHub with list of all mentioned issues and link them to Bu
 <img alt="dlang-bot-github" height="120px" src="public/img/dlang_bot_github_comment.png" />
 
 The first column of the table is the current status of the referenced issue.
+A `✗` means that the issue is only mentioned (i.e. the commit message doesn't contain "Fix")
+and the Bugzilla issue won't be auto-closed nor listed in the changelog as fixed:
+
+![image](https://user-images.githubusercontent.com/4370550/27858949-7e9dd862-6177-11e7-9ba2-764c919f7a78.png)
 
 ### Trello
 
