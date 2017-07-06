@@ -71,6 +71,14 @@ and commented on your PR it can become part of the changelog.
 
 In doubt, you can use e.g. [Regex101](https://regex101.com/r/aI0Rp6/5) to validate your commit message.
 
+### Referencing multiple issues
+
+It's possible to reference multiple issues, e.g. with "Fixes issues 17494, 17505, 17506" the Dlang-Bot would detect:
+
+![image](https://user-images.githubusercontent.com/4370550/27887078-2322e06e-61df-11e7-85cd-4cd5648e0139.png)
+
+Of course, the Dlang-Bot will aggregate all mentioned issues over multiple commits.
+
 ### Nerdy details
 
 - one can mention multiple issues in one commit and/or multiple commits
