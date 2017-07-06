@@ -6,6 +6,8 @@ string githubAuth, hookSecret;
 import std.algorithm, std.range;
 import std.datetime : SysTime;
 import std.format : format;
+import std.meta : AliasSeq;
+import std.typecons : Nullable;
 
 import vibe.core.log;
 import vibe.data.json;
@@ -92,39 +94,76 @@ auto ghGetAllPages(string url)
 
 struct PullRequest
 {
-    import std.typecons : Nullable;
-
     static struct Repo
     {
-        @name("full_name") string fullName;
+        import vibe.data.json : Name = name;
+        ulong id;
+        string name;
+        bool private_;
+        string description;
+        bool fork;
+        @Name("full_name") string fullName;
         GHUser owner;
+        @Name("created_at") SysTime createdAt;
+        @Name("updated_at") SysTime updatedAt;
+        @Name("pushed_at") Nullable!SysTime pushedAt;
+        @Name("git_url") string gitURL;
+        @Name("ssh_url") string sshURL;
+        @Name("clone_url") string cloneURL;
+        @Name("svn_url") string svnURL;
+        string homepage;
+        ulong size;
+        @Name("stargazers_count") ulong stargazersCount;
+        @Name("watchers_count") ulong watchersCount;
+        Nullable!string language;
+        @Name("has_issues") bool hasIssues;
+        @Name("has_downloads") bool hasDownloads;
+        @Name("has_wiki") bool hasWiki;
+        @Name("has_pages") bool hasPages;
+        @Name("forks_count") ulong forksCount;
+        @Name("mirror_url") Nullable!string mirrorURL;
+        @Name("open_issues_count") ulong openIssuesCount;
+        ulong forks;
+        @Name("default_branch") string defaultBranch;
+
     }
     static struct Branch
     {
         string sha;
         string ref_;
+        string label;
+        GHUser user;
         Repo repo;
     }
     Branch base, head;
-    enum State { open, closed }
     enum MergeableState { clean, dirty, unstable, blocked, unknown }
-    @byName State state;
+    @byName GHState state;
     uint number;
     string title;
-    @optional Nullable!bool mergeable;
-    @optional @byName Nullable!MergeableState mergeable_state;
+    Nullable!bool mergeable;
+    @byName @name("mergeable_state") Nullable!MergeableState mergeableState;
     @name("created_at") SysTime createdAt;
     @name("updated_at") SysTime updatedAt;
+    @name("closed_at") Nullable!SysTime closedAt;
     bool locked;
+    // TODO: update payloads
+    //@name("maintainer_can_modify") bool maintainerCanModify;
+    @name("comments") ulong nrComments;
+    @name("review_comments") ulong nrReviewComments;
+    @name("commits") ulong nrCommits;
+    @name("additions") ulong nrAdditions;
+    @name("deletions") ulong nrDeletions;
+    @name("changed_files") ulong nrChangedFiles;
 
     GHUser user;
     Nullable!GHUser assignee;
     GHUser[] assignees;
+    Nullable!GHMilestone milestone;
 
     string baseRepoSlug() const { return base.repo.fullName; }
     string headRepoSlug() const { return head.repo.fullName; }
     alias repoSlug = baseRepoSlug;
-    bool isOpen() const { return state == State.open; }
+    bool isOpen() const { return state == GHState.open; }
 
     string htmlURL() const { return "https://github.com/%s/pull/%d".format(repoSlug, number); }
     string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
@@ -165,6 +204,12 @@ struct PullRequest
         return ghGetRequest(statusURL)
                 .readJson["statuses"]
                 .deserializeJson!(GHCiStatus[]);
+    }
+
+    GHLabel[] labels() const {
+        return ghGetRequest(labelsURL)
+                .readJson
+                .deserializeJson!(GHLabel[]);
     }
 
     void postMerge(in ref GHMerge merge) const
@@ -260,6 +305,102 @@ struct GHMerge
     @name("commit_message") string commitMessage;
     string sha;
     @name("merge_method") @byName MergeMethod mergeMethod;
+}
+
+struct GHLabel
+{
+    ulong id;
+    string url;
+    string name;
+    string color;
+    bool default_;
+}
+
+enum GHState { open, closed }
+
+struct GHIssue
+{
+    static struct SimplifiedGHPullRequest
+    {
+        string url;
+    }
+    // this isn't really useful except for detecting whether it's a pull request
+    @name("pull_request") Nullable!SimplifiedGHPullRequest _pullRequest;
+
+    bool isPullRequest()
+    {
+        return !_pullRequest.isNull;
+    }
+    uint number;
+    ulong id;
+    string title;
+    string url;
+    GHUser user;
+    GHLabel[] labels;
+    @byName GHState state;
+    bool locked;
+    Nullable!GHUser assignee;
+    GHUser[] assignees;
+    Nullable!GHMilestone milestone;
+    ulong comments;
+    @name("created_at") SysTime createdAt;
+    @name("updated_at") SysTime updatedAt;
+    @name("closed_at") Nullable!SysTime closedAt;
+    string body_;
+
+    string labelsURL() const { return "%s/repos/%s/issues/%d/labels".format(githubAPIURL, repoSlug, number); }
+    string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
+    string eventsURL() const { return "%s/repos/%s/issues/%d/events".format(githubAPIURL, repoSlug, number); }
+    string pullRequestURL() const { return "%s/repos/%s/pulls/%d".format(githubAPIURL, repoSlug, number); }
+
+    @name("repository_url") string repositoryURL;
+    string repoSlug() const
+    {
+        int slashes;
+        return repositoryURL[$ - repositoryURL.retro.countUntil!((c){
+            if (c == '/') slashes++;
+            return slashes >= 2;
+        }) .. $];
+    }
+
+    unittest
+    {
+        GHIssue issue;
+        issue.repositoryURL = "https://api.github.com/repos/dlang/phobos";
+        assert(issue.repoSlug == "dlang/phobos");
+    }
+
+    // warning: not all fields can be filled
+    PullRequest toPullRequest() const
+    {
+        PullRequest pr;
+        pr.base.repo.fullName = repoSlug;
+        foreach (symbol; AliasSeq!("number", "state", "title", "user", "assignee",
+                    "createdAt", "updatedAt", "closedAt"))
+        {
+            mixin("pr." ~ symbol ~ " = " ~ symbol ~ ";");
+        }
+        return pr;
+    }
+}
+
+struct GHMilestone
+{
+    string url;
+    @name("html_url") string htmlURL;
+    @name("labels_url") string labelsURL;
+    uint number;
+    ulong id;
+    string title;
+    string description;
+    GHUser creator;
+    @name("open_issues") ulong openIssues;
+    @name("closed_issues") ulong closedIssues;
+    GHState state;
+    @name("created_at") SysTime createdAt;
+    @name("updated_at") SysTime updatedAt;
+    @name("due_on") Nullable!SysTime dueOn;
+    @name("closed_at") Nullable!SysTime closedAt;
 }
 
 //==============================================================================
