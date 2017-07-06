@@ -1,0 +1,72 @@
+[
+  {
+    "sha": "04b3575c14dc7ad9971e19f153f3e3d712c1bdde",
+    "commit": {
+      "author": {
+        "name": "Sebastian Wilzbach",
+        "email": "seb@wilzba.ch",
+        "date": "2017-07-02T22:39:41Z"
+      },
+      "committer": {
+        "name": "Sebastian Wilzbach",
+        "email": "seb@wilzba.ch",
+        "date": "2017-07-02T22:39:41Z"
+      },
+      "message": "Remove deprecated stdc import",
+      "tree": {
+        "sha": "4b2016240e1eba7ea5f9fd9bacf3e1b3d55401b1",
+        "url": "https://api.github.com/repos/vibe-d/vibe-core/git/trees/4b2016240e1eba7ea5f9fd9bacf3e1b3d55401b1"
+      },
+      "url": "https://api.github.com/repos/vibe-d/vibe-core/git/commits/04b3575c14dc7ad9971e19f153f3e3d712c1bdde",
+      "comment_count": 0
+    },
+    "url": "https://api.github.com/repos/vibe-d/vibe-core/commits/04b3575c14dc7ad9971e19f153f3e3d712c1bdde",
+    "html_url": "https://github.com/vibe-d/vibe-core/commit/04b3575c14dc7ad9971e19f153f3e3d712c1bdde",
+    "comments_url": "https://api.github.com/repos/vibe-d/vibe-core/commits/04b3575c14dc7ad9971e19f153f3e3d712c1bdde/comments",
+    "author": {
+      "login": "wilzbach",
+      "id": 4370550,
+      "avatar_url": "https://avatars0.githubusercontent.com/u/4370550?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/wilzbach",
+      "html_url": "https://github.com/wilzbach",
+      "followers_url": "https://api.github.com/users/wilzbach/followers",
+      "following_url": "https://api.github.com/users/wilzbach/following{/other_user}",
+      "gists_url": "https://api.github.com/users/wilzbach/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/wilzbach/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/wilzbach/subscriptions",
+      "organizations_url": "https://api.github.com/users/wilzbach/orgs",
+      "repos_url": "https://api.github.com/users/wilzbach/repos",
+      "events_url": "https://api.github.com/users/wilzbach/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/wilzbach/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "wilzbach",
+      "id": 4370550,
+      "avatar_url": "https://avatars0.githubusercontent.com/u/4370550?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/wilzbach",
+      "html_url": "https://github.com/wilzbach",
+      "followers_url": "https://api.github.com/users/wilzbach/followers",
+      "following_url": "https://api.github.com/users/wilzbach/following{/other_user}",
+      "gists_url": "https://api.github.com/users/wilzbach/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/wilzbach/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/wilzbach/subscriptions",
+      "organizations_url": "https://api.github.com/users/wilzbach/orgs",
+      "repos_url": "https://api.github.com/users/wilzbach/repos",
+      "events_url": "https://api.github.com/users/wilzbach/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/wilzbach/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "346ce03cbd1a192d7a5fad3466966f5a340f33bd",
+        "url": "https://api.github.com/repos/vibe-d/vibe-core/commits/346ce03cbd1a192d7a5fad3466966f5a340f33bd",
+        "html_url": "https://github.com/vibe-d/vibe-core/commit/346ce03cbd1a192d7a5fad3466966f5a340f33bd"
+      }
+    ]
+  }
+]
