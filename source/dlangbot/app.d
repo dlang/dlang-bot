@@ -127,7 +127,9 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
             string repoSlug = json["repository"]["full_name"].get!string;
             logDebug("[github/pull_request_review](%s/%s): state=%s", repoSlug, json["review"]["state"]);
             auto pullRequest = json["pull_request"].deserializeJson!PullRequest;
-            auto labels = ghGetRequest(pullRequest.labelsURL).readJson[];
+            auto labels = ghGetRequest(pullRequest.labelsURL)
+                .readJson
+                .deserializeJson!(GHLabel[]);
             if (auto method = autoMergeMethod(labels))
                 pullRequest.tryMerge(method);
         });
