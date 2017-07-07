@@ -140,20 +140,20 @@ struct PullRequest
     @byName GHState state;
     uint number;
     string title;
-    Nullable!bool mergeable;
-    @byName @name("mergeable_state") Nullable!MergeableState mergeableState;
+    @optional Nullable!bool mergeable;
+    @optional @byName @name("mergeable_state") Nullable!MergeableState mergeableState;
     @name("created_at") SysTime createdAt;
     @name("updated_at") SysTime updatedAt;
     @name("closed_at") Nullable!SysTime closedAt;
     bool locked;
     // TODO: update payloads
     //@name("maintainer_can_modify") bool maintainerCanModify;
-    @name("comments") ulong nrComments;
-    @name("review_comments") ulong nrReviewComments;
-    @name("commits") ulong nrCommits;
-    @name("additions") ulong nrAdditions;
-    @name("deletions") ulong nrDeletions;
-    @name("changed_files") ulong nrChangedFiles;
+    @optional @name("comments") ulong nrComments;
+    @optional @name("review_comments") ulong nrReviewComments;
+    @optional @name("commits") ulong nrCommits;
+    @optional @name("additions") ulong nrAdditions;
+    @optional @name("deletions") ulong nrDeletions;
+    @optional @name("changed_files") ulong nrChangedFiles;
 
     GHUser user;
     Nullable!GHUser assignee;
