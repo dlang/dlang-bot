@@ -20,7 +20,7 @@ public import dlangbot.github_api;
 void printBugList(W)(W app, in IssueRef[] refs, in Issue[] descs)
 {
     auto combined = zip(refs.map!(r => r.id), refs.map!(r => r.fixed), descs.map!(d => d.desc));
-    app.put("Fix | Bugzilla | Description\n");
+    app.put("Auto-close | Bugzilla | Description\n");
     app.put("--- | --- | ---\n");
     foreach (num, closed, desc; combined)
     {

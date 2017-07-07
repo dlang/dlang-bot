@@ -17,7 +17,7 @@ unittest
             auto expectedComment =
 `### Bugzilla references
 
-Fix | Bugzilla | Description
+Auto-close | Bugzilla | Description
 --- | --- | ---
 ✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
 `.format(bugzillaURL);
@@ -47,7 +47,7 @@ unittest
             auto expectedComment =
 `### Bugzilla references
 
-Fix | Bugzilla | Description
+Auto-close | Bugzilla | Description
 --- | --- | ---
 ✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
 `.format(bugzillaURL);
@@ -79,7 +79,7 @@ unittest
             assert(req.method == HTTPMethod.PATCH);
             auto body_= req.json["body"].get!string;
             assert(body_.canFind("@andralex"));
-            assert(!body_.canFind("Fix | Bugzilla"), "Shouldn't contain bug header");
+            assert(!body_.canFind("Auto-close | Bugzilla"), "Shouldn't contain bug header");
             assert(!body_.canFind("/show_bug.cgi?id="), "Shouldn't contain a Bugzilla reference");
         }
     );
@@ -107,7 +107,7 @@ unittest
             assert(req.method == HTTPMethod.PATCH);
             auto body_= req.json["body"].get!string;
             assert(body_.canFind("@andralex"));
-            assert(!body_.canFind("Fix | Bugzilla"), "Shouldn't contain bug header");
+            assert(!body_.canFind("Auto-close | Bugzilla"), "Shouldn't contain bug header");
             assert(!body_.canFind("/show_bug.cgi?id="), "Shouldn't contain a Bugzilla reference");
         }
     );
@@ -240,7 +240,7 @@ unittest
             auto expectedComment =
 "### Bugzilla references
 
-Fix | Bugzilla | Description
+Auto-close | Bugzilla | Description
 --- | --- | ---
 ✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
 
