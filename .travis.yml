@@ -10,9 +10,6 @@ d:
  - ldc
 
 matrix:
-  allow_failures:
-    - d: ldc
-    - d: dmd-beta # temporarily disabled due to https://issues.dlang.org/show_bug.cgi?id=17614
   include:
     - d: dmd-2.070.2 # the deployment compiler
       env: COVERAGE=true
