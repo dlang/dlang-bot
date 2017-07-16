@@ -360,8 +360,8 @@ void searchForInactivePrs(string repoSlug, Duration dur)
             // label PR with persistent CI failures
             auto status = pr.status;
             auto failCount = status.filter!((e){
-                if (e.state == GHCiStatus.State.failure ||
-                    e.state == GHCiStatus.State.error)
+                if (e.state == GHStatuses.State.failure ||
+                    e.state == GHStatuses.State.error)
                     switch (e.context) {
                         case "auto-tester":
                         case "CyberShadow/DAutoTest":
