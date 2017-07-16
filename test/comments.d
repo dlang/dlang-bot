@@ -211,7 +211,6 @@ unittest
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4963/commits",
         "/github/repos/dlang/phobos/issues/4963/comments",
-        "/github/orgs/dlang/public_members?per_page=100",
     );
 
     postGitHubHook("dlang_phobos_merged_4963.json");
@@ -291,12 +290,6 @@ unittest
             assert(req.method == HTTPMethod.DELETE);
             res.statusCode = 200;
         },
-        "/github/repos/dlang/phobos/issues/5519/events",
-        "/github/users/MartinNowak",
-        "/github/repos/dlang/phobos/pulls/5519/merge",
-        (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            res.statusCode = 200;
-        },
         "/bugzilla/buglist.cgi?bug_id=17564&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
         "/github/repos/dlang/phobos/issues/5519/comments",
         "/github/orgs/dlang/public_members?per_page=100",
@@ -332,4 +325,20 @@ unittest
     );
 
     postGitHubHook("dlang_phobos_edit_5519.json");
+}
+
+// #119 - don't edit the comment for closed PRs
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/pulls/4921/commits",
+        "/github/repos/dlang/phobos/issues/4921/labels",
+        "/github/repos/dlang/phobos/issues/4921/comments",
+        "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+    );
+
+    postGitHubHook("dlang_phobos_synchronize_4921.json", "pull_request", (ref Json j, scope req) {
+        j["pull_request"]["state"] = "closed";
+    });
 }

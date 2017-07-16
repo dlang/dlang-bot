@@ -107,6 +107,10 @@ GHComment getBotComment(in ref PullRequest pr)
 void updateGithubComment(in ref PullRequest pr, in ref GHComment comment,
                          string action, IssueRef[] refs, Issue[] descs, UserMessage[] msgs)
 {
+    // The history should be preserved and modifications after a merge/closed event are seldomly seen
+    if (pr.state == GHState.closed)
+        return;
+
     logDebug("[github/updateGithubComment](%s): %s", pr.pid, refs);
     logDebug("%s", descs);
     assert(refs.map!(r => r.id).equal(descs.map!(d => d.id)));
@@ -127,8 +131,6 @@ void updateGithubComment(in ref PullRequest pr, in ref GHComment comment,
 //==============================================================================
 // Github Auto-merge
 //==============================================================================
-
-alias LabelsAndCommits = Tuple!(GHLabel[], "labels", Json[], "commits");
 
 string labelName(GHMerge.MergeMethod method)
 {
@@ -154,17 +156,6 @@ GHMerge.MergeMethod autoMergeMethod(GHLabel[] labels)
             return rebase;
         return none;
     }
-}
-
-auto handleGithubLabel(in ref PullRequest pr)
-{
-    auto labels = pr.labels;
-
-    Json[] commits;
-    if (auto method = labels.autoMergeMethod)
-        commits = pr.tryMerge(method);
-
-    return LabelsAndCommits(labels, commits);
 }
 
 Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)

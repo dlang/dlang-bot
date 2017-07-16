@@ -164,17 +164,19 @@ void handlePR(string action, PullRequest* _pr)
 
     if (action == "labeled" || action == "synchronize")
     {
-        auto labelsAndCommits = handleGithubLabel(pr);
+        auto labels = pr.labels;
         if (action == "labeled")
+        {
+            if (auto method = labels.autoMergeMethod)
+                commits = pr.tryMerge(method);
             return;
+        }
         if (action == "synchronize")
         {
             logDebug("[github/handlePR](%s): checkAndRemoveLabels", _pr.pid);
             enum toRemoveLabels = ["auto-merge", "auto-merge-squash",
                                    "needs rebase", "needs work"];
-            checkAndRemoveLabels(labelsAndCommits.labels, pr, toRemoveLabels);
-            if (labelsAndCommits.commits !is null)
-                commits = labelsAndCommits.commits;
+            checkAndRemoveLabels(labels, pr, toRemoveLabels);
         }
     }
 
