@@ -36,7 +36,8 @@ void checkBugzilla(in ref PullRequest pr, ref UserMessage[] msgs, in Issue[] bug
         {
             msgs ~= UserMessage(UserMessage.Type.Warning,
                 "Regression or critical bug fixes should always target the `stable` branch." ~
-                " [Learn more](https://wiki.dlang.org/Starting_as_a_Contributor#Stable_Branch)");
+                " Learn more about [rebasing to `stable`](https://wiki.dlang.org/Starting_as_a_Contributor#Stable_Branch) or" ~
+                " the [D release process](https://github.com/dlang/DIPs/blob/master/DIPs/archive/DIP75.md#branching-strategy).");
         }
     }
 }
