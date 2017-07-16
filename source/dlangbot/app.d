@@ -45,6 +45,7 @@ void startServer(HTTPServerSettings settings)
         .post("/github_hook", &githubHook)
         .match(HTTPMethod.HEAD, "/trello_hook", (req, res) => res.writeVoidBody)
         .post("/trello_hook", &trelloHook)
+        .post("/codecov_hook", &codecovHook)
         ;
 
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
@@ -225,6 +226,14 @@ void handlePR(string action, PullRequest* _pr)
         logDebug("[github/handlePR](%s): updating trello card", _pr.pid);
         updateTrelloCard(action, pr.htmlURL, refs, descs);
     }
+}
+
+//==============================================================================
+
+void codecovHook(HTTPServerRequest req, HTTPServerResponse res)
+{
+    logDebug("codecovHook: %s", req.bodyReader.readAllUTF8);
+    return res.writeBody("OK");
 }
 
 //==============================================================================
