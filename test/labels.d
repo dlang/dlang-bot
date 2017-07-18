@@ -150,3 +150,23 @@ unittest
 
     postGitHubHook("vibe-d_vibe-core_label_22.json");
 }
+
+// Fix dlang-tour/core/583 issue with null on the homepage field
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang-tour/core/pulls/583/commits",
+        "/github/repos/dlang-tour/core/issues/583/labels",
+        "/github/repos/dlang-tour/core/issues/583/events",
+        "/github/users/wilzbach",
+        "/github/repos/dlang-tour/core/pulls/583/merge",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.json["sha"] == "4941624d1af77e84565ec86979c21c1d582b1c06");
+            assert(req.json["merge_method"] == "merge");
+            assert(req.json["commit_message"] == "Run docker update async + remove previous versions\n" ~
+                    "merged-on-behalf-of: Sebastian Wilzbach <wilzbach@users.noreply.github.com>");
+        }
+    );
+
+    postGitHubHook("dlang-tour_core_label_583.json");
+}
