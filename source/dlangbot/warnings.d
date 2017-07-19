@@ -1,6 +1,6 @@
 module dlangbot.warnings;
 
-import dlangbot.bugzilla : Issue;
+import dlangbot.bugzilla : Issue, IssueRef;
 import dlangbot.github : PullRequest;
 
 import std.algorithm;
@@ -25,14 +25,16 @@ Check bugzilla priority
 - enhancement -> changelog entry
 - regression/major -> stable
 */
-void checkBugzilla(in ref PullRequest pr, ref UserMessage[] msgs, in Issue[] bugzillaIssues)
+void checkBugzilla(in ref PullRequest pr, ref UserMessage[] msgs,
+        in Issue[] bugzillaIssues, in IssueRef[] refs)
 {
     // check for stable
     if (pr.base.ref_ != "stable")
     {
-        if (bugzillaIssues.any!(i => i.status.among("NEW", "ASSIGNED") &&
+        if (bugzillaIssues.any!(i => i.status.among("NEW", "ASSIGNED", "REOPENED") &&
                                      i.severity.among("critical", "major",
-                                                      "blocker", "regression")))
+                                                      "blocker", "regression") &&
+                                     refs.canFind!(r => r.id == i.id && r.fixed)))
         {
             msgs ~= UserMessage(UserMessage.Type.Warning,
                 "Regression or critical bug fixes should always target the `stable` branch." ~
@@ -43,11 +45,11 @@ void checkBugzilla(in ref PullRequest pr, ref UserMessage[] msgs, in Issue[] bug
 }
 
 
-UserMessage[] checkForWarnings(in PullRequest pr, in Issue[] bugzillaIssues)
+UserMessage[] checkForWarnings(in PullRequest pr, in Issue[] bugzillaIssues, in IssueRef[] refs)
 {
     UserMessage[] msgs;
     pr.checkDiff(msgs);
-    pr.checkBugzilla(msgs, bugzillaIssues);
+    pr.checkBugzilla(msgs, bugzillaIssues, refs);
     return msgs;
 }
 

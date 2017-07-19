@@ -196,7 +196,7 @@ void handlePR(string action, PullRequest* _pr)
     UserMessage[] msgs;
     if (action == "opened" || action == "synchronize")
     {
-        msgs = pr.checkForWarnings(descs);
+        msgs = pr.checkForWarnings(descs, refs);
     }
 
     if (pr.base.repo.owner.login.among("dlang", "dlang-bots"))
