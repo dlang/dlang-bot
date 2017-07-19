@@ -1,0 +1,72 @@
+[
+  {
+    "sha": "4941624d1af77e84565ec86979c21c1d582b1c06",
+    "commit": {
+      "author": {
+        "name": "Sebastian Wilzbach",
+        "email": "seb@wilzba.ch",
+        "date": "2017-07-18T16:28:38Z"
+      },
+      "committer": {
+        "name": "Sebastian Wilzbach",
+        "email": "seb@wilzba.ch",
+        "date": "2017-07-18T16:28:38Z"
+      },
+      "message": "Run docker update async + remove previous versions",
+      "tree": {
+        "sha": "51dc1192f774ed252cc392264f28f9c1932d8da1",
+        "url": "https://api.github.com/repos/dlang-tour/core/git/trees/51dc1192f774ed252cc392264f28f9c1932d8da1"
+      },
+      "url": "https://api.github.com/repos/dlang-tour/core/git/commits/4941624d1af77e84565ec86979c21c1d582b1c06",
+      "comment_count": 0
+    },
+    "url": "https://api.github.com/repos/dlang-tour/core/commits/4941624d1af77e84565ec86979c21c1d582b1c06",
+    "html_url": "https://github.com/dlang-tour/core/commit/4941624d1af77e84565ec86979c21c1d582b1c06",
+    "comments_url": "https://api.github.com/repos/dlang-tour/core/commits/4941624d1af77e84565ec86979c21c1d582b1c06/comments",
+    "author": {
+      "login": "wilzbach",
+      "id": 4370550,
+      "avatar_url": "https://avatars3.githubusercontent.com/u/4370550?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/wilzbach",
+      "html_url": "https://github.com/wilzbach",
+      "followers_url": "https://api.github.com/users/wilzbach/followers",
+      "following_url": "https://api.github.com/users/wilzbach/following{/other_user}",
+      "gists_url": "https://api.github.com/users/wilzbach/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/wilzbach/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/wilzbach/subscriptions",
+      "organizations_url": "https://api.github.com/users/wilzbach/orgs",
+      "repos_url": "https://api.github.com/users/wilzbach/repos",
+      "events_url": "https://api.github.com/users/wilzbach/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/wilzbach/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "wilzbach",
+      "id": 4370550,
+      "avatar_url": "https://avatars3.githubusercontent.com/u/4370550?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/wilzbach",
+      "html_url": "https://github.com/wilzbach",
+      "followers_url": "https://api.github.com/users/wilzbach/followers",
+      "following_url": "https://api.github.com/users/wilzbach/following{/other_user}",
+      "gists_url": "https://api.github.com/users/wilzbach/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/wilzbach/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/wilzbach/subscriptions",
+      "organizations_url": "https://api.github.com/users/wilzbach/orgs",
+      "repos_url": "https://api.github.com/users/wilzbach/repos",
+      "events_url": "https://api.github.com/users/wilzbach/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/wilzbach/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "f011912ed26c4cc9913d23bbc52854403a1fd836",
+        "url": "https://api.github.com/repos/dlang-tour/core/commits/f011912ed26c4cc9913d23bbc52854403a1fd836",
+        "html_url": "https://github.com/dlang-tour/core/commit/f011912ed26c4cc9913d23bbc52854403a1fd836"
+      }
+    ]
+  }
+]

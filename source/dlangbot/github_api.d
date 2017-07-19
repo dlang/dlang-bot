@@ -105,13 +105,13 @@ struct PullRequest
         @Name("full_name") string fullName;
         GHUser owner;
         @Name("created_at") SysTime createdAt;
-        @Name("updated_at") SysTime updatedAt;
+        @Name("updated_at") Nullable!SysTime updatedAt;
         @Name("pushed_at") Nullable!SysTime pushedAt;
         @Name("git_url") string gitURL;
         @Name("ssh_url") string sshURL;
         @Name("clone_url") string cloneURL;
         @Name("svn_url") string svnURL;
-        string homepage;
+        Nullable!string homepage;
         ulong size;
         @Name("stargazers_count") ulong stargazersCount;
         @Name("watchers_count") ulong watchersCount;
