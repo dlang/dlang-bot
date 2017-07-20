@@ -183,8 +183,14 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
 
     string author = "unknown";
     if (!events.empty)
+    {
+        logDebug("[github/tryMerge/author](%s): %s", pr.pid, events.front["actor"]);
         author = getUserEmail(events.front["actor"]["login"].get!string);
+    }
 
+    logDebug("[github/tryMerge/commits](%s): %s", pr.pid, commits);
+    logDebug("[github/tryMerge/commitsURL](%s): %s", pr.pid, pr.commitsURL);
+    logDebug("[github/tryMerge/commits](%s): %s", pr.pid, commits[$ - 1]);
     GHMerge mergeInput = {
         commitMessage: "%s\nmerged-on-behalf-of: %s".format(pr.title, author),
         sha: commits[$ - 1]["sha"].get!string,
@@ -232,7 +238,7 @@ void replaceLabels(in ref PullRequest pr, string[] labels)
 string getUserEmail(string login)
 {
     auto user = ghGetRequest("%s/users/%s".format(githubAPIURL, login)).readJson;
-    auto name = user["name"].get!string;
+    auto name = user["name"].opt!string(login);
     auto email = user["email"].opt!string(login ~ "@users.noreply.github.com");
     return "%s <%s>".format(name, email);
 }
