@@ -232,7 +232,7 @@ void replaceLabels(in ref PullRequest pr, string[] labels)
 string getUserEmail(string login)
 {
     auto user = ghGetRequest("%s/users/%s".format(githubAPIURL, login)).readJson;
-    auto name = user["name"].get!string;
+    auto name = user["name"].opt!string(login);
     auto email = user["email"].opt!string(login ~ "@users.noreply.github.com");
     return "%s <%s>".format(name, email);
 }
