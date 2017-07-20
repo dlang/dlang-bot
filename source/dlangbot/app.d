@@ -43,7 +43,7 @@ void startServer(HTTPServerSettings settings)
         .get("/", (req, res) => res.render!"index.dt")
         .get("*", serveStaticFiles("public"))
         .post("/github_hook", &githubHook)
-        .match(HTTPMethod.HEAD, "/trello_hook", (req, res) => res.writeVoidBody)
+        .match(HTTPMethod.HEAD, "/trello_hook", (HTTPServerRequest req, HTTPServerResponse res) => res.writeVoidBody)
         .post("/trello_hook", &trelloHook)
         .post("/codecov_hook", &codecovHook)
         ;
