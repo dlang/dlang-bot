@@ -9,9 +9,14 @@ d:
  - ldc-beta
  - ldc
 
+addons:
+  apt:
+    packages:
+      - libevent-dev
+
 matrix:
   include:
-    - d: dmd-2.070.2 # the deployment compiler
+    - d: dmd-2.077.1 # the deployment compiler
       env: COVERAGE=true
       script:
         # https://issues.dlang.org/show_bug.cgi?id=13742
