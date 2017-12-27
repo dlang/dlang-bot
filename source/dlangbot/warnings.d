@@ -32,8 +32,7 @@ void checkBugzilla(in ref PullRequest pr, ref UserMessage[] msgs,
     if (pr.base.ref_ != "stable")
     {
         if (bugzillaIssues.any!(i => i.status.among("NEW", "ASSIGNED", "REOPENED") &&
-                                     i.severity.among("critical", "major",
-                                                      "blocker", "regression") &&
+                                     i.severity.among("critical", "blocker", "regression") &&
                                      refs.canFind!(r => r.id == i.id && r.fixed)))
         {
             msgs ~= UserMessage(UserMessage.Type.Warning,
