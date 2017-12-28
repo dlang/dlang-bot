@@ -232,7 +232,9 @@ void handlePR(string action, PullRequest* _pr)
 
 void codecovHook(HTTPServerRequest req, HTTPServerResponse res)
 {
-    logDebug("codecovHook: %s", req.bodyReader.readAllUTF8);
+    import dlangbot.codecov;
+    auto payload = req.bodyReader.readAllUTF8.parseJsonString.deserializeJson!CodeCovHook;
+    runTaskHelper(&handleCodecovPR, &payload);
     return res.writeBody("OK");
 }
 

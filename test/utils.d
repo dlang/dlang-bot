@@ -18,6 +18,7 @@ public import std.algorithm;
 string testServerURL;
 string ghTestHookURL;
 string trelloTestHookURL;
+string codecovTestHookURL;
 
 string payloadDir = "./data/payloads";
 string hookDir = "./data/hooks";
@@ -51,6 +52,7 @@ shared static this()
                              ~ settings.port.to!string;
     ghTestHookURL = testServerURL ~ "/github_hook";
     trelloTestHookURL = testServerURL ~ "/trello_hook";
+    codecovTestHookURL = testServerURL ~ "/codecov_hook";
 
     import vibe.core.log;
     setLogLevel(LogLevel.info);
@@ -296,6 +298,38 @@ void postTrelloHook(string payload,
     }
     assert(req.statusCode == 200);
     assert(req.bodyReader.readAllUTF8 == "handled");
+    checkAPIExpectations;
+}
+
+void postCodeCovHook(string payload,
+    void delegate(ref Json j, scope HTTPClientRequest req) postprocess = null,
+    int line = __LINE__, string file = __FILE__)
+{
+    import std.file : readText;
+    import std.path : buildPath;
+    import dlangbot.trello : getSignature;
+
+    payload = hookDir.buildPath("codecov", payload);
+
+    logInfo("Starting test in %s:%d with payload: %s", file, line, payload);
+
+    auto req = requestHTTP(codecovTestHookURL, (scope req) {
+        req.method = HTTPMethod.POST;
+
+        auto payload = payload.readText.parseJsonString;
+
+        if (postprocess !is null)
+            postprocess(payload, req);
+
+        auto respStr = payload.toString;
+        req.writeBody(cast(ubyte[]) respStr);
+    });
+    scope(failure) {
+        if (req.statusCode != 200)
+            writeln(req.bodyReader.readAllUTF8);
+    }
+    assert(req.statusCode == 200);
+    assert(req.bodyReader.readAllUTF8 == "OK");
     checkAPIExpectations;
 }
 

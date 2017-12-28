@@ -1,0 +1,273 @@
+{
+  "compare": {
+    "message": "increased",
+    "url": "https://codecov.io/gh/dlang/druntime/compare/a3627aa018874ff207392a8fce9eaf174dc2202b...d4015f4d403bd22ecee8b81bb61378d33e7df7df",
+    "notation": "+",
+    "coverage": "0.08"
+  },
+  "owner": {
+    "service_id": "565913",
+    "username": "dlang",
+    "service": "github"
+  },
+  "pull": {
+    "title": "Merge remote-tracking branch 'upstream/mangle' into merge_mangle",
+    "id": "1877",
+    "state": "open",
+    "number": "1877",
+    "head": {
+      "commitid": "d4015f4d403bd22ecee8b81bb61378d33e7df7df",
+      "branch": "merge_mangle"
+    },
+    "base": {
+      "commitid": "a3627aa018874ff207392a8fce9eaf174dc2202b",
+      "branch": "master"
+    }
+  },
+  "head": {
+    "message": "Merge remote-tracking branch 'upstream/mangle' into merge_mangle",
+    "version": 3,
+    "timestamp": "2017-07-16 13:43:16",
+    "branch": "merge_mangle",
+    "ci_passed": true,
+    "pullid": "1877",
+    "service_url": "https://github.com/dlang/druntime/commit/d4015f4d403bd22ecee8b81bb61378d33e7df7df",
+    "changes": [
+      [
+        "src/gc/impl/conservative/gc.d",
+        null,
+        null,
+        false,
+        null,
+        [
+          0,
+          0,
+          -2,
+          2,
+          0,
+          -0.17841000000001372,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      [
+        "src/core/thread.d",
+        null,
+        null,
+        false,
+        null,
+        [
+          0,
+          0,
+          -3,
+          3,
+          0,
+          -0.3278700000000043,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      [
+        "src/core/sync/semaphore.d",
+        null,
+        null,
+        false,
+        null,
+        [
+          0,
+          0,
+          1,
+          -1,
+          0,
+          1.2195099999999996,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      [
+        "src/core/demangle.d",
+        null,
+        null,
+        true,
+        null,
+        [
+          0,
+          0,
+          26,
+          -26,
+          0,
+          3.3333300000000037,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ]
+    ],
+    "logs": [
+      {
+        "event": "upload",
+        "build": "943",
+        "ci": "circleci",
+        "time": "2017-07-16 13:46:47.433296"
+      }
+    ],
+    "archived": true,
+    "totals": {
+      "M": 0,
+      "s": 1,
+      "p": 0,
+      "N": 0,
+      "C": 0,
+      "h": 13367,
+      "n": 17647,
+      "m": 4280,
+      "c": "75.74659",
+      "b": 0,
+      "f": 137,
+      "d": 0
+    },
+    "notified": null,
+    "parent_totals": {
+      "m": 4229,
+      "diff": [
+        1,
+        29,
+        29,
+        0,
+        0,
+        "100",
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "s": 1,
+      "p": 0,
+      "N": 0,
+      "C": 0,
+      "h": 13148,
+      "n": 17377,
+      "M": 0,
+      "c": "75.66323",
+      "b": 0,
+      "f": 137,
+      "d": 0
+    },
+    "merged": false,
+    "author": {
+      "name": "Martin Nowak",
+      "service_id": "288976",
+      "service": "github",
+      "username": "MartinNowak",
+      "email": "removed@removed.com"
+    },
+    "commitid": "d4015f4d403bd22ecee8b81bb61378d33e7df7df",
+    "deleted": null,
+    "parent": "a3627aa018874ff207392a8fce9eaf174dc2202b",
+    "state": "complete",
+    "updatestamp": "2017-07-16 13:53:57.426479",
+    "url": "https://codecov.io/gh/dlang/druntime/commit/d4015f4d403bd22ecee8b81bb61378d33e7df7df"
+  },
+  "base": {
+    "parent_totals": {
+      "m": 4231,
+      "diff": [
+        1,
+        29,
+        29,
+        0,
+        0,
+        "100",
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "s": 1,
+      "p": 0,
+      "n": 17377,
+      "C": 0,
+      "h": 13146,
+      "N": 0,
+      "M": 0,
+      "c": "75.65172",
+      "b": 0,
+      "f": 137,
+      "d": 0
+    },
+    "notified": true,
+    "message": "Merge pull request #1875 from rainers/gc_coverage\n\nGC: add tests to make coverage a bit more deterministic",
+    "version": 3,
+    "timestamp": "2017-07-16 13:01:39",
+    "archived": true,
+    "totals": {
+      "M": 0,
+      "s": 1,
+      "p": 0,
+      "N": 0,
+      "C": 0,
+      "h": 13148,
+      "n": 17377,
+      "m": 4229,
+      "c": "75.66323",
+      "b": 0,
+      "f": 137,
+      "d": 0
+    },
+    "ci_passed": true,
+    "state": "complete",
+    "merged": false,
+    "author": {
+      "name": "Andrei Alexandrescu",
+      "service_id": "566679",
+      "service": "github",
+      "username": "andralex",
+      "email": "removed@removed.com"
+    },
+    "commitid": "a3627aa018874ff207392a8fce9eaf174dc2202b",
+    "deleted": null,
+    "parent": "692bcade6508c1da10a41058f668048a36b606c5",
+    "pullid": null,
+    "logs": [
+      {
+        "event": "upload",
+        "build": "941",
+        "ci": "circleci",
+        "time": "2017-07-16 13:04:36.007785"
+      }
+    ],
+    "updatestamp": "2017-07-16 13:10:53.611332",
+    "branch": "master"
+  },
+  "repo": {
+    "service_id": "1257087",
+    "private": false,
+    "url": "https://codecov.io/gh/dlang/druntime",
+    "name": "druntime"
+  }
+}

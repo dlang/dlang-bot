@@ -200,10 +200,10 @@ struct PullRequest
             .readJson
             .deserializeJson!(GHReview[]);
     }
-    GHCiStatus[] status() const {
+    GHStatuses[] status() const {
         return ghGetRequest(statusURL)
                 .readJson["statuses"]
-                .deserializeJson!(GHCiStatus[]);
+                .deserializeJson!(GHStatuses[]);
     }
 
     GHLabel[] labels() const {
@@ -288,12 +288,13 @@ struct GHCommit
     GHUser committer;
 }
 
-struct GHCiStatus
+// https://developer.github.com/v3/repos/statuses/
+struct GHStatuses
 {
     enum State { success, error, failure, pending }
     @byName State state;
     string description;
-    @name("target_url") string targetUrl;
+    @name("target_url") string targetURL;
     string context; // "CyberShadow/DAutoTest", "Project Tester",
                     // "ci/circleci", "auto-tester", "codecov/project",
                     // "codecov/patch", "continuous-integration/travis-ci/pr"
