@@ -23,3 +23,6 @@ matrix:
         - dub test --compiler=$DC --build=unittest-cov --build-mode=singleFile
       after_success:
         - bash <(curl -s https://codecov.io/bash)
+  allow_failures:
+   - d: dmd-nightly
+   - d: dmd-beta
