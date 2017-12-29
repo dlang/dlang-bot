@@ -139,7 +139,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 
 //==============================================================================
 
-void cronDaily(bool simulate)
+void cronDaily(string[] repositories, bool simulate)
 {
     CronConfig config = {simulate: simulate};
     auto actions = [
@@ -149,7 +149,7 @@ void cronDaily(bool simulate)
         &detectPRWithPersistentCIFailures,
     ];
 
-    foreach (repo; ["dlang/phobos"])
+    foreach (repo; repositories)
     {
         logInfo("[cron-daily/%s]: starting", repo);
         walkPRs(repo, actions, config);
@@ -246,6 +246,8 @@ void codecovHook(HTTPServerRequest req, HTTPServerResponse res)
 version (unittest) {}
 else void main(string[] args)
 {
+    import std.array : array;
+    import std.algorithm.iteration : map;
     import std.process : environment;
     import vibe.core.args : readOption;
 
@@ -270,8 +272,20 @@ else void main(string[] args)
     readOption("cron-daily", &runDailyCron, "Run daily cron tasks.");
     if (!finalizeCommandLineOptions())
         return;
-    if (runDailyCron || runDailyCronSimulation)
-        return cronDaily(runDailyCronSimulation);
+
+    string[] cronRepositories;
+    if (runDailyCron)
+    {
+        cronRepositories = ["dmd", "druntime", "phobos", "dlang.org", "tools", "installer"]
+            .map!(r => "dlang/" ~ r).array;
+    }
+    else if (runDailyCronSimulation)
+    {
+        cronRepositories = ["dlang/phobos"];
+    }
+
+    if (cronRepositories)
+        return cronDaily(cronRepositories, runDailyCronSimulation);
 
     startServer(settings);
     lowerPrivileges();

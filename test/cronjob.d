@@ -4,6 +4,7 @@ import std.format : format;
 import std.stdio;
 
 bool simulate = false;
+string[] repositories = ["dlang/phobos"];
 
 // test the first items of the cron job
 unittest
