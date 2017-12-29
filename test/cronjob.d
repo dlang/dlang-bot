@@ -3,6 +3,8 @@ import utils;
 import std.format : format;
 import std.stdio;
 
+bool simulate = false;
+
 // test the first items of the cron job
 unittest
 {
@@ -52,7 +54,7 @@ unittest
     );
 
     import dlangbot.app : cronDaily;
-    cronDaily();
+    cronDaily(repositories, simulate);
     checkAPIExpectations;
 }
 
@@ -79,6 +81,6 @@ unittest
     );
 
     import dlangbot.app : cronDaily;
-    cronDaily();
+    cronDaily(repositories, simulate);
     checkAPIExpectations;
 }

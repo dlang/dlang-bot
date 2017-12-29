@@ -1,6 +1,6 @@
 module dlangbot.app;
 
-import dlangbot.bugzilla, dlangbot.github, dlangbot.trello,
+import dlangbot.bugzilla, dlangbot.cron, dlangbot.github, dlangbot.trello,
        dlangbot.utils;
 
 public import dlangbot.bugzilla : bugzillaURL;
@@ -24,8 +24,6 @@ bool runTrello = true;
 
 Duration timeBetweenFullPRChecks = 1.minutes; // this should never be larger 30 mins on heroku
 Throttler!(typeof(&searchForAutoMergePrs)) prThrottler;
-
-Duration prInactivityDur = 90.days; // PRs with no activity within X days will get flagged
 
 enum trelloHookURL = "https://dlang-bot.herokuapp.com/trello_hook";
 
@@ -141,12 +139,20 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 
 //==============================================================================
 
-void cronDaily()
+void cronDaily(bool simulate)
 {
+    CronConfig config = {simulate: simulate};
+    auto actions = [
+        &detectStalledPR,
+        &detectInactiveStablePR,
+        &detectPRWithMergeConflicts,
+        &detectPRWithPersistentCIFailures,
+    ];
+
     foreach (repo; ["dlang/phobos"])
     {
-        logInfo("running cron.daily for: %s", repo);
-        searchForInactivePrs(repo, prInactivityDur);
+        logInfo("[cron-daily/%s]: starting", repo);
+        walkPRs(repo, actions, config);
     }
 }
 
@@ -175,7 +181,7 @@ void handlePR(string action, PullRequest* _pr)
         {
             logDebug("[github/handlePR](%s): checkAndRemoveLabels", _pr.pid);
             enum toRemoveLabels = ["auto-merge", "auto-merge-squash",
-                                   "needs rebase", "needs work"];
+                                   "needs rebase", "needs work", "stalled", "stable-stalled"];
             checkAndRemoveLabels(labels, pr, toRemoveLabels);
         }
     }
@@ -256,15 +262,16 @@ else void main(string[] args)
         });
     }
 
-    bool runDailyCron;
+    bool runDailyCron, runDailyCronSimulation;
     auto settings = new HTTPServerSettings;
     settings.port = 8080;
     readOption("port|p", &settings.port, "Sets the port used for serving.");
+    readOption("simulative-cron-daily", &runDailyCronSimulation, "Sets the port used for serving.");
     readOption("cron-daily", &runDailyCron, "Run daily cron tasks.");
     if (!finalizeCommandLineOptions())
         return;
-    if (runDailyCron)
-        return cronDaily();
+    if (runDailyCron || runDailyCronSimulation)
+        return cronDaily(runDailyCronSimulation);
 
     startServer(settings);
     lowerPrivileges();
