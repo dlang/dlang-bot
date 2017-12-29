@@ -139,7 +139,7 @@ The Dlang-Bot goes over all pull requests every day and will label PRs:
 - ["needs rebase"](https://github.com/dlang/phobos/issues?q=is%3Aopen+is%3Apr+label%3A%22needs+rebase%22) (PR has a merge conflict)
 - ["needs work"](https://github.com/dlang/phobos/issues?q=is%3Aopen+is%3Apr+label%3A%22needs+work%22) (PR has more than two failing CI providers)
 
-Currently this feature is in alpha-mode and only enabled for Phobos.
+Currently this feature is only enabled for DMD and Phobos.
 
 <a name="user-tagging" />
 

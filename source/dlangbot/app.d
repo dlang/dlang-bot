@@ -144,7 +144,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 
 void cronDaily()
 {
-    foreach (repo; ["dlang/phobos"])
+    foreach (repo; ["dlang/phobos", "dlang/dmd"])
     {
         logInfo("running cron.daily for: %s", repo);
         searchForInactivePrs(repo, prInactivityDur);
