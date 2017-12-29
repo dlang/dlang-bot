@@ -22,7 +22,7 @@ struct CronConfig
     bool simulate;
 }
 
-alias PRTuple = Tuple!(PullRequest, "pr", GHComment[], "comments", CronConfig, "config");
+alias PRTuple = Tuple!(PullRequest, "pr", GHComment[], "comments", GHComment[], "reviewComments", CronConfig, "config");
 enum LabelAction {add, remove, none}
 alias LabelResponse = Tuple!(LabelAction, "action", string, "label");
 
@@ -33,12 +33,24 @@ alias LabelResponse = Tuple!(LabelAction, "action", string, "label");
 auto findLastActivity(PRTuple t)
 {
     auto now = Clock.currTime;
-    Duration timeDiff;
 
-    if (t.comments.length)
-        timeDiff = now - t.comments[$ - 1].updatedAt;
-    else
-        timeDiff = now - t.pr.createdAt; // don't use updatedAt
+    // don't use updatedAt (labelling isn't an activity)
+    // don't look at the events (could be spammed by CIs)
+    SysTime lastComment = t.pr.createdAt;
+
+    // comments and reviewComments are two different lists
+    // -> take the newest date
+    static foreach (el; ["comments", "reviewComments"])
+    {{
+        mixin("auto comments = t." ~ el ~ ";");
+        if (comments.length)
+        {
+            auto date = comments[$ - 1].updatedAt;
+            lastComment = max(lastComment, date);
+        }
+    }}
+
+    auto timeDiff = now - lastComment;
 
     return timeDiff;
 }
@@ -112,6 +124,7 @@ auto walkPR(Actions)(string repoSlug, GHIssue issue, Actions actions, CronConfig
     // TODO: direction doesn't seem to work here
     // https://developer.github.com/v3/issues/comments/#list-comments-in-a-repository
     t.comments = ghGetRequest(pr.commentsURL).readJson.deserializeJson!(GHComment[]);
+    t.reviewComments = ghGetRequest(pr.reviewCommentsURL).readJson.deserializeJson!(GHComment[]);
 
     // perform actions
     foreach (action; actions)
