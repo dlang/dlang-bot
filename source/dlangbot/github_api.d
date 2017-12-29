@@ -393,7 +393,7 @@ struct GHMilestone
     uint number;
     ulong id;
     string title;
-    string description;
+    Nullable!string description;
     GHUser creator;
     @name("open_issues") ulong openIssues;
     @name("closed_issues") ulong closedIssues;
