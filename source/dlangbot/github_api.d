@@ -167,6 +167,7 @@ struct PullRequest
 
     string htmlURL() const { return "https://github.com/%s/pull/%d".format(repoSlug, number); }
     string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
+    string reviewCommentsURL() const { return "%s/repos/%s/pulls/%d/comments".format(githubAPIURL, repoSlug, number); }
     string commitsURL() const { return "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, number); }
     string eventsURL() const { return "%s/repos/%s/issues/%d/events".format(githubAPIURL, repoSlug, number); }
     string labelsURL() const { return "%s/repos/%s/issues/%d/labels".format(githubAPIURL, repoSlug, number); }
