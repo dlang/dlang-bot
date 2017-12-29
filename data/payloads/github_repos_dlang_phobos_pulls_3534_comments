@@ -1,0 +1,143 @@
+[
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/pulls/comments/38389478",
+    "pull_request_review_id": null,
+    "id": 38389478,
+    "diff_hunk": "@@ -2777,23 +2777,30 @@ smallest element and with the same ending as $(D range). The function\n can actually be used for finding the maximum or any other ordering\n predicate (that's why $(D maxPos) is not provided).\n  */\n-Range minPos(alias pred = \"a < b\", Range)(Range range)\n+auto minPos(alias pred = \"a < b\", Range)(Range range)",
+    "path": "std/algorithm/searching.d",
+    "position": null,
+    "original_position": 5,
+    "commit_id": "b7bf452ca52c2a529e79a830eee97310233e3a9c",
+    "original_commit_id": "644087dd0195d69fd43ad372cc2ea4479be23a3b",
+    "user": {
+      "login": "JakobOvrum",
+      "id": 155856,
+      "avatar_url": "https://avatars2.githubusercontent.com/u/155856?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/JakobOvrum",
+      "html_url": "https://github.com/JakobOvrum",
+      "followers_url": "https://api.github.com/users/JakobOvrum/followers",
+      "following_url": "https://api.github.com/users/JakobOvrum/following{/other_user}",
+      "gists_url": "https://api.github.com/users/JakobOvrum/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/JakobOvrum/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/JakobOvrum/subscriptions",
+      "organizations_url": "https://api.github.com/users/JakobOvrum/orgs",
+      "repos_url": "https://api.github.com/users/JakobOvrum/repos",
+      "events_url": "https://api.github.com/users/JakobOvrum/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/JakobOvrum/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "The return type is `Range` for all paths; explicit return type is better for documented functions as it provides important information to readers.\n",
+    "created_at": "2015-09-01T06:39:54Z",
+    "updated_at": "2015-09-03T07:33:59Z",
+    "html_url": "https://github.com/dlang/phobos/pull/3534#discussion_r38389478",
+    "pull_request_url": "https://api.github.com/repos/dlang/phobos/pulls/3534",
+    "author_association": "MEMBER",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/comments/38389478"
+      },
+      "html": {
+        "href": "https://github.com/dlang/phobos/pull/3534#discussion_r38389478"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/3534"
+      }
+    }
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/pulls/comments/38389855",
+    "pull_request_review_id": null,
+    "id": 38389855,
+    "diff_hunk": "@@ -2852,6 +2864,76 @@ unittest\n     assert(minPos!(\"a[0] < b[0]\")(b) == [ [2, 4], [4], [4] ]);\n }\n \n+import std.algorithm.comparison : min, max;\n+\n+/** Returns: Minimum Element in $(D range) or $(D unit) if $(D range) is empty.\n+ */\n+auto minElement(alias F = min, R)(R range,",
+    "path": "std/algorithm/searching.d",
+    "position": 56,
+    "original_position": 61,
+    "commit_id": "b7bf452ca52c2a529e79a830eee97310233e3a9c",
+    "original_commit_id": "644087dd0195d69fd43ad372cc2ea4479be23a3b",
+    "user": {
+      "login": "JakobOvrum",
+      "id": 155856,
+      "avatar_url": "https://avatars2.githubusercontent.com/u/155856?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/JakobOvrum",
+      "html_url": "https://github.com/JakobOvrum",
+      "followers_url": "https://api.github.com/users/JakobOvrum/followers",
+      "following_url": "https://api.github.com/users/JakobOvrum/following{/other_user}",
+      "gists_url": "https://api.github.com/users/JakobOvrum/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/JakobOvrum/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/JakobOvrum/subscriptions",
+      "organizations_url": "https://api.github.com/users/JakobOvrum/orgs",
+      "repos_url": "https://api.github.com/users/JakobOvrum/repos",
+      "events_url": "https://api.github.com/users/JakobOvrum/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/JakobOvrum/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "Do we really need these? \"Compliance with C++ STL\" doesn't seem like a good argument. I recommend moving these to a different PR where they can be evaluated separately.\n",
+    "created_at": "2015-09-01T06:47:22Z",
+    "updated_at": "2015-09-03T07:33:59Z",
+    "html_url": "https://github.com/dlang/phobos/pull/3534#discussion_r38389855",
+    "pull_request_url": "https://api.github.com/repos/dlang/phobos/pulls/3534",
+    "author_association": "MEMBER",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/comments/38389855"
+      },
+      "html": {
+        "href": "https://github.com/dlang/phobos/pull/3534#discussion_r38389855"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/3534"
+      }
+    }
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/pulls/comments/38619613",
+    "pull_request_review_id": null,
+    "id": 38619613,
+    "diff_hunk": "@@ -2777,23 +2777,30 @@ smallest element and with the same ending as $(D range). The function\n can actually be used for finding the maximum or any other ordering\n predicate (that's why $(D maxPos) is not provided).\n  */\n-Range minPos(alias pred = \"a < b\", Range)(Range range)\n+auto minPos(alias pred = \"a < b\", Range)(Range range)",
+    "path": "std/algorithm/searching.d",
+    "position": null,
+    "original_position": 5,
+    "commit_id": "b7bf452ca52c2a529e79a830eee97310233e3a9c",
+    "original_commit_id": "644087dd0195d69fd43ad372cc2ea4479be23a3b",
+    "user": {
+      "login": "nordlow",
+      "id": 829407,
+      "avatar_url": "https://avatars1.githubusercontent.com/u/829407?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/nordlow",
+      "html_url": "https://github.com/nordlow",
+      "followers_url": "https://api.github.com/users/nordlow/followers",
+      "following_url": "https://api.github.com/users/nordlow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/nordlow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/nordlow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/nordlow/subscriptions",
+      "organizations_url": "https://api.github.com/users/nordlow/orgs",
+      "repos_url": "https://api.github.com/users/nordlow/repos",
+      "events_url": "https://api.github.com/users/nordlow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/nordlow/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "Done.\n",
+    "created_at": "2015-09-03T07:33:31Z",
+    "updated_at": "2015-09-03T07:33:59Z",
+    "html_url": "https://github.com/dlang/phobos/pull/3534#discussion_r38619613",
+    "pull_request_url": "https://api.github.com/repos/dlang/phobos/pulls/3534",
+    "author_association": "CONTRIBUTOR",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/comments/38619613"
+      },
+      "html": {
+        "href": "https://github.com/dlang/phobos/pull/3534#discussion_r38619613"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/3534"
+      }
+    }
+  }
+]
