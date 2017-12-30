@@ -64,7 +64,6 @@ void startFakeAPIServer()
     auto fakeSettings = new HTTPServerSettings;
     fakeSettings.port = getFreePort;
     fakeSettings.bindAddresses = ["0.0.0.0"];
-    fakeSettings.options = HTTPServerOption.defaults & HTTPServerOption.parseJsonBody;
     auto router = new URLRouter;
     router.any("*", &payloadServer);
 

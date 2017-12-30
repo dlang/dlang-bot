@@ -36,7 +36,6 @@ void startServer(HTTPServerSettings settings)
     import vibe.http.server : HTTPServerOption, listenHTTP, render;
 
     settings.bindAddresses = ["0.0.0.0"];
-    settings.options = HTTPServerOption.defaults & ~HTTPServerOption.parseJsonBody;
 
     auto router = new URLRouter;
     router
