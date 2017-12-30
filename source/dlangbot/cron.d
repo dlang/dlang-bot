@@ -173,7 +173,7 @@ auto walkPRs(Actions)(string repoSlug, Actions actions, CronConfig config = Cron
         foreach (idx, issueJson; page[].enumerate)
         {
             auto issue = issueJson.deserializeJson!GHIssue;
-
+            logInfo("[cron-daily/%s/%d]: walkPR", repoSlug, issue.number);
             walkPR(repoSlug, issue, actions, config);
 
             // limit search for local testing
