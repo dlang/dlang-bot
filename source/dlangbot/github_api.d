@@ -131,9 +131,9 @@ struct PullRequest
     {
         string sha;
         string ref_;
-        string label;
-        GHUser user;
-        Repo repo;
+        Nullable!string label;
+        Nullable!GHUser user;
+        Nullable!Repo repo;
     }
     Branch base, head;
     enum MergeableState { clean, dirty, unstable, blocked, unknown }
@@ -167,6 +167,7 @@ struct PullRequest
 
     string htmlURL() const { return "https://github.com/%s/pull/%d".format(repoSlug, number); }
     string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
+    string reviewCommentsURL() const { return "%s/repos/%s/pulls/%d/comments".format(githubAPIURL, repoSlug, number); }
     string commitsURL() const { return "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, number); }
     string eventsURL() const { return "%s/repos/%s/issues/%d/events".format(githubAPIURL, repoSlug, number); }
     string labelsURL() const { return "%s/repos/%s/issues/%d/labels".format(githubAPIURL, repoSlug, number); }
@@ -238,7 +239,7 @@ struct GHComment
 {
     @name("created_at") SysTime createdAt;
     @name("updated_at") SysTime updatedAt;
-    GHUser user;
+    Nullable!GHUser user;
     string body_;
     string url;
 
@@ -346,7 +347,7 @@ struct GHIssue
     @name("created_at") SysTime createdAt;
     @name("updated_at") SysTime updatedAt;
     @name("closed_at") Nullable!SysTime closedAt;
-    string body_;
+    Nullable!string body_;
 
     string labelsURL() const { return "%s/repos/%s/issues/%d/labels".format(githubAPIURL, repoSlug, number); }
     string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
@@ -374,9 +375,10 @@ struct GHIssue
     PullRequest toPullRequest() const
     {
         PullRequest pr;
+        pr.base.repo = PullRequest.Repo.init;
         pr.base.repo.fullName = repoSlug;
-        foreach (symbol; AliasSeq!("number", "state", "title", "user", "assignee",
-                    "createdAt", "updatedAt", "closedAt"))
+        static foreach (symbol; ["number", "state", "title", "user", "assignee",
+                    "createdAt", "updatedAt", "closedAt"])
         {
             mixin("pr." ~ symbol ~ " = " ~ symbol ~ ";");
         }
@@ -392,11 +394,11 @@ struct GHMilestone
     uint number;
     ulong id;
     string title;
-    string description;
+    Nullable!string description;
     GHUser creator;
     @name("open_issues") ulong openIssues;
     @name("closed_issues") ulong closedIssues;
-    GHState state;
+    @byName GHState state;
     @name("created_at") SysTime createdAt;
     @name("updated_at") SysTime updatedAt;
     @name("due_on") Nullable!SysTime dueOn;

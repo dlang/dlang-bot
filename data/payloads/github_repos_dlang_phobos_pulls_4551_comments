@@ -1,0 +1,192 @@
+[
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/pulls/comments/130091297",
+    "pull_request_review_id": 52932251,
+    "id": 130091297,
+    "diff_hunk": "@@ -2397,12 +2397,12 @@ version (unittest)\n private @property Mutex initOnceLock()\n {\n     __gshared Mutex lock;",
+    "path": "std/concurrency.d",
+    "position": 3,
+    "original_position": 3,
+    "commit_id": "7eef3a038a3a349869efa9bd02b66336099a3144",
+    "original_commit_id": "7eef3a038a3a349869efa9bd02b66336099a3144",
+    "user": {
+      "login": "ZombineDev",
+      "id": 3475150,
+      "avatar_url": "https://avatars2.githubusercontent.com/u/3475150?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ZombineDev",
+      "html_url": "https://github.com/ZombineDev",
+      "followers_url": "https://api.github.com/users/ZombineDev/followers",
+      "following_url": "https://api.github.com/users/ZombineDev/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ZombineDev/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ZombineDev/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ZombineDev/subscriptions",
+      "organizations_url": "https://api.github.com/users/ZombineDev/orgs",
+      "repos_url": "https://api.github.com/users/ZombineDev/repos",
+      "events_url": "https://api.github.com/users/ZombineDev/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ZombineDev/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "We need to fix `initOnce` so that it takes a `shared(Mutex)` and deprecate the overload that takes a non-shared one.\r\nI fixed `core.sync.mutex.Mutex` so that it works well with `shared` one or two releases ago. I think `initOnce` taking a non-shared `Mutex` was simply because  `shared(Mutex)` didn't work at all at the time the function was added.",
+    "created_at": "2017-07-28T13:39:05Z",
+    "updated_at": "2017-07-28T13:40:07Z",
+    "html_url": "https://github.com/dlang/phobos/pull/4551#discussion_r130091297",
+    "pull_request_url": "https://api.github.com/repos/dlang/phobos/pulls/4551",
+    "author_association": "MEMBER",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/comments/130091297"
+      },
+      "html": {
+        "href": "https://github.com/dlang/phobos/pull/4551#discussion_r130091297"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/4551"
+      }
+    }
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/pulls/comments/130091773",
+    "pull_request_review_id": 52932770,
+    "id": 130091773,
+    "diff_hunk": "@@ -1665,7 +1665,8 @@ if (sharedLog !is myLogger)\n     static auto trustedLoad(ref shared Logger logger) @trusted\n     {\n         import core.atomic : atomicLoad, MemoryOrder;\n-        return atomicLoad!(MemoryOrder.acq)(logger);\n+        return cast() atomicLoad!(MemoryOrder.acq)(logger);\n+            //FIXME: Casting shared away here. Not good. See issue 16232.",
+    "path": "std/experimental/logger/core.d",
+    "position": 6,
+    "original_position": 6,
+    "commit_id": "7eef3a038a3a349869efa9bd02b66336099a3144",
+    "original_commit_id": "7eef3a038a3a349869efa9bd02b66336099a3144",
+    "user": {
+      "login": "ZombineDev",
+      "id": 3475150,
+      "avatar_url": "https://avatars2.githubusercontent.com/u/3475150?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ZombineDev",
+      "html_url": "https://github.com/ZombineDev",
+      "followers_url": "https://api.github.com/users/ZombineDev/followers",
+      "following_url": "https://api.github.com/users/ZombineDev/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ZombineDev/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ZombineDev/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ZombineDev/subscriptions",
+      "organizations_url": "https://api.github.com/users/ZombineDev/orgs",
+      "repos_url": "https://api.github.com/users/ZombineDev/repos",
+      "events_url": "https://api.github.com/users/ZombineDev/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ZombineDev/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "Looks ok, we have no other options here.",
+    "created_at": "2017-07-28T13:41:04Z",
+    "updated_at": "2017-07-28T13:41:04Z",
+    "html_url": "https://github.com/dlang/phobos/pull/4551#discussion_r130091773",
+    "pull_request_url": "https://api.github.com/repos/dlang/phobos/pulls/4551",
+    "author_association": "MEMBER",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/comments/130091773"
+      },
+      "html": {
+        "href": "https://github.com/dlang/phobos/pull/4551#discussion_r130091773"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/4551"
+      }
+    }
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/pulls/comments/130145506",
+    "pull_request_review_id": 52993933,
+    "id": 130145506,
+    "diff_hunk": "@@ -2397,12 +2397,12 @@ version (unittest)\n private @property Mutex initOnceLock()\n {\n     __gshared Mutex lock;",
+    "path": "std/concurrency.d",
+    "position": 3,
+    "original_position": 3,
+    "commit_id": "7eef3a038a3a349869efa9bd02b66336099a3144",
+    "original_commit_id": "7eef3a038a3a349869efa9bd02b66336099a3144",
+    "user": {
+      "login": "aG0aep6G",
+      "id": 9287500,
+      "avatar_url": "https://avatars1.githubusercontent.com/u/9287500?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/aG0aep6G",
+      "html_url": "https://github.com/aG0aep6G",
+      "followers_url": "https://api.github.com/users/aG0aep6G/followers",
+      "following_url": "https://api.github.com/users/aG0aep6G/following{/other_user}",
+      "gists_url": "https://api.github.com/users/aG0aep6G/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/aG0aep6G/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/aG0aep6G/subscriptions",
+      "organizations_url": "https://api.github.com/users/aG0aep6G/orgs",
+      "repos_url": "https://api.github.com/users/aG0aep6G/repos",
+      "events_url": "https://api.github.com/users/aG0aep6G/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/aG0aep6G/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "> We need to fix initOnce so that it takes a shared(Mutex) and deprecate the overload that takes a non-shared one.\r\n\r\nAs far as I see, that's a separate issue. It can be fixed independently from issue 16230.\r\n\r\nI suggest to fix it afterwards. Fixing it here would mean either\r\n1) making the phobos and druntime PRs mutually dependent (not fun, in my experience), or\r\n2) adding casts to shared that won't be needed once issue 16230 is fixed.\r\n\r\nAnd I'd rather not add another deprecation discussion to this, seeing that the druntime PR has been stuck in one for a long time.\r\n\r\nI think it's going to be a smoother ride when we do this in three steps. Here's a PR for the third step (to be pulled after the druntime PR): #5661.",
+    "created_at": "2017-07-28T17:41:15Z",
+    "updated_at": "2017-07-28T17:41:15Z",
+    "html_url": "https://github.com/dlang/phobos/pull/4551#discussion_r130145506",
+    "pull_request_url": "https://api.github.com/repos/dlang/phobos/pulls/4551",
+    "author_association": "CONTRIBUTOR",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/comments/130145506"
+      },
+      "html": {
+        "href": "https://github.com/dlang/phobos/pull/4551#discussion_r130145506"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/4551"
+      }
+    },
+    "in_reply_to_id": 130091297
+  },
+  {
+    "url": "https://api.github.com/repos/dlang/phobos/pulls/comments/130217685",
+    "pull_request_review_id": 53073463,
+    "id": 130217685,
+    "diff_hunk": "@@ -2397,12 +2397,12 @@ version (unittest)\n private @property Mutex initOnceLock()\n {\n     __gshared Mutex lock;",
+    "path": "std/concurrency.d",
+    "position": 3,
+    "original_position": 3,
+    "commit_id": "7eef3a038a3a349869efa9bd02b66336099a3144",
+    "original_commit_id": "7eef3a038a3a349869efa9bd02b66336099a3144",
+    "user": {
+      "login": "ZombineDev",
+      "id": 3475150,
+      "avatar_url": "https://avatars2.githubusercontent.com/u/3475150?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/ZombineDev",
+      "html_url": "https://github.com/ZombineDev",
+      "followers_url": "https://api.github.com/users/ZombineDev/followers",
+      "following_url": "https://api.github.com/users/ZombineDev/following{/other_user}",
+      "gists_url": "https://api.github.com/users/ZombineDev/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/ZombineDev/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/ZombineDev/subscriptions",
+      "organizations_url": "https://api.github.com/users/ZombineDev/orgs",
+      "repos_url": "https://api.github.com/users/ZombineDev/repos",
+      "events_url": "https://api.github.com/users/ZombineDev/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/ZombineDev/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "body": "Fair enough",
+    "created_at": "2017-07-29T09:55:05Z",
+    "updated_at": "2017-07-29T09:55:05Z",
+    "html_url": "https://github.com/dlang/phobos/pull/4551#discussion_r130217685",
+    "pull_request_url": "https://api.github.com/repos/dlang/phobos/pulls/4551",
+    "author_association": "MEMBER",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/comments/130217685"
+      },
+      "html": {
+        "href": "https://github.com/dlang/phobos/pull/4551#discussion_r130217685"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/dlang/phobos/pulls/4551"
+      }
+    },
+    "in_reply_to_id": 130091297
+  }
+]
