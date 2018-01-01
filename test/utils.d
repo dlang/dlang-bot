@@ -317,3 +317,14 @@ void openUrl(string url, string expectedResponse,
     checkAPIExpectations;
     assert(req.bodyReader.readAllUTF8 == expectedResponse);
 }
+
+void testCronDaily(string[] repositories, int line = __LINE__, string file = __FILE__)
+{
+    import dlangbot.app : cronDaily;
+    bool simulate = false;
+
+    logInfo("Starting cron test in %s:%d", file, line);
+
+    cronDaily(repositories, simulate);
+    checkAPIExpectations;
+}

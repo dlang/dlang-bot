@@ -3,7 +3,6 @@ import utils;
 import std.format : format;
 import std.stdio;
 
-bool simulate = false;
 string[] repositories = ["dlang/phobos"];
 
 // test the first items of the cron job
@@ -57,10 +56,7 @@ unittest
             ));
         },
     );
-
-    import dlangbot.app : cronDaily;
-    cronDaily(repositories, simulate);
-    checkAPIExpectations;
+    testCronDaily(repositories);
 }
 
 // test that stalled isn't falsely removed (e.g. by recent labelling)
@@ -86,7 +82,5 @@ unittest
         },
     );
 
-    import dlangbot.app : cronDaily;
-    cronDaily(repositories, simulate);
-    checkAPIExpectations;
+    testCronDaily(repositories);
 }
