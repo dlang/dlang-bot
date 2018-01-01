@@ -3,7 +3,6 @@ import utils;
 import std.format : format;
 import std.stdio;
 
-bool simulate = false;
 string[] repositories = ["dlang/phobos"];
 
 // test the first items of the cron job
@@ -53,14 +52,11 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PUT);
             assert(req.json[].map!(e => e.get!string).equal(
-                ["Bug Fix", "Enhancement","decision block", "needs rebase", "stalled"]
+                ["Bug Fix", "decision block", "Enhancement", "needs rebase", "stalled"]
             ));
         },
     );
-
-    import dlangbot.app : cronDaily;
-    cronDaily(repositories, simulate);
-    checkAPIExpectations;
+    testCronDaily(repositories);
 }
 
 // test that stalled isn't falsely removed (e.g. by recent labelling)
@@ -86,7 +82,5 @@ unittest
         },
     );
 
-    import dlangbot.app : cronDaily;
-    cronDaily(repositories, simulate);
-    checkAPIExpectations;
+    testCronDaily(repositories);
 }
