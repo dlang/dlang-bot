@@ -197,8 +197,9 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
 
 void checkAndRemoveLabels(GHLabel[] labels, in ref PullRequest pr, in string[] toRemoveLabels)
 {
+    import std.uni : toLower;
     labels
-        .map!(l => l.name)
+        .map!(l => l.name.toLower)
         .filter!(n => toRemoveLabels.canFind(n))
         .each!(l => pr.removeLabel(l));
 }

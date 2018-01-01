@@ -144,13 +144,18 @@ auto walkPR(Actions)(string repoSlug, GHIssue issue, Actions actions, CronConfig
         }
     }
 
+    import std.uni : asLowerCase, sicmp;
+    alias siEqual = (a, b) => sicmp(a, b) == 0;
+    alias siLess = (a, b) => sicmp(a, b) < 0;
     // update labels
     auto putLabels = labels.chain(addLabels)
                         .array
-                        .sort.uniq
-                        .filter!(l => !removeLabels.canFind(l)).array;
+                        .sort!siLess
+                        .uniq!siEqual
+                        .filter!(l => !removeLabels.map!asLowerCase.canFind(l.asLowerCase)).array;
 
-    if (!labels.equal(putLabels))
+    auto labelsSorted = labels.dup.sort!siLess;
+    if (!labelsSorted.equal!siEqual(putLabels))
     {
         logInfo("[%s/%d/putLabels]: %s (before: %s)", repoSlug, pr.number, putLabels, labels);
         if (!config.simulate)

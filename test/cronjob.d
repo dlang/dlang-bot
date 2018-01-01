@@ -52,7 +52,7 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PUT);
             assert(req.json[].map!(e => e.get!string).equal(
-                ["Bug Fix", "Enhancement","decision block", "needs rebase", "stalled"]
+                ["Bug Fix", "decision block", "Enhancement", "needs rebase", "stalled"]
             ));
         },
     );
