@@ -268,7 +268,7 @@ else void main(string[] args)
     auto settings = new HTTPServerSettings;
     settings.port = 8080;
     readOption("port|p", &settings.port, "Sets the port used for serving.");
-    readOption("simulative-cron-daily", &runDailyCronSimulation, "Sets the port used for serving.");
+    readOption("simulate-cron-daily", &runDailyCronSimulation, "Sets the port used for serving.");
     readOption("cron-daily", &runDailyCron, "Run daily cron tasks.");
     if (!finalizeCommandLineOptions())
         return;
