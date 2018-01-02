@@ -410,3 +410,36 @@ unittest
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
+
+// Remove old labels on push
+unittest
+{
+    import std.array : replace;
+    foreach (label; ["needs work", "Needs work", "stalled"])
+    {
+        setAPIExpectations(
+            "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
+                j = Json.emptyArray;
+             },
+            "/github/repos/dlang/phobos/issues/4921/labels", (ref Json j) {
+                j[0]["name"] = label;
+            },
+            // encodeComponent is avoided on purpose
+            "/github/repos/dlang/phobos/issues/4921/labels/" ~ label.replace(" ", "%20"),
+            (scope HTTPServerRequest req, scope HTTPServerResponse res){
+                assert(req.method == HTTPMethod.DELETE);
+            },
+             "/github/repos/dlang/phobos/issues/4921/comments",
+            "/github/orgs/dlang/public_members?per_page=100",
+             "/github/repos/dlang/phobos/issues/comments/262784442",
+            (scope HTTPServerRequest req, scope HTTPServerResponse res){
+                assert(req.method == HTTPMethod.PATCH);
+                auto body_ = req.json["body"].get!string;
+                assert(body_.canFind("@andralex"));
+                assert(!body_.canFind("Auto-close | Bugzilla"), "Shouldn't contain bug header");
+                assert(!body_.canFind("/show_bug.cgi?id="), "Shouldn't contain a Bugzilla reference");
+            }
+        );
+        postGitHubHook("dlang_phobos_synchronize_4921.json");
+    }
+}

@@ -197,10 +197,10 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
 
 void checkAndRemoveLabels(GHLabel[] labels, in ref PullRequest pr, in string[] toRemoveLabels)
 {
-    import std.uni : toLower;
+    import std.uni : sicmp;
     labels
-        .map!(l => l.name.toLower)
-        .filter!(n => toRemoveLabels.canFind(n))
+        .map!(l => l.name)
+        .filter!(n => toRemoveLabels.canFind!((a, b) => sicmp(a,b) == 0)(n))
         .each!(l => pr.removeLabel(l));
 }
 
@@ -222,7 +222,8 @@ void addLabels(in ref PullRequest pr, in string[] newLabels)
 
 void removeLabel(in ref PullRequest pr, string label)
 {
-    ghSendRequest(HTTPMethod.DELETE, pr.labelsURL ~ "/" ~ label);
+    import std.uri : encodeComponent;
+    ghSendRequest(HTTPMethod.DELETE, pr.labelsURL ~ "/" ~ label.encodeComponent);
 }
 
 void replaceLabels(in ref PullRequest pr, string[] labels)
