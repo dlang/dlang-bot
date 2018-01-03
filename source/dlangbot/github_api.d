@@ -136,11 +136,13 @@ struct PullRequest
         Nullable!Repo repo;
     }
     Branch base, head;
-    enum MergeableState { clean, dirty, unstable, blocked, unknown }
+    enum MergeableState { checking, clean, dirty, unstable, blocked, unknown }
     @byName GHState state;
     uint number;
+    string url;
     string title;
     @optional Nullable!bool mergeable;
+    // https://platform.github.community/t/documentation-about-mergeable-state/4259
     @optional @byName @name("mergeable_state") Nullable!MergeableState mergeableState;
     @name("created_at") SysTime createdAt;
     @name("updated_at") SysTime updatedAt;
@@ -222,6 +224,12 @@ struct PullRequest
             req.headers["Accept"] = "application/vnd.github.polaris-preview+json";
             req.writeJsonBody(merge);
         }, mergeURL);
+    }
+
+    typeof(this) refresh() {
+        return ghGetRequest(url)
+                .readJson
+                .deserializeJson!(typeof(this));
     }
 }
 

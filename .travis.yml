@@ -24,5 +24,6 @@ matrix:
       after_success:
         - bash <(curl -s https://codecov.io/bash)
   allow_failures:
+   - d: dmd
    - d: dmd-nightly
    - d: dmd-beta

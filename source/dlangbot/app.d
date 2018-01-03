@@ -139,9 +139,8 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 
 //==============================================================================
 
-void cronDaily(string[] repositories, bool simulate)
+void cronDaily(string[] repositories, CronConfig config)
 {
-    CronConfig config = {simulate: simulate};
     auto actions = [
         &detectStalledPR,
         &detectInactiveStablePR,
@@ -285,7 +284,10 @@ else void main(string[] args)
     }
 
     if (cronRepositories)
-        return cronDaily(cronRepositories, runDailyCronSimulation);
+    {
+        CronConfig config = {simulate: runDailyCronSimulation};
+        return cronDaily(cronRepositories, config);
+    }
 
     startServer(settings);
     lowerPrivileges();

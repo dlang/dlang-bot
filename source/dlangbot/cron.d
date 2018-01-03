@@ -20,6 +20,7 @@ struct CronConfig
     Duration stalledPRs = 90.days; // PRs with no activity within X days will get flagged
     Duration oldStablePRs = 3.days; // PRs targeting stable which should trigger a warning
     bool simulate;
+    Duration waitAfterMergeNullState = 750.msecs; // Time to wait before refetching a PR with mergeable: null
 }
 
 alias PRTuple = Tuple!(PullRequest, "pr", GHComment[], "comments", GHComment[], "reviewComments", CronConfig, "config");
@@ -73,8 +74,51 @@ auto detectInactiveStablePR(PRTuple t)
 
 auto detectPRWithMergeConflicts(PRTuple t)
 {
+    if (t.pr.mergeable.isNull)
+    {
+        logInfo("[cron-daily/%s/%d]: detectMerge - mergeable is null.", t.pr.repoSlug, t.pr.number);
+        // repeat request to receive computed mergeable information
+        foreach (i; 0 .. 4)
+        {
+            import vibe.core.core : sleep;
+            t.config.waitAfterMergeNullState.sleep;
+            logInfo("[cron-daily/%s/%d]: detectMerge - repeating request", t.pr.repoSlug, t.pr.number);
+            t.pr = t.pr.refresh;
+            if (!t.pr.mergeable.isNull)
+                goto mergable;
+        }
+        return LabelResponse(LabelAction.none, "");
+    }
+mergable:
+
+    bool isMergeable;
+    if (!t.pr.mergeableState.isNull)
+    {
+        logInfo("[cron-daily/%s/%d]: mergableState = %s", t.pr.repoSlug, t.pr.number, t.pr.mergeableState.get);
+        with (PullRequest.MergeableState)
+        final switch(t.pr.mergeableState)
+        {
+            case unknown, checking:
+                // should only be set if mergeable is null
+                return LabelResponse(LabelAction.none, "");
+            case clean, unstable:
+                isMergeable = true;
+                break;
+            case dirty:
+                isMergeable = false;
+                break;
+            // a reviewer has blocked the merge (not observed yet)
+            case blocked:
+                return LabelResponse(LabelAction.none, "");
+        }
+    }
+    else
+    {
+        logInfo("[cron-daily/%s/%d]: mergable = %s", t.pr.repoSlug, t.pr.number, t.pr.mergeable.get);
+        isMergeable = t.pr.mergeable.get;
+    }
+
     // "needs rebase" gets automatically removed on a new push
-    bool isMergeable = !t.pr.mergeable.isNull && t.pr.mergeable.get;
     with(LabelAction)
     return LabelResponse(!isMergeable ? add : remove, "needs rebase");
 }

@@ -321,10 +321,14 @@ void openUrl(string url, string expectedResponse,
 void testCronDaily(string[] repositories, int line = __LINE__, string file = __FILE__)
 {
     import dlangbot.app : cronDaily;
-    bool simulate = false;
+    import dlangbot.cron : CronConfig;
 
     logInfo("Starting cron test in %s:%d", file, line);
 
-    cronDaily(repositories, simulate);
+    CronConfig config = {
+        simulate: false,
+        waitAfterMergeNullState: 1.msecs,
+    };
+    cronDaily(repositories, config);
     checkAPIExpectations;
 }
