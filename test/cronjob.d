@@ -138,3 +138,30 @@ unittest
 
     testCronDaily(repositories);
 }
+
+// for "blocked" PRs, the `mergeable` attribute should be preferred
+// if mergeable is true, "needs rebase" should be removed
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/issues?state=open&sort=updated&direction=asc", (ref Json j) {
+            // only test one pull request
+            j = Json([j[0]]);
+            j[0]["labels"][0]["name"] = "needs rebase";
+        },
+        "/github/repos/dlang/phobos/pulls/2526", (ref Json j) {
+            j["mergeable"] = true;
+            j["mergeable_state"] = "blocked";
+        },
+        "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44",
+        "/github/repos/dlang/phobos/issues/2526/comments", &dontTestStalled,
+        "/github/repos/dlang/phobos/pulls/2526/comments",
+        "/github/repos/dlang/phobos/issues/2526/labels",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.PUT);
+            assert(req.json[].length == 0);
+        },
+    );
+
+    testCronDaily(repositories);
+}
