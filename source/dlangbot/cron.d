@@ -146,7 +146,7 @@ auto detectPRWithPersistentCIFailures(PRTuple t)
                 case "auto-tester":
                 case "CyberShadow/DAutoTest":
                 case "continuous-integration/travis-ci/pr":
-                case "continuous-integration/jenkins/pr-merge":
+                case "continuous-integration/travis-ci/jenkins":
                 case "appveyor":
                 case "ci/circleci":
                     return true;
