@@ -165,28 +165,3 @@ unittest
 
     testCronDaily(repositories);
 }
-
-// test that two or more failing CI trigger "needs work"
-unittest
-{
-    setAPIExpectations(
-        "/github/repos/dlang/phobos/issues?state=open&sort=updated&direction=asc", (ref Json j) {
-            // only test one pull request
-            j = Json([j[0]]);
-        },
-        "/github/repos/dlang/phobos/pulls/2526",
-        "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44", (ref Json j) {
-            j["statuses"][1]["state"] = "error";
-            j["statuses"][2]["state"] = "failure";
-        },
-        "/github/repos/dlang/phobos/issues/2526/comments", &dontTestStalled,
-        "/github/repos/dlang/phobos/pulls/2526/comments",
-        "/github/repos/dlang/phobos/issues/2526/labels",
-        (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            assert(req.method == HTTPMethod.PUT);
-            assert(req.json[].map!(e => e.get!string).equal(["blocked", "needs work"]));
-        },
-    );
-
-    testCronDaily(repositories);
-}
