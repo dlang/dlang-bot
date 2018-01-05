@@ -5,13 +5,6 @@ import std.stdio;
 
 string[] repositories = ["dlang/phobos"];
 
-void dontTestStalled(ref Json j)
-{
-    import std.datetime : Clock, days;
-    j[$ - 1]["created_at"] = (Clock.currTime - 2.days).toISOExtString;
-    j[$ - 1]["updated_at"] = (Clock.currTime - 2.days).toISOExtString;
-}
-
 // test the first items of the cron job
 unittest
 {
@@ -69,13 +62,13 @@ unittest
 // test that stalled isn't falsely removed (e.g. by recent labelling)
 unittest
 {
+    import std.datetime : Clock, days;
     setAPIExpectations(
         "/github/repos/dlang/phobos/issues?state=open&sort=updated&direction=asc", (ref Json j) {
             // only test one pull request
             j = Json([j[0]]);
         },
         "/github/repos/dlang/phobos/pulls/2526", (ref Json j) {
-            import std.datetime : Clock, days;
             // simulate a recent label update
             j["updated_at"] = (Clock.currTime - 2.days).toISOExtString;
         },
@@ -95,6 +88,7 @@ unittest
 // test that no label updates are sent if no activity was found
 unittest
 {
+    import std.datetime : Clock, days;
     setAPIExpectations(
         "/github/repos/dlang/phobos/issues?state=open&sort=updated&direction=asc", (ref Json j) {
             // only test one pull request
@@ -104,7 +98,10 @@ unittest
             j["mergeable"] = false;
         },
         "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44",
-        "/github/repos/dlang/phobos/issues/2526/comments", &dontTestStalled,
+        "/github/repos/dlang/phobos/issues/2526/comments", (ref Json j) {
+            j[$ - 1]["created_at"] = (Clock.currTime - 2.days).toISOExtString;
+            j[$ - 1]["updated_at"] = (Clock.currTime - 2.days).toISOExtString;
+        },
         "/github/repos/dlang/phobos/pulls/2526/comments",
     );
 
@@ -114,6 +111,7 @@ unittest
 // test that the merge state gets refreshed
 unittest
 {
+    import std.datetime : Clock, days;
     setAPIExpectations(
         "/github/repos/dlang/phobos/issues?state=open&sort=updated&direction=asc", (ref Json j) {
             // only test one pull request
@@ -127,39 +125,15 @@ unittest
             j["mergeable_state"] = "dirty";
         },
         "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44",
-        "/github/repos/dlang/phobos/issues/2526/comments", &dontTestStalled,
+        "/github/repos/dlang/phobos/issues/2526/comments", (ref Json j) {
+            j[$ - 1]["created_at"] = (Clock.currTime - 2.days).toISOExtString;
+            j[$ - 1]["updated_at"] = (Clock.currTime - 2.days).toISOExtString;
+        },
         "/github/repos/dlang/phobos/pulls/2526/comments",
         "/github/repos/dlang/phobos/issues/2526/labels",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PUT);
             assert(req.json[].map!(e => e.get!string).equal(["blocked", "needs rebase"]));
-        },
-    );
-
-    testCronDaily(repositories);
-}
-
-// for "blocked" PRs, the `mergeable` attribute should be preferred
-// if mergeable is true, "needs rebase" should be removed
-unittest
-{
-    setAPIExpectations(
-        "/github/repos/dlang/phobos/issues?state=open&sort=updated&direction=asc", (ref Json j) {
-            // only test one pull request
-            j = Json([j[0]]);
-            j[0]["labels"][0]["name"] = "needs rebase";
-        },
-        "/github/repos/dlang/phobos/pulls/2526", (ref Json j) {
-            j["mergeable"] = true;
-            j["mergeable_state"] = "blocked";
-        },
-        "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44",
-        "/github/repos/dlang/phobos/issues/2526/comments", &dontTestStalled,
-        "/github/repos/dlang/phobos/pulls/2526/comments",
-        "/github/repos/dlang/phobos/issues/2526/labels",
-        (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            assert(req.method == HTTPMethod.PUT);
-            assert(req.json[].length == 0);
         },
     );
 

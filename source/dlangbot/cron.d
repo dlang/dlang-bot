@@ -74,17 +74,15 @@ auto detectInactiveStablePR(PRTuple t)
 
 auto detectPRWithMergeConflicts(PRTuple t)
 {
-    import std.typecons : Nullable;
-
     if (t.pr.mergeable.isNull)
     {
-        logInfo("[cron-daily/%s/%d/detectMerge]: mergeable is null.", t.pr.repoSlug, t.pr.number);
+        logInfo("[cron-daily/%s/%d]: detectMerge - mergeable is null.", t.pr.repoSlug, t.pr.number);
         // repeat request to receive computed mergeable information
         foreach (i; 0 .. 4)
         {
             import vibe.core.core : sleep;
             t.config.waitAfterMergeNullState.sleep;
-            logInfo("[cron-daily/%s/%d/detectMerge]: repeating request", t.pr.repoSlug, t.pr.number);
+            logInfo("[cron-daily/%s/%d]: detectMerge - repeating request", t.pr.repoSlug, t.pr.number);
             t.pr = t.pr.refresh;
             if (!t.pr.mergeable.isNull)
                 goto mergable;
@@ -93,40 +91,30 @@ auto detectPRWithMergeConflicts(PRTuple t)
     }
 mergable:
 
-    Nullable!bool isMergeable;
+    bool isMergeable;
     if (!t.pr.mergeableState.isNull)
     {
-        logInfo("[cron-daily/%s/%d/detectMerge]: mergeableState = %s", t.pr.repoSlug, t.pr.number, t.pr.mergeableState.get);
+        logInfo("[cron-daily/%s/%d]: mergableState = %s", t.pr.repoSlug, t.pr.number, t.pr.mergeableState.get);
         with (PullRequest.MergeableState)
         final switch(t.pr.mergeableState)
         {
-            case clean:
-                // branch is up to date with master and has no conflicts
-                isMergeable = true;
-                break;
-            case unstable:
-                // branch isn't up to date with master, but has no conflicts
+            case unknown, checking:
+                // should only be set if mergeable is null
+                return LabelResponse(LabelAction.none, "");
+            case clean, unstable:
                 isMergeable = true;
                 break;
             case dirty:
-                // GitHub detected conflicts
                 isMergeable = false;
                 break;
-            case unknown, checking:
-                // should only be set if mergeable is null
+            // a reviewer has blocked the merge (not observed yet)
             case blocked:
-                // the repo requires reviews and the PR hasn't been approved yet
-                // the repo requires status checks and they have failed
-                break;
+                return LabelResponse(LabelAction.none, "");
         }
     }
-
-    if (isMergeable.isNull)
+    else
     {
-        if (t.pr.mergeable.isNull)
-            return LabelResponse(LabelAction.none, "");
-
-        logInfo("[cron-daily/%s/%d/detectMerge]: mergeable = %s", t.pr.repoSlug, t.pr.number, t.pr.mergeable.get);
+        logInfo("[cron-daily/%s/%d]: mergable = %s", t.pr.repoSlug, t.pr.number, t.pr.mergeable.get);
         isMergeable = t.pr.mergeable.get;
     }
 
