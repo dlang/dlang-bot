@@ -111,12 +111,10 @@ void updateGithubComment(in ref PullRequest pr, in ref GHComment comment,
     if (pr.state == GHState.closed)
         return;
 
-    logDebug("[github/updateGithubComment](%s): %s", pr.pid, refs);
-    logDebug("%s", descs);
+    pr.logAction("found %s", refs);
     assert(refs.map!(r => r.id).equal(descs.map!(d => d.id)));
 
     auto msg = pr.formatComment(refs, descs, msgs);
-    logDebug("%s", msg);
 
     if (msg != comment.body_)
     {
@@ -215,7 +213,7 @@ void addLabels(in ref PullRequest pr, in string[] newLabels)
 
     if (!toBeAdded.empty)
     {
-        logInfo("[github/handlePR](%s): adding labels: %s", pr.pid, toBeAdded);
+        pr.logAction("adding labels: %s", toBeAdded);
         ghSendRequest(HTTPMethod.POST, pr.labelsURL, toBeAdded.array);
     }
 }

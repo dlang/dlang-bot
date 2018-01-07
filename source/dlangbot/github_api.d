@@ -436,3 +436,17 @@ Json verifyRequest(string signature, string data)
             "Hook signature mismatch");
     return parseJsonString(data);
 }
+
+//==============================================================================
+// Logging
+//==============================================================================
+
+void logAction(string func = __FUNCTION__, Args...)(in ref PullRequest pr, string message, Args args)
+{
+    log!(func, Args)("github", pr.repoSlug, pr.number, message, args);
+}
+
+void log(string func = __FUNCTION__, Args...)(string tag, string repoSlug, uint number, string message, Args args)
+{
+    logInfo("[%s/%s/%d] " ~ message, tag, repoSlug, number, func, args);
+}

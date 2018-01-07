@@ -27,6 +27,12 @@ alias PRTuple = Tuple!(PullRequest, "pr", GHComment[], "comments", GHComment[], 
 enum LabelAction {add, remove, none}
 alias LabelResponse = Tuple!(LabelAction, "action", string, "label");
 
+void logCron(string func = __FUNCTION__, Args...)(in ref PullRequest pr, string message, Args args)
+{
+    import dlangbot.github_api : log;
+    log!(func, Args)("cron", pr.repoSlug, pr.number, message, args);
+}
+
 //==============================================================================
 // Cron actions
 //==============================================================================
@@ -52,7 +58,6 @@ auto findLastActivity(PRTuple t)
     }}
 
     auto timeDiff = now - lastComment;
-
     return timeDiff;
 }
 
@@ -78,13 +83,13 @@ auto detectPRWithMergeConflicts(PRTuple t)
 
     if (t.pr.mergeable.isNull)
     {
-        logInfo("[cron-daily/%s/%d/detectMerge]: mergeable is null.", t.pr.repoSlug, t.pr.number);
+        t.pr.logCron("mergeable is null");
         // repeat request to receive computed mergeable information
         foreach (i; 0 .. 4)
         {
             import vibe.core.core : sleep;
             t.config.waitAfterMergeNullState.sleep;
-            logInfo("[cron-daily/%s/%d/detectMerge]: repeating request", t.pr.repoSlug, t.pr.number);
+            t.pr.logCron("repeating request");
             t.pr = t.pr.refresh;
             if (!t.pr.mergeable.isNull)
                 goto mergable;
@@ -96,7 +101,7 @@ mergable:
     Nullable!bool isMergeable;
     if (!t.pr.mergeableState.isNull)
     {
-        logInfo("[cron-daily/%s/%d/detectMerge]: mergeableState = %s", t.pr.repoSlug, t.pr.number, t.pr.mergeableState.get);
+        t.pr.logCron("mergeableState = %s", t.pr.mergeableState.get);
         with (PullRequest.MergeableState)
         final switch(t.pr.mergeableState)
         {
@@ -126,7 +131,7 @@ mergable:
         if (t.pr.mergeable.isNull)
             return LabelResponse(LabelAction.none, "");
 
-        logInfo("[cron-daily/%s/%d/detectMerge]: mergeable = %s", t.pr.repoSlug, t.pr.number, t.pr.mergeable.get);
+        t.pr.logCron("mergeable = %s", t.pr.mergeable.get);
         isMergeable = t.pr.mergeable.get;
     }
 
@@ -213,7 +218,7 @@ auto walkPR(Actions)(string repoSlug, GHIssue issue, Actions actions, CronConfig
     auto labelsSorted = labels.dup.sort!siLess;
     if (!labelsSorted.equal!siEqual(putLabels))
     {
-        logInfo("[%s/%d/putLabels]: %s (before: %s)", repoSlug, pr.number, putLabels, labels);
+        pr.logCron("putLabels %s (before: %s)", putLabels, labels);
         if (!config.simulate)
             pr.replaceLabels(putLabels);
     }

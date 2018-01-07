@@ -96,7 +96,8 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     case "status":
         string repoSlug = json["name"].get!string;
         string state = json["state"].get!string;
-        logDebug("[github/pull_request](%s): state=%s, sha=%s, url=%s", repoSlug, state, json["sha"], json["target_url"]);
+        auto number = json["number"].get!uint;
+        log("github", repoSlug, number, "status: state=%s, sha=%s, url=%s", state, json["sha"], json["target_url"]);
         // no need to trigger the checker for failure/pending
         if (state == "success")
             prThrottler(repoSlug);
@@ -106,7 +107,8 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 
         auto action = json["action"].get!string;
         string repoSlug = json["repository"]["full_name"].get!string;
-        logDebug("[github/pull_request](%s/%s): action=%s", repoSlug, json["number"], action);
+        auto number = json["number"].get!uint;
+        log("github", repoSlug, number, "pull_request - action=%s", action);
 
         switch (action)
         {
@@ -129,7 +131,8 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
         runTaskHelper({
             import std.algorithm : among, filter;
             string repoSlug = json["repository"]["full_name"].get!string;
-            logDebug("[github/pull_request_review](%s/%s): state=%s", repoSlug, json["review"]["state"]);
+            auto number = json["number"].get!uint;
+            log("github", repoSlug, number, "review: state=%s", repoSlug, json["review"]["state"]);
             auto pullRequest = json["pull_request"].deserializeJson!PullRequest;
             auto labels = ghGetRequest(pullRequest.labelsURL)
                 .readJson
@@ -184,7 +187,6 @@ void handlePR(string action, PullRequest* _pr)
         }
         if (action == "synchronize")
         {
-            logDebug("[github/handlePR](%s): checkAndRemoveLabels", _pr.pid);
             enum toRemoveLabels = ["auto-merge", "auto-merge-squash",
                                    "needs rebase", "needs work", "stalled", "stable-stalled"];
             checkAndRemoveLabels(labels, pr, toRemoveLabels);
@@ -221,7 +223,7 @@ void handlePR(string action, PullRequest* _pr)
         auto bugzillSeverities = descs
             .filter!(d => bugzillaIds.canFind(d.id))
             .map!(i => i.severity);
-        logDebug("[github/handlePR](%s): trying to add bug fix label", _pr.pid);
+        pr.logAction("trying to add bug fix label");
         string[] labels;
         if (bugzillSeverities.canFind("enhancement"))
             labels ~= "Enhancement";
@@ -233,7 +235,7 @@ void handlePR(string action, PullRequest* _pr)
 
     if (runTrello)
     {
-        logDebug("[github/handlePR](%s): updating trello card", _pr.pid);
+        pr.logAction("updating trello card");
         updateTrelloCard(action, pr.htmlURL, refs, descs);
     }
 
