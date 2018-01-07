@@ -40,6 +40,7 @@ shared static this()
     githubAuth = "GH_DUMMY_AUTH_TOKEN";
     hookSecret = "GH_DUMMY_HOOK_SECRET";
     trelloAuth = "key=01234&token=abcde";
+    appveyorAuth = "key=01234&token=abcde";
 
     // start our hook server
     auto settings = new HTTPServerSettings;
@@ -56,6 +57,7 @@ shared static this()
     setLogLevel(LogLevel.info);
 
     runAsync = false;
+    runAppVeyor = false;
 }
 
 void startFakeAPIServer()
@@ -75,6 +77,7 @@ void startFakeAPIServer()
     githubAPIURL = fakeAPIServerURL ~ "/github";
     trelloAPIURL = fakeAPIServerURL ~ "/trello";
     bugzillaURL = fakeAPIServerURL ~ "/bugzilla";
+    appveyorAPIURL = fakeAPIServerURL ~ "/appveyor";
 }
 
 // serves saved GitHub API payloads
@@ -124,7 +127,7 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     {
         logInfo("reading payload: %s", filePath);
         auto payload = filePath.readText;
-        if (req.requestURL.startsWith("/github", "/trello"))
+        if (req.requestURL.startsWith("/github", "/trello", "/appveyor"))
         {
             auto payloadJson = payload.parseJsonString;
             replaceAPIReferences("https://api.github.com", githubAPIURL, payloadJson);
