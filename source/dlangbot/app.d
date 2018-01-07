@@ -1,8 +1,13 @@
 module dlangbot.app;
 
-import dlangbot.bugzilla, dlangbot.cron, dlangbot.github, dlangbot.trello,
-       dlangbot.utils;
+import dlangbot.appveyor;
+import dlangbot.bugzilla;
+import dlangbot.cron;
+import dlangbot.github;
+import dlangbot.trello;
+import dlangbot.utils;
 
+public import dlangbot.appveyor : appveyorAPIURL, appveyorAuth;
 public import dlangbot.bugzilla : bugzillaURL;
 public import dlangbot.github_api   : githubAPIURL, githubAuth, hookSecret;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
@@ -21,6 +26,7 @@ import vibe.stream.operations : readAllUTF8;
 
 bool runAsync = true;
 bool runTrello = true;
+bool runAppVeyor = true;
 
 Duration timeBetweenFullPRChecks = 1.minutes; // this should never be larger 30 mins on heroku
 Throttler!(typeof(&searchForAutoMergePrs)) prThrottler;
@@ -230,6 +236,24 @@ void handlePR(string action, PullRequest* _pr)
         logDebug("[github/handlePR](%s): updating trello card", _pr.pid);
         updateTrelloCard(action, pr.htmlURL, refs, descs);
     }
+
+
+    // wait until builds for the current push are created
+    if (pr.repoSlug == "dlang/dmd" && runAppVeyor)
+    {
+        // AppVeyor doesn't support organizations natively
+        import std.array : replace;
+        auto repoSlug = pr.repoSlug.replace("dlang/dmd", "greenify/dmd");
+        setBotTimer(30.seconds, { dedupAppVeyorBuilds(action, repoSlug, pr.number); });
+    }
+}
+
+void setBotTimer(C)(Duration dur, C callback)
+{
+    if (runAsync)
+        setTimer(dur, callback);
+    else
+        callback();
 }
 
 //==============================================================================
@@ -254,6 +278,7 @@ else void main(string[] args)
     trelloSecret = environment["TRELLO_SECRET"];
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
     hookSecret = environment["GH_HOOK_SECRET"];
+    appveyorAuth = "Bearer " ~ environment["APPVEYOR_TOKEN"];
 
     // workaround for stupid openssl.conf on Heroku
     if (environment.get("DYNO") !is null)

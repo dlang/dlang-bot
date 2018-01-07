@@ -16,6 +16,7 @@ Features
 - [Send contributing advice message](#hello-contributor)
 - [Auto-label PRs](#auto-labelling)
 - [Using the Dlang-Bot for your project](#dlang-bot-for-your-project)
+- [Canceling stale AppVeyor builds](#canceling-stale)
 - [Missing a feature?](#missing-a-feature)
 
 <a name="automated-references" />
@@ -206,6 +207,15 @@ For `auto-merge`:
 For example, `dlang/phobos` is configured as follows:
 
 ![image](https://user-images.githubusercontent.com/4370550/27859920-b418a38e-617a-11e7-9ff2-c1fd9f6fdd20.png)
+
+<a name="#canceling-stale" />
+
+Canceling stale AppVeyor builds
+-------------------------------
+
+To avoid wasteful resource consumption with Travis CI,
+the Dlang-Bot will automatically cancel the previous, possibly running build of
+a PR on a new commit event (push or synchronization by a user).
 
 <a name="missing-a-feature" />
 
