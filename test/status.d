@@ -70,7 +70,6 @@ unittest
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Fix issue 16977 - bad debug info for function default arguments\n"~
                    "merged-on-behalf-of: unknown");
-            res.statusCode = 200;
         }
     );
 
@@ -101,7 +100,6 @@ unittest
             assert(req.json["merge_method"] == "squash");
             assert(req.json["commit_message"] == "taking address of local means it cannot be 'scope' later\n"~
                    "merged-on-behalf-of: Martin Nowak <somemail@example.org>");
-            res.statusCode = 200;
         }
     );
 
@@ -130,7 +128,6 @@ unittest
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Fix issue 16977 - bad debug info for function default arguments\n"~
                    "merged-on-behalf-of: unknown");
-            res.statusCode = 200;
         },
         "/github/repos/dlang/dmd/pulls/6328/commits",
         "/github/repos/dlang/dmd/issues/6328/events",
@@ -141,7 +138,6 @@ unittest
             assert(req.json["merge_method"] == "squash");
             assert(req.json["commit_message"] == "taking address of local means it cannot be 'scope' later\n"~
                    "merged-on-behalf-of: Martin Nowak <somemail@example.org>");
-            res.statusCode = 200;
         }
     );
 

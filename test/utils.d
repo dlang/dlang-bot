@@ -5,7 +5,7 @@ import std.functional, std.string;
 
 // forward commonly needed imports
 public import dlangbot.app;
-public import vibe.http.common : HTTPMethod;
+public import vibe.http.common : HTTPMethod, HTTPStatus;
 public import vibe.http.client : HTTPClientRequest;
 public import vibe.http.server : HTTPServerRequest, HTTPServerResponse;
 public import std.functional : toDelegate;
@@ -104,6 +104,8 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
         assert(0, "Request for unexpected URL received: " ~ req.requestURL);
     }
 
+    res.statusCode = expectation.respStatusCode;
+
     string filePath = buildPath(payloadDir, req.requestURL[1 .. $].replace("/", "_"));
 
     if (expectation.reqHandler !is null)
@@ -169,13 +171,17 @@ void replaceAPIReferences(string official, string local, ref Json json)
 
 struct APIExpectation
 {
+    /// the called server url
     string url;
 
-    // implement a custom request handler
+    /// implement a custom request handler
     private void delegate(scope HTTPServerRequest req, scope HTTPServerResponse res) reqHandler;
 
-    // modify the json of the payload before being served
+    /// modify the json of the payload before being served
     private void delegate(ref Json j) jsonHandler;
+
+    /// respond with the given status
+    HTTPStatus respStatusCode = HTTPStatus.ok;
 
     this(string url)
     {
@@ -195,7 +201,11 @@ void setAPIExpectations(Args...)(Args args)
     {
         static if (is(Args[i] : string))
         {
-                apiExpectations ~= APIExpectation(arg);
+            apiExpectations ~= APIExpectation(arg);
+        }
+        else static if (is(Args[i] : HTTPStatus))
+        {
+            apiExpectations[$ - 1].respStatusCode = arg;
         }
         else
         {

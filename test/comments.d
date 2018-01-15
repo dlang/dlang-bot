@@ -186,7 +186,6 @@ unittest
         "/github/repos/dlang/phobos/issues/4921/labels/auto-merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.DELETE);
-            res.statusCode = 200;
         },
         "/github/repos/dlang/phobos/issues/4921/comments",
         "/github/orgs/dlang/public_members?per_page=100",
@@ -289,7 +288,6 @@ unittest
         "/github/repos/dlang/phobos/issues/5519/labels/auto-merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.DELETE);
-            res.statusCode = 200;
         },
         "/bugzilla/buglist.cgi?bug_id=17564&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
         "/github/repos/dlang/phobos/issues/5519/comments",

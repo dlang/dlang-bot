@@ -13,7 +13,6 @@ unittest
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Fix tan returning -nan for inputs where abs(x) >= 2^63\n"~
                    "merged-on-behalf-of: ZombineDev <ZombineDev@users.noreply.github.com>");
-            res.statusCode = 200;
         }
     );
 
