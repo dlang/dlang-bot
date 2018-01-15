@@ -2,7 +2,7 @@ import utils;
 
 import std.format : format;
 
-// existing comment
+@("update-comment")
 unittest
 {
     setAPIExpectations(
@@ -29,7 +29,7 @@ Auto-close | Bugzilla | Description
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// no existing dlang bot comment -> create comment and add bug fix label
+@("create-comment")
 unittest
 {
     setAPIExpectations(
@@ -60,8 +60,7 @@ Auto-close | Bugzilla | Description
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// existing dlang bot comment, but no commits that reference a issue
-// -> update comment (without references to Bugzilla)
+@("update-comment-without-issue-ref")
 unittest
 {
     setAPIExpectations(
@@ -87,9 +86,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// existing dlang bot comment, but no commits that reference a issue
-// -> update comment (without references to Bugzilla)
-// test that we don't create a duplicate comment
+@("no-duplicate-comments")
 unittest
 {
     setAPIExpectations(
@@ -115,8 +112,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// existing dlang bot comment + enhancement bugzilla labels
-// -> test that we add an enhancement label (not bug fix)
+@("add-enhancement-label")
 unittest
 {
     setAPIExpectations(
@@ -151,8 +147,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// existing dlang bot comment + existing bugzilla labels
-// -> test that we don't resend an enhancement label (#97)
+@("do-not-readd-labels-1-#97")
 unittest
 {
     setAPIExpectations(
@@ -178,8 +173,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// existing dlang bot comment -> update comment
-// auto-merge label -> remove (due to synchronization)
+@("remove-auto-merge-on-sync")
 unittest
 {
     setAPIExpectations(
@@ -205,7 +199,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// send merge event
+@("send-merge-event")
 unittest
 {
     setAPIExpectations(
@@ -216,7 +210,7 @@ unittest
     postGitHubHook("dlang_phobos_merged_4963.json");
 }
 
-// critical bug fix (not in stable) -> show warning to target stable
+@("redirect-critical-fixes-to-stable")
 unittest
 {
     setAPIExpectations(
@@ -264,7 +258,7 @@ Auto-close | Bugzilla | Description
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// contributors should see a different hello world message
+@("hello-world-for-contributors")
 unittest
 {
     setAPIExpectations(
@@ -286,8 +280,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// check that the bot doesn't send duplicate labels (#112)
-// phobos/pull/5519 has the "Bug Fix" label already
+@("do-not-readd-labels-2-#112")
 unittest
 {
     setAPIExpectations(
@@ -312,8 +305,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_5519.json");
 }
 
-// check that the bot doesn't send duplicate labels (#112)
-// phobos/pull/5519 has the "Bug Fix" label already
+@("do-not-readd-labels-3-#112")
 unittest
 {
     setAPIExpectations(
@@ -335,7 +327,7 @@ unittest
     postGitHubHook("dlang_phobos_edit_5519.json");
 }
 
-// #119 - don't edit the comment for closed PRs
+@("do-not-comment-closed-prs-#119")
 unittest
 {
     setAPIExpectations(
@@ -351,7 +343,7 @@ unittest
     });
 }
 
-// #138 - don't show stable warning for PRs that don't close an issue
+@("redirect-only-fixes-to-stable-#138")
 unittest
 {
     setAPIExpectations(
@@ -380,7 +372,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// #138 - don't show stable warning for PRs with closed issues
+@("redirect-only-closing-fixes-to-stable-#138")
 unittest
 {
     setAPIExpectations(
@@ -411,7 +403,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-// Remove old labels on push
+@("remove-review-labels-on-push")
 unittest
 {
     import std.array : replace;
