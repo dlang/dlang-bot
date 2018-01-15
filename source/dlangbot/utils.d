@@ -3,8 +3,24 @@ module dlangbot.utils;
 import dlangbot.app : runAsync;
 
 import vibe.http.client : HTTPClientRequest, HTTPClientResponse;
+import vibe.http.common : HTTPStatus;
 
 import std.datetime : Duration;
+
+version (unittest) int _expectedStatusCode;
+
+bool expectedStatusCode(int statusCode) nothrow @safe @nogc
+{
+    version (unittest)
+    {
+        if (_expectedStatusCode == statusCode)
+        {
+            _expectedStatusCode = 0;
+            return true;
+        }
+    }
+    return false;
+}
 
 HTTPClientResponse request(
     string url,
@@ -23,7 +39,7 @@ HTTPClientResponse request(
                 requester(req);
             method = req.method;
         });
-    if (res.statusCode / 100 != 2)
+    if (res.statusCode / 100 != 2 && !expectedStatusCode(res.statusCode))
         logError("%s %s failed;  %s %s.", method, url, res.statusPhrase, res.statusCode);
     return res;
 }
@@ -46,7 +62,7 @@ void request(
             method = req.method;
         },
         (scope res) {
-            if (res.statusCode / 100 != 2)
+            if (res.statusCode / 100 != 2 && !expectedStatusCode(res.statusCode))
                 logError("%s %s failed;  %s %s.", method, url, res.statusPhrase, res.statusCode);
             responder(res);
         }

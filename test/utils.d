@@ -105,6 +105,10 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     }
 
     res.statusCode = expectation.respStatusCode;
+    // set failure status code exception to suppress false errors
+    import dlangbot.utils : _expectedStatusCode;
+    if (expectation.respStatusCode / 100 != 2)
+        _expectedStatusCode = expectation.respStatusCode;
 
     string filePath = buildPath(payloadDir, req.requestURL[1 .. $].replace("/", "_"));
 
