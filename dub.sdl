@@ -4,13 +4,15 @@ copyright "Copyright © 2015, Martin Nowak"
 authors "Martin Nowak"
 dependency "vibe-d" version="~>0.8.0"
 subConfiguration "vibe-d:core" "vibe-core"
-configuration "default" {
-	versions "VibeCustomMain"
-	targetType "executable"
+targetType "executable"
+
+configuration "executable" {
 }
+
 configuration "unittest" {
-	versions "VibeCustomMain"
-	sourcePaths "source" "test"
-	importPaths "source" "test"
-	stringImportPaths "views"
+    dependency "unit-threaded" version="~>0.7.11"
+    mainSourceFile "ut.d"
+    preBuildCommands "dub run unit-threaded -c gen_ut_main -- -f ut.d"
+    sourcePaths "source" "test"
+    importPaths "source" "test"
 }
