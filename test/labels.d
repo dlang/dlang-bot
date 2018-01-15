@@ -1,6 +1,6 @@
 import utils;
 
-// send normal label event --> nothing
+@("ignore-normal-labels")
 unittest
 {
     setAPIExpectations(
@@ -13,7 +13,7 @@ unittest
     }.toDelegate);
 }
 
-// send auto-merge label event, but closed PR --> nothing
+@("ignore-auto-merge-on-closed")
 unittest
 {
     setAPIExpectations(
@@ -26,7 +26,7 @@ unittest
     postGitHubHook("dlang_phobos_label_4921.json");
 }
 
-// send auto-merge label event --> try merge --> failure
+@("fail-to-auto-merge")
 unittest
 {
     setAPIExpectations(
@@ -55,7 +55,7 @@ unittest
     }.toDelegate);
 }
 
-// send auto-merge-squash label event --> try merge --> success
+@("succeed-to-auto-merge-squash")
 unittest
 {
     setAPIExpectations(
@@ -85,7 +85,7 @@ unittest
     );
 }
 
-// test whether users can label their PR via the title
+@("label-via-title")
 unittest
 {
     setAPIExpectations(
@@ -111,7 +111,7 @@ unittest
     );
 }
 
-// test that not only a selection of labels is accepted
+@("labels-via-title-are-whitelisted")
 unittest
 {
     setAPIExpectations(
@@ -130,7 +130,7 @@ unittest
     );
 }
 
-// reproduce behavior of vibe-d/vibe-core/22
+@("reproduce-vibe-d/vibe-core#22")
 unittest
 {
     setAPIExpectations(
@@ -151,7 +151,7 @@ unittest
     postGitHubHook("vibe-d_vibe-core_label_22.json");
 }
 
-// Fix dlang-tour/core/583 issue with null on the homepage field
+@("reproduce-dlang-tour/core#583")
 unittest
 {
     setAPIExpectations(
