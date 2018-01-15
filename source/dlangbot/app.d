@@ -93,20 +93,22 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     {
     case "ping":
         return res.writeBody("pong");
+
     case "status":
-        string repoSlug = json["name"].get!string;
-        string state = json["state"].get!string;
+        auto state = json["state"].get!string;
+        auto repoSlug = json["name"].get!string;
         logDebug("[github/pull_request](%s): state=%s, sha=%s, url=%s", repoSlug, state, json["sha"], json["target_url"]);
         // no need to trigger the checker for failure/pending
         if (state == "success")
             prThrottler(repoSlug);
 
         return res.writeBody("handled");
-    case "pull_request":
 
+    case "pull_request":
         auto action = json["action"].get!string;
-        string repoSlug = json["repository"]["full_name"].get!string;
-        logDebug("[github/pull_request](%s/%s): action=%s", repoSlug, json["number"], action);
+        auto repoSlug = json["repository"]["full_name"].get!string;
+        auto pullRequest = json["pull_request"].deserializeJson!PullRequest;
+        logInfo("[github/pull_request](%s#%s): action=%s", repoSlug, pullRequest.number, action);
 
         switch (action)
         {
@@ -119,25 +121,21 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
             goto case;
         case "opened", "reopened", "synchronize", "labeled", "edited":
 
-            auto pullRequest = json["pull_request"].deserializeJson!PullRequest;
             runTaskHelper(&handlePR, action, &pullRequest);
             return res.writeBody("handled");
         default:
             return res.writeBody("ignored");
         }
+
     case "pull_request_review":
-        runTaskHelper({
-            import std.algorithm : among, filter;
-            string repoSlug = json["repository"]["full_name"].get!string;
-            logDebug("[github/pull_request_review](%s/%s): state=%s", repoSlug, json["review"]["state"]);
-            auto pullRequest = json["pull_request"].deserializeJson!PullRequest;
-            auto labels = ghGetRequest(pullRequest.labelsURL)
-                .readJson
-                .deserializeJson!(GHLabel[]);
-            if (auto method = autoMergeMethod(labels))
-                pullRequest.tryMerge(method);
-        });
+        auto state = json["review"]["state"].get!string;
+        auto repoSlug = json["repository"]["full_name"].get!string;
+        auto pullRequest = json["pull_request"].deserializeJson!PullRequest;
+        logInfo("[github/pull_request_review](%s#%s): state=%s", repoSlug, pullRequest.number, state);
+
+        runTaskHelper(&handleReview, state, &pullRequest);
         return res.writeBody("handled");
+
     default:
         return res.writeVoidBody();
     }
@@ -246,6 +244,19 @@ void handlePR(string action, PullRequest* _pr)
         auto repoSlug = pr.repoSlug.replace("dlang/dmd", "greenify/dmd");
         setBotTimer(30.seconds, { dedupAppVeyorBuilds(action, repoSlug, pr.number); });
     }
+}
+
+void handleReview(string action, PullRequest* _pr)
+{
+    import std.algorithm : among, filter;
+
+    const PullRequest pr = *_pr;
+
+    auto labels = ghGetRequest(pr.labelsURL)
+        .readJson
+        .deserializeJson!(GHLabel[]);
+    if (auto method = autoMergeMethod(labels))
+        pr.tryMerge(method);
 }
 
 void setBotTimer(C)(Duration dur, C callback)
