@@ -20,9 +20,9 @@ unittest
             j["builds"] = j["builds"][0..2];
         },
         "/appveyor/builds/greenify/dmd/13074433/cancel",
+        HTTPStatus.noContent,
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.method == HTTPMethod.DELETE);
-            res.statusCode = 204;
             res.writeVoidBody;
         },
     );

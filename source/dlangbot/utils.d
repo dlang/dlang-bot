@@ -2,7 +2,73 @@ module dlangbot.utils;
 
 import dlangbot.app : runAsync;
 
+import vibe.http.client : HTTPClientRequest, HTTPClientResponse;
+import vibe.http.common : HTTPStatus;
+
 import std.datetime : Duration;
+
+version (unittest) int _expectedStatusCode;
+
+bool expectedStatusCode(int statusCode) nothrow @safe @nogc
+{
+    version (unittest)
+    {
+        if (_expectedStatusCode == statusCode)
+        {
+            _expectedStatusCode = 0;
+            return true;
+        }
+    }
+    return false;
+}
+
+HTTPClientResponse request(
+    string url,
+    scope void delegate(scope HTTPClientRequest) requester = cast(void delegate(scope HTTPClientRequest req))null
+) @safe
+{
+    import vibe.core.log : logError;
+    import vibe.http.client : requestHTTP;
+    import vibe.http.common : HTTPMethod;
+
+    HTTPMethod method;
+    auto res = requestHTTP(
+        url,
+        (scope req) {
+            if (requester !is null)
+                requester(req);
+            method = req.method;
+        });
+    if (res.statusCode / 100 != 2 && !expectedStatusCode(res.statusCode))
+        logError("%s %s failed;  %s %s.", method, url, res.statusPhrase, res.statusCode);
+    return res;
+}
+
+void request(
+    string url,
+    scope void delegate(scope HTTPClientRequest) requester,
+    scope void delegate(scope HTTPClientResponse) responder
+) @safe
+{
+    import vibe.core.log : logError;
+    import vibe.http.client : requestHTTP;
+    import vibe.http.common : HTTPMethod;
+
+    HTTPMethod method;
+    requestHTTP(
+        url,
+        (scope req) {
+            requester(req);
+            method = req.method;
+        },
+        (scope res) {
+            if (res.statusCode / 100 != 2 && !expectedStatusCode(res.statusCode))
+                logError("%s %s failed;  %s %s.", method, url, res.statusPhrase, res.statusCode);
+            responder(res);
+        }
+    );
+
+}
 
 auto runTaskHelper(Fun, Args...)(Fun fun, auto ref Args args)
 {

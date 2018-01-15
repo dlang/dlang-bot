@@ -11,20 +11,22 @@ import std.typecons : Nullable;
 
 import vibe.core.log;
 import vibe.data.json;
-import vibe.http.client : HTTPClientRequest, requestHTTP;
+import vibe.http.client : HTTPClientRequest;
 public import vibe.http.common : HTTPMethod;
 import vibe.stream.operations : readAllUTF8;
 
+import dlangbot.utils : request;
+
 auto ghGetRequest(string url)
 {
-    return requestHTTP(url, (scope req) {
+    return request(url, (scope req) {
         req.headers["Authorization"] = githubAuth;
     });
 }
 
 auto ghGetRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
 {
-    return requestHTTP(url, (scope req) {
+    return request(url, (scope req) {
         req.headers["Authorization"] = githubAuth;
         userReq(req);
     });
@@ -33,7 +35,7 @@ auto ghGetRequest(scope void delegate(scope HTTPClientRequest req) userReq, stri
 auto ghSendRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
 {
     HTTPMethod method;
-    requestHTTP(url, (scope req) {
+    request(url, (scope req) {
         req.headers["Authorization"] = githubAuth;
         userReq(req);
         method = req.method;
@@ -43,9 +45,6 @@ auto ghSendRequest(scope void delegate(scope HTTPClientRequest req) userReq, str
             logInfo("%s %s, %s\n", method, url, res.statusPhrase);
             res.bodyReader.readAllUTF8;
         }
-        else
-            logWarn("%s %s failed;  %s %s.\n%s", method, url,
-                res.statusPhrase, res.statusCode, res.bodyReader.readAllUTF8);
     });
 }
 

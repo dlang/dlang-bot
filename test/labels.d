@@ -1,6 +1,6 @@
 import utils;
 
-// send normal label event --> nothing
+@("ignore-normal-labels")
 unittest
 {
     setAPIExpectations(
@@ -10,10 +10,11 @@ unittest
     postGitHubHook("dlang_phobos_label_4921.json", "pull_request",
         (ref Json j, scope HTTPClientRequest req){
             j["pull_request"]["state"] = "open";
-    }.toDelegate);
+        }
+    );
 }
 
-// send auto-merge label event, but closed PR --> nothing
+@("ignore-auto-merge-on-closed")
 unittest
 {
     setAPIExpectations(
@@ -26,7 +27,7 @@ unittest
     postGitHubHook("dlang_phobos_label_4921.json");
 }
 
-// send auto-merge label event --> try merge --> failure
+@("fail-to-auto-merge")
 unittest
 {
     setAPIExpectations(
@@ -39,23 +40,25 @@ unittest
             j[1]["label"]["name"] = "auto-merge";
         },
         "/github/users/9il",
-        "/github/repos/dlang/phobos/pulls/4921/merge", (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+        "/github/repos/dlang/phobos/pulls/4921/merge",
+        HTTPStatus.methodNotAllowed,
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             // https://developer.github.com/v3/pulls/#response-if-merge-cannot-be-performed
             assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
                    "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
-            res.statusCode = 405;
         }
     );
 
     postGitHubHook("dlang_phobos_label_4921.json", "pull_request",
         (ref Json j, scope HTTPClientRequest req){
             j["pull_request"]["state"] = "open";
-    }.toDelegate);
+        }
+    );
 }
 
-// send auto-merge-squash label event --> try merge --> success
+@("succeed-to-auto-merge-squash")
 unittest
 {
     setAPIExpectations(
@@ -74,7 +77,6 @@ unittest
             assert(req.json["merge_method"] == "squash");
             assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
                    "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
-            res.statusCode = 200;
         }
     );
 
@@ -85,7 +87,7 @@ unittest
     );
 }
 
-// test whether users can label their PR via the title
+@("label-via-title")
 unittest
 {
     setAPIExpectations(
@@ -111,7 +113,7 @@ unittest
     );
 }
 
-// test that not only a selection of labels is accepted
+@("labels-via-title-are-whitelisted")
 unittest
 {
     setAPIExpectations(
@@ -130,7 +132,7 @@ unittest
     );
 }
 
-// reproduce behavior of vibe-d/vibe-core/22
+@("reproduce-vibe-d/vibe-core#22")
 unittest
 {
     setAPIExpectations(
@@ -144,14 +146,13 @@ unittest
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Remove deprecated stdc import\n" ~
                     "merged-on-behalf-of: Sebastian Wilzbach <wilzbach@users.noreply.github.com>");
-            res.statusCode = 200;
         }
     );
 
     postGitHubHook("vibe-d_vibe-core_label_22.json");
 }
 
-// Fix dlang-tour/core/583 issue with null on the homepage field
+@("reproduce-dlang-tour/core#583")
 unittest
 {
     setAPIExpectations(
