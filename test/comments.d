@@ -237,7 +237,7 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);
             auto expectedComment =
-"### Bugzilla references
+("### Bugzilla references
 
 Auto-close | Bugzilla | Description
 --- | --- | ---
@@ -248,7 +248,7 @@ Auto-close | Bugzilla | Description
 - Regression or critical bug fixes should always target the `stable` branch." ~
 " Learn more about [rebasing to `stable`](https://wiki.dlang.org/Starting_as_a_Contributor#Stable_Branch) or" ~
 " the [D release process](https://github.com/dlang/DIPs/blob/master/DIPs/archive/DIP75.md#branching-strategy).
-".format(bugzillaURL);
+").format(bugzillaURL);
             assert(req.json["body"].get!string.canFind(expectedComment));
             res.writeVoidBody;
         },
