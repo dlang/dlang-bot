@@ -13,19 +13,19 @@ import vibe.core.log;
 void cancelBuild(string repoSlug, size_t buildId)
 {
     import std.format : format;
-    import vibe.http.client : requestHTTP;
     import vibe.http.common : HTTPMethod;
     import vibe.stream.operations : readAllUTF8;
+    import dlangbot.utils : request;
 
     auto url = "%s/builds/%s/%s/cancel".format(appveyorAPIURL, repoSlug, buildId);
-    requestHTTP(url, (scope req) {
+    request(url, (scope req) {
         req.headers["Authorization"] = appveyorAuth;
         req.method = HTTPMethod.DELETE;
     }, (scope res) {
         if (res.statusCode / 100 == 2)
             logInfo("[appveyor/%s]: Canceled Build %s\n", repoSlug, buildId);
         else
-            logWarn("[appveyor/%s]: POST %s failed;  %s %s.\n%s", repoSlug, url, res.statusPhrase,
+            logError("[appveyor/%s]: POST %s failed;  %s %s.\n%s", repoSlug, url, res.statusPhrase,
                 res.statusCode, res.bodyReader.readAllUTF8);
     });
 }
@@ -38,7 +38,7 @@ void dedupAppVeyorBuilds(string action, string repoSlug, uint pullRequestNumber)
     import std.format : format;
     import std.range : drop;
     import vibe.data.json : Json;
-    import vibe.http.client : requestHTTP;
+    import dlangbot.utils : request;
 
     if (action != "synchronize" && action != "merged")
         return;
@@ -51,7 +51,7 @@ void dedupAppVeyorBuilds(string action, string repoSlug, uint pullRequestNumber)
     // GET /api/projects/{accountName}/{projectSlug}/history?recordsNumber={records-per-page}[&startBuildId={buildId}&branch={branch}]
 
     auto url = "%s/projects/%s/history?recordsNumber=100".format(appveyorAPIURL, repoSlug);
-    auto activeBuildsForPR = requestHTTP(url, (scope req) {
+    auto activeBuildsForPR = request(url, (scope req) {
             req.headers["Authorization"] = appveyorAuth;
         })
         .readJson["builds"][]

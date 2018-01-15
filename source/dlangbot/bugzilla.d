@@ -62,14 +62,14 @@ struct Issue
 Issue[] getDescriptions(R)(R issueRefs)
 {
     import std.csv;
-    import vibe.http.client : requestHTTP;
     import vibe.stream.operations : readAllUTF8;
+    import dlangbot.utils : request;
 
     if (issueRefs.empty)
         return null;
     return "%s/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority"
         .format(bugzillaURL, issueRefs.map!(r => r.id))
-        .requestHTTP
+        .request
         .bodyReader.readAllUTF8
         .csvReader!Issue(null)
         .array

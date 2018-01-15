@@ -4,12 +4,12 @@ string trelloAPIURL = "https://api.trello.com";
 string trelloSecret, trelloAuth;
 
 import dlangbot.bugzilla : Issue, IssueRef;
+import dlangbot.utils : request;
 import std.algorithm, std.range;
 import std.format : format;
 
 import vibe.core.log;
 import vibe.data.json;
-import vibe.http.client : requestHTTP;
 import vibe.http.common : HTTPMethod;
 import vibe.stream.operations : readAllUTF8;
 
@@ -20,7 +20,7 @@ import vibe.stream.operations : readAllUTF8;
 void trelloSendRequest(T...)(HTTPMethod method, string url, T arg)
     if (T.length <= 1)
 {
-    requestHTTP(url, (scope req) {
+    request(url, (scope req) {
         req.method = method;
         static if (T.length)
             req.writeJsonBody(arg);
@@ -29,7 +29,7 @@ void trelloSendRequest(T...)(HTTPMethod method, string url, T arg)
             logInfo("%s %s: %s\n", method, url.replace(trelloAuth, "key=[hidden]&token=[hidden]")
                     , res.statusPhrase);
         else
-            logWarn("%s %s: %s %s.\n%s", method, url.replace(trelloAuth, "key=[hidden]&token=[hidden]"),
+            logError("%s %s: %s %s.\n%s", method, url.replace(trelloAuth, "key=[hidden]&token=[hidden]"),
                 res.statusPhrase, res.statusCode, res.bodyReader.readAllUTF8);
     });
 }
@@ -79,7 +79,7 @@ auto findTrelloCards(int issueID)
 {
 
     return trelloAPI("/1/search?query=name:\"Issue %d\"", issueID)
-        .requestHTTP
+        .request
         .readJson["cards"][]
         .map!(c => TrelloCard(c["id"].get!string, issueID));
 }
@@ -89,7 +89,7 @@ struct Comment { string url, body_; }
 Comment getTrelloBotComment(string cardID)
 {
     auto res = trelloAPI("/1/cards/%s/actions?filter=commentCard", cardID)
-        .requestHTTP
+        .request
         .readJson[]
         .find!(c => c["memberCreator"]["username"] == "dlangbot");
     if (res.length)
@@ -102,10 +102,10 @@ Comment getTrelloBotComment(string cardID)
 void moveCardToList(string cardID, string listName)
 {
     auto card = trelloAPI("/1/cards/%s", cardID)
-        .requestHTTP
+        .request
         .readJson;
     auto lists = trelloAPI("/1/board/%s/lists", card["idBoard"].get!string)
-        .requestHTTP
+        .request
         .readJson[];
 
     immutable curListName = lists.find!(c => c["id"].get!string == card["idList"].get!string)
