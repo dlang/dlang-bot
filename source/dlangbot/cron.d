@@ -138,10 +138,11 @@ mergable:
 auto detectPRWithPersistentCIFailures(PRTuple t)
 {
     // label PR with persistent CI failures
-    auto status = t.pr.status;
-    auto failCount = status.filter!((e){
-        if (e.state == GHCiStatus.State.failure ||
-            e.state == GHCiStatus.State.error)
+    // TODO: unclear whether we want all statuses for PR commit, or only the latest
+    auto status = t.pr.combinedStatus;
+    auto failCount = status.latestStatuses.filter!((e){
+        if (e.state == CIState.failure ||
+            e.state == CIState.error)
             switch (e.context) {
                 case "auto-tester":
                 case "CyberShadow/DAutoTest":

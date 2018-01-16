@@ -1,6 +1,6 @@
 import utils;
 
-// send pending status event -> no action
+@("pending-ignored")
 unittest
 {
     setAPIExpectations();
@@ -8,7 +8,7 @@ unittest
     postGitHubHook("dlang_dmd_status_6324.json", "status");
 }
 
-// send failed status event -> no action
+@("failed-ignored")
 unittest
 {
     setAPIExpectations();
@@ -20,9 +20,12 @@ unittest
     );
 }
 
-// send success status event -> tryMergeForAllOpenPrs -> no action (no auto-merge PR)
+@("trigger-merge-check-on-success")
 unittest
 {
+    prThrottler.reset;
+
+    // success status triggers merge check for all open auto-merge PRs
     setAPIExpectations(
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge", (ref Json j) {
             j = Json.emptyArray;
@@ -37,11 +40,8 @@ unittest
             j["state"] = "success";
         }
     );
-}
 
-// send success status event within throttle time -> no action
-unittest
-{
+    // not triggered again within throttle time
     setAPIExpectations();
 
     postGitHubHook("dlang_dmd_status_6324.json", "status",
@@ -51,17 +51,19 @@ unittest
     );
 }
 
-// send success status event -> tryMergeForAllOpenPrs -> merge()
-// PR 6237 has the label "auto-merge"
+@("trigger-merge-check-and-merge-on-success")
 unittest
 {
     prThrottler.reset;
 
     setAPIExpectations(
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge",
+        // PR 6327 has the label "auto-merge"
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge-squash", (ref Json j) {
             j = Json.emptyArray;
         },
+        "/github/repos/dlang/dmd/pulls/6327",
+        "/github/repos/dlang/dmd/commits/782fd3fdd4a9c23e1307b4b963b443ed60517dfe/status",
         "/github/repos/dlang/dmd/pulls/6327/commits",
         "/github/repos/dlang/dmd/issues/6327/events",
         "/github/repos/dlang/dmd/pulls/6327/merge",
@@ -80,8 +82,7 @@ unittest
     );
 }
 
-// send success status event -> tryMergeForAllOpenPrs -> merge()
-// PR 6237 has the label "auto-merge-squash"
+@("trigger-merge-check-and-squash-on-success")
 unittest
 {
     prThrottler.reset;
@@ -91,6 +92,11 @@ unittest
             j = Json.emptyArray;
         },
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge-squash",
+        // PR 6328 has the label "auto-merge-squash"
+        "/github/repos/dlang/dmd/pulls/6328",
+        "/github/repos/dlang/dmd/commits/d6fc98058b637f9a558206847e6d7057ab9fb3de/status", (ref Json j) {
+            j["state"] = "success"; // fake
+        },
         "/github/repos/dlang/dmd/pulls/6328/commits",
         "/github/repos/dlang/dmd/issues/6328/events",
         "/github/users/MartinNowak",
@@ -110,16 +116,18 @@ unittest
     );
 }
 
-// send success status event -> tryMergeForAllOpenPrs -> merge()
-// 6327 has "auto-merge"
-// 6328 has "auto-merge-squash"
+@("trigger-merge-check-and-merge-and-squash-on-success")
 unittest
 {
     prThrottler.reset;
 
     setAPIExpectations(
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge",
+        // 6327 has "auto-merge"
         "/github/repos/dlang/dmd/issues?state=open&labels=auto-merge-squash",
+        // 6328 has "auto-merge-squash"
+        "/github/repos/dlang/dmd/pulls/6327",
+        "/github/repos/dlang/dmd/commits/782fd3fdd4a9c23e1307b4b963b443ed60517dfe/status",
         "/github/repos/dlang/dmd/pulls/6327/commits",
         "/github/repos/dlang/dmd/issues/6327/events",
         "/github/repos/dlang/dmd/pulls/6327/merge",
@@ -128,6 +136,10 @@ unittest
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Fix issue 16977 - bad debug info for function default arguments\n"~
                    "merged-on-behalf-of: unknown");
+        },
+        "/github/repos/dlang/dmd/pulls/6328",
+        "/github/repos/dlang/dmd/commits/d6fc98058b637f9a558206847e6d7057ab9fb3de/status", (ref Json j) {
+            j["state"] = "success"; // fake
         },
         "/github/repos/dlang/dmd/pulls/6328/commits",
         "/github/repos/dlang/dmd/issues/6328/events",
