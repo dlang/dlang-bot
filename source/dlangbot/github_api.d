@@ -175,7 +175,6 @@ struct PullRequest
     string reviewsURL() const { return "%s/repos/%s/pulls/%d/reviews".format(githubAPIURL, repoSlug, number); }
     string mergeURL() const { return "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, repoSlug, number); }
     string combinedStatusURL() const { return "%s/repos/%s/commits/%s/status".format(githubAPIURL, repoSlug, head.sha); }
-    string statusesURL() const { return "%s/repos/%s/commits/%s/statuses".format(githubAPIURL, repoSlug, head.sha); }
     string membersURL() const { return "%s/orgs/%s/public_members".format(githubAPIURL, base.repo.owner.login); }
 
     string pid() const
@@ -208,12 +207,6 @@ struct PullRequest
         return ghGetRequest(combinedStatusURL)
                 .readJson
                 .deserializeJson!GHCombinedCIStatus;
-    }
-    /// get all statuses for a commit
-    GHCIStatus[] statuses() const {
-        return ghGetRequest(statusesURL)
-                .readJson
-                .deserializeJson!(GHCIStatus[]);
     }
 
     GHLabel[] labels() const {
