@@ -1,5 +1,5 @@
 {
-  "state": "pending",
+  "state": "failure",
   "statuses": [
     {
       "url": "https://api.github.com/repos/dlang/phobos/statuses/a04acd6a2813fb344d3e47369cf7fd64523ece44",
@@ -30,10 +30,20 @@
       "context": "CyberShadow/DAutoTest",
       "created_at": "2016-02-27T00:06:47Z",
       "updated_at": "2016-02-27T00:06:47Z"
+    },
+    {
+      "url": "https://api.github.com/repos/dlang/phobos/statuses/a04acd6a2813fb344d3e47369cf7fd64523ece44",
+      "id": 1169527599,
+      "state": "error",
+      "description": "This commit cannot be built",
+      "target_url": "https://ci.dlang.io/job/dlang-org/job/phobos/job/PR-2526/14/display/redirect",
+      "context": "continuous-integration/jenkins/pr-merge",
+      "created_at": "2017-04-21T14:13:38Z",
+      "updated_at": "2017-04-21T14:13:38Z"
     }
   ],
   "sha": "a04acd6a2813fb344d3e47369cf7fd64523ece44",
-  "total_count": 3,
+  "total_count": 4,
   "repository": {
     "id": 1257084,
     "name": "phobos",
@@ -41,7 +51,7 @@
     "owner": {
       "login": "dlang",
       "id": 565913,
-      "avatar_url": "https://avatars.githubusercontent.com/u/565913?v=3",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/565913?v=4",
       "gravatar_id": "",
       "url": "https://api.github.com/users/dlang",
       "html_url": "https://github.com/dlang",

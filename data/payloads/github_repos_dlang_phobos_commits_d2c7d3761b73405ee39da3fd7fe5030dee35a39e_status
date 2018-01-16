@@ -1,29 +1,59 @@
 {
-  "state": "pending",
+  "state": "success",
   "statuses": [
     {
-      "url": "https://api.github.com/repos/dlang/phobos/statuses/5b8b90e1824cb90635719f6d3b1f6c195a95a47e",
-      "id": 375428776,
-      "state": "pending",
-      "description": "Pass: 7, In Progress: 1, Pending: 2",
-      "target_url": "https://auto-tester.puremagic.com/pull-history.ghtml?projectid=1&repoid=3&pullid=3620",
-      "context": "auto-tester",
-      "created_at": "2015-11-28T14:08:20Z",
-      "updated_at": "2015-11-28T14:08:20Z"
+      "url": "https://api.github.com/repos/dlang/phobos/statuses/d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+      "id": 915017858,
+      "state": "success",
+      "description": "Your tests passed on CircleCI!",
+      "target_url": "https://circleci.com/gh/dlang/phobos/1010?utm_campaign=vcs-integration-link&utm_medium=referral&utm_source=github-build-link",
+      "context": "ci/circleci",
+      "created_at": "2016-12-16T09:25:11Z",
+      "updated_at": "2016-12-16T09:25:11Z"
     },
     {
-      "url": "https://api.github.com/repos/dlang/phobos/statuses/5b8b90e1824cb90635719f6d3b1f6c195a95a47e",
-      "id": 501347549,
-      "state": "pending",
-      "description": "Building documentation",
-      "target_url": "http://dtest.thecybershadow.net/results/e625a94a01da76d252929b31ad8afc8a829d3a43/5b8b90e1824cb90635719f6d3b1f6c195a95a47e/",
+      "url": "https://api.github.com/repos/dlang/phobos/statuses/d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+      "id": 915018626,
+      "state": "success",
+      "description": "100% of diff hit (target 89.397%)",
+      "target_url": "https://codecov.io/gh/dlang/phobos/compare/72af0090db27e438cfbcd3d1b9a0343a71079d42...d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+      "context": "codecov/patch",
+      "created_at": "2016-12-16T09:25:42Z",
+      "updated_at": "2016-12-16T09:25:42Z"
+    },
+    {
+      "url": "https://api.github.com/repos/dlang/phobos/statuses/d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+      "id": 915018658,
+      "state": "success",
+      "description": "89.411% (+0.013%) compared to 72af009",
+      "target_url": "https://codecov.io/gh/dlang/phobos/compare/72af0090db27e438cfbcd3d1b9a0343a71079d42...d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+      "context": "codecov/project",
+      "created_at": "2016-12-16T09:25:43Z",
+      "updated_at": "2016-12-16T09:25:43Z"
+    },
+    {
+      "url": "https://api.github.com/repos/dlang/phobos/statuses/d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+      "id": 915530379,
+      "state": "success",
+      "description": "Documentation OK (no changes)",
+      "target_url": "http://dtest.thecybershadow.net/results/9273e954e7891fbece18eb27cefd375fd0694b8a/d2c7d3761b73405ee39da3fd7fe5030dee35a39e/",
       "context": "CyberShadow/DAutoTest",
-      "created_at": "2016-03-26T23:31:10Z",
-      "updated_at": "2016-03-26T23:31:10Z"
+      "created_at": "2016-12-16T14:59:13Z",
+      "updated_at": "2016-12-16T14:59:13Z"
+    },
+    {
+      "url": "https://api.github.com/repos/dlang/phobos/statuses/d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+      "id": 915565419,
+      "state": "success",
+      "description": "Pass: 10",
+      "target_url": "https://auto-tester.puremagic.com/pull-history.ghtml?projectid=1&repoid=3&pullid=4921",
+      "context": "auto-tester",
+      "created_at": "2016-12-16T15:16:46Z",
+      "updated_at": "2016-12-16T15:16:46Z"
     }
   ],
-  "sha": "5b8b90e1824cb90635719f6d3b1f6c195a95a47e",
-  "total_count": 2,
+  "sha": "d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+  "total_count": 5,
   "repository": {
     "id": 1257084,
     "name": "phobos",
@@ -31,7 +61,7 @@
     "owner": {
       "login": "dlang",
       "id": 565913,
-      "avatar_url": "https://avatars.githubusercontent.com/u/565913?v=3",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/565913?v=4",
       "gravatar_id": "",
       "url": "https://api.github.com/users/dlang",
       "html_url": "https://github.com/dlang",
@@ -89,6 +119,6 @@
     "releases_url": "https://api.github.com/repos/dlang/phobos/releases{/id}",
     "deployments_url": "https://api.github.com/repos/dlang/phobos/deployments"
   },
-  "commit_url": "https://api.github.com/repos/dlang/phobos/commits/5b8b90e1824cb90635719f6d3b1f6c195a95a47e",
-  "url": "https://api.github.com/repos/dlang/phobos/commits/5b8b90e1824cb90635719f6d3b1f6c195a95a47e/status"
+  "commit_url": "https://api.github.com/repos/dlang/phobos/commits/d2c7d3761b73405ee39da3fd7fe5030dee35a39e",
+  "url": "https://api.github.com/repos/dlang/phobos/commits/d2c7d3761b73405ee39da3fd7fe5030dee35a39e/status"
 }

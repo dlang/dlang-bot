@@ -162,17 +162,24 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
 {
     import std.conv : to;
 
+    const status = pr.combinedStatus;
+    if (status.state != CIState.success)
+    {
+        logInfo("Can't auto-merge PR %s#%d with combined CI state: %s", pr.repoSlug, pr.number, status.state);
+        return null;
+    }
+
     auto commits = ghGetRequest(pr.commitsURL).readJson[];
 
     if (!pr.isOpen)
     {
-        logWarn("Can't auto-merge PR %s/%d - it is already closed", pr.repoSlug, pr.number);
+        logWarn("Can't auto-merge PR %s#%d - it is already closed", pr.repoSlug, pr.number);
         return commits;
     }
 
     if (commits.length == 0)
     {
-        logWarn("Can't auto-merge PR %s/%d has no commits attached", pr.repoSlug, pr.number);
+        logWarn("Can't auto-merge PR %s#%d has no commits attached", pr.repoSlug, pr.number);
         return commits;
     }
 
@@ -262,10 +269,10 @@ void searchForAutoMergePrs(string repoSlug)
     static immutable labels = ["auto-merge", "auto-merge-squash"];
     foreach (issue; getIssuesForLabels(repoSlug, labels))
     {
-        if (!issue.isPullRequest)
+        if (!issue.isPullRequest) // TODO: query is:pr
             continue;
 
-        auto pr = issue.toPullRequest;
+        auto pr = issue.pullRequest;
         if (auto method = autoMergeMethod(issue.labels))
             pr.tryMerge(method);
     }

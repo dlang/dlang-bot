@@ -174,7 +174,7 @@ struct PullRequest
     string labelsURL() const { return "%s/repos/%s/issues/%d/labels".format(githubAPIURL, repoSlug, number); }
     string reviewsURL() const { return "%s/repos/%s/pulls/%d/reviews".format(githubAPIURL, repoSlug, number); }
     string mergeURL() const { return "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, repoSlug, number); }
-    string statusURL() const { return "%s/repos/%s/status/%s".format(githubAPIURL, repoSlug, head.sha); }
+    string combinedStatusURL() const { return "%s/repos/%s/commits/%s/status".format(githubAPIURL, repoSlug, head.sha); }
     string membersURL() const { return "%s/orgs/%s/public_members".format(githubAPIURL, base.repo.owner.login); }
 
     string pid() const
@@ -202,10 +202,11 @@ struct PullRequest
             .readJson
             .deserializeJson!(GHReview[]);
     }
-    GHCiStatus[] status() const {
-        return ghGetRequest(statusURL)
-                .readJson["statuses"]
-                .deserializeJson!(GHCiStatus[]);
+    /// get combined status (contains latest status for each CI context)
+    GHCombinedCIStatus combinedStatus() const {
+        return ghGetRequest(combinedStatusURL)
+                .readJson
+                .deserializeJson!GHCombinedCIStatus;
     }
 
     GHLabel[] labels() const {
@@ -296,15 +297,22 @@ struct GHCommit
     GHUser committer;
 }
 
-struct GHCiStatus
+enum CIState { error /*default*/, failure, success, pending }
+
+struct GHCIStatus
 {
-    enum State { success, error, failure, pending }
-    @byName State state;
+    @byName CIState state;
     string description;
     @name("target_url") string targetUrl;
     string context; // "CyberShadow/DAutoTest", "Project Tester",
                     // "ci/circleci", "auto-tester", "codecov/project",
                     // "codecov/patch", "continuous-integration/travis-ci/pr"
+}
+
+struct GHCombinedCIStatus
+{
+    @byName CIState state;
+    @name("statuses") GHCIStatus[] latestStatuses; // latest per context
 }
 
 struct GHMerge
@@ -335,7 +343,7 @@ struct GHIssue
     // this isn't really useful except for detecting whether it's a pull request
     @name("pull_request") Nullable!SimplifiedGHPullRequest _pullRequest;
 
-    bool isPullRequest()
+    bool isPullRequest() const
     {
         return !_pullRequest.isNull;
     }
@@ -378,18 +386,13 @@ struct GHIssue
         assert(issue.repoSlug == "dlang/phobos");
     }
 
-    // warning: not all fields can be filled
-    PullRequest toPullRequest() const
+    PullRequest pullRequest() const
     {
-        PullRequest pr;
-        pr.base.repo = PullRequest.Repo.init;
-        pr.base.repo.fullName = repoSlug;
-        static foreach (symbol; ["number", "state", "title", "user", "assignee",
-                    "createdAt", "updatedAt", "closedAt"])
-        {
-            mixin("pr." ~ symbol ~ " = " ~ symbol ~ ";");
-        }
-        return pr;
+        assert(isPullRequest);
+
+        return ghGetRequest(_pullRequest.url)
+                .readJson
+                .deserializeJson!PullRequest;
     }
 }
 

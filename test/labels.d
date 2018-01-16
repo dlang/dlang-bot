@@ -18,6 +18,7 @@ unittest
 unittest
 {
     setAPIExpectations(
+        "/github/repos/dlang/phobos/commits/d2c7d3761b73405ee39da3fd7fe5030dee35a39e/status",
         "/github/repos/dlang/phobos/pulls/4921/commits",
         "/github/repos/dlang/phobos/issues/4921/labels", (ref Json j) {
             j[0]["name"] = "auto-merge";
@@ -27,10 +28,11 @@ unittest
     postGitHubHook("dlang_phobos_label_4921.json");
 }
 
-@("fail-to-auto-merge")
+@("succeed-to-auto-merge")
 unittest
 {
     setAPIExpectations(
+        "/github/repos/dlang/phobos/commits/d2c7d3761b73405ee39da3fd7fe5030dee35a39e/status",
         "/github/repos/dlang/phobos/pulls/4921/commits",
         "/github/repos/dlang/phobos/issues/4921/labels", (ref Json j) {
             j[0]["name"] = "auto-merge";
@@ -41,7 +43,6 @@ unittest
         },
         "/github/users/9il",
         "/github/repos/dlang/phobos/pulls/4921/merge",
-        HTTPStatus.methodNotAllowed,
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             // https://developer.github.com/v3/pulls/#response-if-merge-cannot-be-performed
             assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
@@ -62,6 +63,7 @@ unittest
 unittest
 {
     setAPIExpectations(
+        "/github/repos/dlang/phobos/commits/d2c7d3761b73405ee39da3fd7fe5030dee35a39e/status",
         "/github/repos/dlang/phobos/pulls/4921/commits",
         "/github/repos/dlang/phobos/issues/4921/labels", (ref Json j) {
             j[0]["name"] = "auto-merge-squash";
@@ -75,6 +77,39 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
             assert(req.json["merge_method"] == "squash");
+            assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
+                   "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
+        }
+    );
+
+    postGitHubHook("dlang_phobos_label_4921.json", "pull_request",
+        (ref Json j, scope HTTPClientRequest req){
+            j["pull_request"]["state"] = "open";
+        }
+    );
+}
+
+@("failing-ci-prevents-auto-merge")
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/commits/d2c7d3761b73405ee39da3fd7fe5030dee35a39e/status", (ref Json j) {
+            j["status"] = "failure";
+        },
+        "/github/repos/dlang/phobos/pulls/4921/commits",
+        "/github/repos/dlang/phobos/issues/4921/labels", (ref Json j) {
+            j[0]["name"] = "auto-merge";
+        },
+        "/github/repos/dlang/phobos/issues/4921/events", (ref Json j) {
+            assert(j[1]["event"] == "labeled");
+            j[1]["label"]["name"] = "auto-merge";
+        },
+        "/github/users/9il",
+        "/github/repos/dlang/phobos/pulls/4921/merge",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            // https://developer.github.com/v3/pulls/#response-if-merge-cannot-be-performed
+            assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
+            assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
                    "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
         }
@@ -136,6 +171,7 @@ unittest
 unittest
 {
     setAPIExpectations(
+        "/github/repos/vibe-d/vibe-core/commits/04b3575c14dc7ad9971e19f153f3e3d712c1bdde/status",
         "/github/repos/vibe-d/vibe-core/pulls/22/commits",
         "/github/repos/vibe-d/vibe-core/issues/22/labels",
         "/github/repos/vibe-d/vibe-core/issues/22/events",
@@ -156,6 +192,9 @@ unittest
 unittest
 {
     setAPIExpectations(
+        "/github/repos/dlang-tour/core/commits/4941624d1af77e84565ec86979c21c1d582b1c06/status", (ref Json j) {
+            j["state"] = "success"; // fake it till you...
+        },
         "/github/repos/dlang-tour/core/pulls/583/commits",
         "/github/repos/dlang-tour/core/issues/583/labels",
         "/github/repos/dlang-tour/core/issues/583/events",

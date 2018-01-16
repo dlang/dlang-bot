@@ -1,10 +1,11 @@
 import utils;
 
-// review approved --> look if merge possible --> tryMerge
+@("check-auto-merge-on-approval-positive")
 unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/issues/5114/labels",
+        "/github/repos/dlang/phobos/commits/0fb66f092b897b55318509c6582008b3f912311a/status",
         "/github/repos/dlang/phobos/pulls/5114/commits",
         "/github/repos/dlang/phobos/issues/5114/events",
         "/github/users/ZombineDev",
@@ -20,6 +21,7 @@ unittest
 }
 
 // review approved --> look if merge possible --> no auto-merge
+@("check-auto-merge-on-approval-negative")
 unittest
 {
     setAPIExpectations(

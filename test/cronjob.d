@@ -12,7 +12,7 @@ void dontTestStalled(ref Json j)
     j[$ - 1]["updated_at"] = (Clock.currTime - 2.days).toISOExtString;
 }
 
-// test the first items of the cron job
+@("test-first-items-of-cron-job")
 unittest
 {
     setAPIExpectations(
@@ -21,7 +21,7 @@ unittest
             res.headers["Link"] = `<https://api.github.com/repositories/1257084/issues?state=open&sort=updated&direction=asc&page=2>; rel="next", <https://api.github.com/repositories/1257084/issues?state=open&sort=updated&direction=asc&page=3>; rel="last"`;
         },
         "/github/repos/dlang/phobos/pulls/2526",
-        "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44",
+        "/github/repos/dlang/phobos/commits/a04acd6a2813fb344d3e47369cf7fd64523ece44/status",
         "/github/repos/dlang/phobos/issues/2526/comments",
         "/github/repos/dlang/phobos/pulls/2526/comments",
         "/github/repos/dlang/phobos/issues/2526/labels",
@@ -30,7 +30,7 @@ unittest
             assert(req.json[].map!(e => e.get!string).equal(["blocked", "stalled"]));
         },
         "/github/repos/dlang/phobos/pulls/3534",
-        "/github/repos/dlang/phobos/status/b7bf452ca52c2a529e79a830eee97310233e3a9c",
+        "/github/repos/dlang/phobos/commits/b7bf452ca52c2a529e79a830eee97310233e3a9c/status",
         "/github/repos/dlang/phobos/issues/3534/comments",
         "/github/repos/dlang/phobos/pulls/3534/comments",
         "/github/repos/dlang/phobos/issues/3534/labels",
@@ -41,7 +41,7 @@ unittest
             ));
         },
         "/github/repos/dlang/phobos/pulls/4551",
-        "/github/repos/dlang/phobos/status/c4224ad203f5497569452ff05284124eb7030602",
+        "/github/repos/dlang/phobos/commits/c4224ad203f5497569452ff05284124eb7030602/status",
         "/github/repos/dlang/phobos/issues/4551/comments",
         "/github/repos/dlang/phobos/pulls/4551/comments",
         "/github/repos/dlang/phobos/issues/4551/labels",
@@ -52,7 +52,7 @@ unittest
             ));
         },
         "/github/repos/dlang/phobos/pulls/3620",
-        "/github/repos/dlang/phobos/status/5b8b90e1824cb90635719f6d3b1f6c195a95a47e",
+        "/github/repos/dlang/phobos/commits/5b8b90e1824cb90635719f6d3b1f6c195a95a47e/status",
         "/github/repos/dlang/phobos/issues/3620/comments",
         "/github/repos/dlang/phobos/pulls/3620/comments",
         "/github/repos/dlang/phobos/issues/3620/labels",
@@ -66,7 +66,7 @@ unittest
     testCronDaily(repositories);
 }
 
-// test that stalled isn't falsely removed (e.g. by recent labelling)
+@("stalled-sticks-on-labelling")
 unittest
 {
     setAPIExpectations(
@@ -79,7 +79,7 @@ unittest
             // simulate a recent label update
             j["updated_at"] = (Clock.currTime - 2.days).toISOExtString;
         },
-        "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44",
+        "/github/repos/dlang/phobos/commits/a04acd6a2813fb344d3e47369cf7fd64523ece44/status",
         "/github/repos/dlang/phobos/issues/2526/comments",
         "/github/repos/dlang/phobos/pulls/2526/comments",
         "/github/repos/dlang/phobos/issues/2526/labels",
@@ -92,7 +92,7 @@ unittest
     testCronDaily(repositories);
 }
 
-// test that no label updates are sent if no activity was found
+@("no-label-updates-with-inactivity")
 unittest
 {
     setAPIExpectations(
@@ -103,7 +103,7 @@ unittest
         "/github/repos/dlang/phobos/pulls/2526", (ref Json j) {
             j["mergeable"] = false;
         },
-        "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44",
+        "/github/repos/dlang/phobos/commits/a04acd6a2813fb344d3e47369cf7fd64523ece44/status",
         "/github/repos/dlang/phobos/issues/2526/comments", &dontTestStalled,
         "/github/repos/dlang/phobos/pulls/2526/comments",
     );
@@ -111,7 +111,7 @@ unittest
     testCronDaily(repositories);
 }
 
-// test that the merge state gets refreshed
+@("merge-state-refreshed")
 unittest
 {
     setAPIExpectations(
@@ -126,7 +126,7 @@ unittest
             j["mergeable"] = false;
             j["mergeable_state"] = "dirty";
         },
-        "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44",
+        "/github/repos/dlang/phobos/commits/a04acd6a2813fb344d3e47369cf7fd64523ece44/status",
         "/github/repos/dlang/phobos/issues/2526/comments", &dontTestStalled,
         "/github/repos/dlang/phobos/pulls/2526/comments",
         "/github/repos/dlang/phobos/issues/2526/labels",
@@ -139,8 +139,7 @@ unittest
     testCronDaily(repositories);
 }
 
-// for "blocked" PRs, the `mergeable` attribute should be preferred
-// if mergeable is true, "needs rebase" should be removed
+@("blocked-mergeable-removes-needs-rebase")
 unittest
 {
     setAPIExpectations(
@@ -153,7 +152,7 @@ unittest
             j["mergeable"] = true;
             j["mergeable_state"] = "blocked";
         },
-        "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44",
+        "/github/repos/dlang/phobos/commits/a04acd6a2813fb344d3e47369cf7fd64523ece44/status",
         "/github/repos/dlang/phobos/issues/2526/comments", &dontTestStalled,
         "/github/repos/dlang/phobos/pulls/2526/comments",
         "/github/repos/dlang/phobos/issues/2526/labels",
@@ -166,7 +165,7 @@ unittest
     testCronDaily(repositories);
 }
 
-// test that two or more failing CI trigger "needs work"
+@("more-than-two-failures-requires-work")
 unittest
 {
     setAPIExpectations(
@@ -175,7 +174,7 @@ unittest
             j = Json([j[0]]);
         },
         "/github/repos/dlang/phobos/pulls/2526",
-        "/github/repos/dlang/phobos/status/a04acd6a2813fb344d3e47369cf7fd64523ece44", (ref Json j) {
+        "/github/repos/dlang/phobos/commits/a04acd6a2813fb344d3e47369cf7fd64523ece44/status", (ref Json j) {
             j["statuses"][1]["state"] = "error";
             j["statuses"][2]["state"] = "failure";
         },
