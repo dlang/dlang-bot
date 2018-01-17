@@ -174,6 +174,7 @@ void handlePR(string action, PullRequest* _pr)
     if (action == "labeled" || action == "synchronize")
     {
         auto labels = pr.labels;
+        logDebug("[github/handlePR](%s): labels", labels);
         if (action == "labeled")
         {
             if (auto method = labels.autoMergeMethod)
