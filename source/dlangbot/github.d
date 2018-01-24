@@ -200,7 +200,9 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
     logDebug("[github/tryMerge/commits](%s): %s", pr.pid, commits[$ - 1]);
     GHMerge mergeInput = {
         commitMessage: "%s\nmerged-on-behalf-of: %s".format(pr.title, author),
-        sha: commits[$ - 1]["sha"].get!string,
+        // disabled due to mismatching head conflicts
+        // see: https://github.com/dlang-bots/dlang-bot/issues/77
+        //sha: commits[$ - 1]["sha"].get!string,
         mergeMethod: method
     };
     pr.postMerge(mergeInput);
