@@ -45,6 +45,7 @@ unittest
         "/github/repos/dlang/phobos/pulls/4921/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             // https://developer.github.com/v3/pulls/#response-if-merge-cannot-be-performed
+            assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
                    "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
@@ -74,6 +75,7 @@ unittest
         "/github/users/9il",
         "/github/repos/dlang/phobos/pulls/4921/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
             assert(req.json["merge_method"] == "squash");
             assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
                    "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
@@ -106,6 +108,7 @@ unittest
         "/github/repos/dlang/phobos/pulls/4921/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             // https://developer.github.com/v3/pulls/#response-if-merge-cannot-be-performed
+            assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
                    "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
@@ -175,6 +178,7 @@ unittest
         "/github/users/wilzbach",
         "/github/repos/vibe-d/vibe-core/pulls/22/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.json["sha"] == "04b3575c14dc7ad9971e19f153f3e3d712c1bdde");
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Remove deprecated stdc import\n" ~
                     "merged-on-behalf-of: Sebastian Wilzbach <wilzbach@users.noreply.github.com>");
@@ -197,6 +201,7 @@ unittest
         "/github/users/wilzbach",
         "/github/repos/dlang-tour/core/pulls/583/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.json["sha"] == "4941624d1af77e84565ec86979c21c1d582b1c06");
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Run docker update async + remove previous versions\n" ~
                     "merged-on-behalf-of: Sebastian Wilzbach <wilzbach@users.noreply.github.com>");
