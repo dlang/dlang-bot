@@ -68,7 +68,6 @@ unittest
         "/github/repos/dlang/dmd/issues/6327/events",
         "/github/repos/dlang/dmd/pulls/6327/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            assert(req.json["sha"] == "782fd3fdd4a9c23e1307b4b963b443ed60517dfe");
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Fix issue 16977 - bad debug info for function default arguments\n"~
                    "merged-on-behalf-of: unknown");
@@ -102,7 +101,6 @@ unittest
         "/github/users/MartinNowak",
         "/github/repos/dlang/dmd/pulls/6328/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            assert(req.json["sha"] == "d6fc98058b637f9a558206847e6d7057ab9fb3de");
             assert(req.json["merge_method"] == "squash");
             assert(req.json["commit_message"] == "taking address of local means it cannot be 'scope' later\n"~
                    "merged-on-behalf-of: Martin Nowak <somemail@example.org>");
@@ -132,7 +130,6 @@ unittest
         "/github/repos/dlang/dmd/issues/6327/events",
         "/github/repos/dlang/dmd/pulls/6327/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            assert(req.json["sha"] == "782fd3fdd4a9c23e1307b4b963b443ed60517dfe");
             assert(req.json["merge_method"] == "merge");
             assert(req.json["commit_message"] == "Fix issue 16977 - bad debug info for function default arguments\n"~
                    "merged-on-behalf-of: unknown");
@@ -146,7 +143,6 @@ unittest
         "/github/users/MartinNowak",
         "/github/repos/dlang/dmd/pulls/6328/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
-            assert(req.json["sha"] == "d6fc98058b637f9a558206847e6d7057ab9fb3de");
             assert(req.json["merge_method"] == "squash");
             assert(req.json["commit_message"] == "taking address of local means it cannot be 'scope' later\n"~
                    "merged-on-behalf-of: Martin Nowak <somemail@example.org>");
