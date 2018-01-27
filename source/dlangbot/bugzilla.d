@@ -26,12 +26,15 @@ auto matchIssueRefs(string message)
 
     // see https://github.com/github/github-services/blob/2e886f407696261bd5adfc99b16d36d5e7b50241/lib/services/bugzilla.rb#L155
     enum issueRE = ctRegex!(`((close|fix|address)e?(s|d)? )?(ticket|bug|tracker item|issue)s?:? *([\d ,\+&#and]+)`, "i");
-    return message.matchAll(issueRE).map!matchToRefs.joiner;
+    return matchToRefs(message.matchFirst(issueRE));
 }
 
 unittest
 {
     assert(equal(matchIssueRefs("fix issue 16319 and fix std.traits.isInnerClass"), [IssueRef(16319, true)]));
+    assert(equal(matchIssueRefs("Fixes issues 17494, 17505, 17506"), [IssueRef(17494, true), IssueRef(17505, true), IssueRef(17506, true)]));
+    // only first match considered, see #175
+    assert(equal(matchIssueRefs("Fixes Issues 1234 and 2345\nblabla\nFixes Issue 3456"), [IssueRef(1234, true), IssueRef(2345, true)]));
 }
 
 struct IssueRef { int id; bool fixed; }
