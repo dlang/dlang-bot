@@ -35,3 +35,6 @@ docs/
 
 # Config environment file
 /.env
+
+# Auto-generated unittest file
+/ut.d
