@@ -51,19 +51,20 @@ string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs
     else
     {
         app.formattedWrite(
-`Thanks for your pull request, @%s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
+"Thanks for your pull request and interest in making D better, @%s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
+Please verify that your PR follows this checklist:
 
-Some tips to help speed things up:
+- [ ] My PR is fully covered with tests (you can see the annotated coverage diff directly on GitHub with [CodeCov's browser extension](https://github.com/codecov/browser-extension)
+- [ ] My PR is as minimal as possible (smaller, focused PRs are easier to review than big ones)
+- [ ] My PR follows the [DStyle](https://dlang.org/dstyle.html)
+- [ ] I have provided a detailed rationale explaining my changes
+- [ ] New or modified functions have Ddoc comments (with `Params:` and `Returns:`)
 
-- smaller, focused PRs are easier to review than big ones
+Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) for more information.
 
-- try not to mix up refactoring or style changes with bug fixes or feature enhancements
+---
 
-- provide helpful commit messages explaining the rationale behind each change
-
-Bear in mind that large or tricky changes may require multiple rounds of review and revision.
-
-Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) for more information.`,
+If you have addressed all reviews or aren't sure how to proceed, don't hesitate to ping us with a simple comment.",
                            pr.user.login, pr.repoSlug);
     }
 
