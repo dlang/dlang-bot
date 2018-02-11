@@ -230,10 +230,13 @@ void handlePR(string action, PullRequest* _pr)
 
     import std.format : format;
     if (action == "merged")
-        if (twitterEnabled)
-            if (pr.base.user.login == "dlang")
-                tweet(`%s: PR #%d "%s" from @%s has been merged - %s`.format(
-                    pr.baseRepoSlug, pr.number, pr.title, pr.head.user.login, pr.htmlURL));
+    {
+        if (twitterEnabled && pr.base.user.login == "dlang")
+        {
+            tweet(`%s: PR #%d "%s" by %s has been merged %s`.format(
+                pr.baseRepoSlug, pr.number, pr.title, pr.head.user.login, pr.htmlURL));
+        }
+    }
 
     if (runTrello)
     {
