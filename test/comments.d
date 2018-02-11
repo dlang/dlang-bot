@@ -17,9 +17,9 @@ unittest
             auto expectedComment =
 `### Bugzilla references
 
-Auto-close | Bugzilla | Description
---- | --- | ---
-✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
+Auto-close | Bugzilla | Severity | Description
+--- | --- | --- | ---
+✗ | [8573](%s/show_bug.cgi?id=8573) | enhancement | A simpler Phobos function that returns the index of the mix or max item
 `.format(bugzillaURL);
             assert(req.json["body"].get!string.canFind(expectedComment));
         },
@@ -47,9 +47,9 @@ unittest
             auto expectedComment =
 `### Bugzilla references
 
-Auto-close | Bugzilla | Description
---- | --- | ---
-✗ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
+Auto-close | Bugzilla | Severity | Description
+--- | --- | --- | ---
+✗ | [8573](%s/show_bug.cgi?id=8573) | enhancement | A simpler Phobos function that returns the index of the mix or max item
 `.format(bugzillaURL);
             assert(req.json["body"].get!string.canFind(expectedComment));
             res.writeVoidBody;
@@ -238,9 +238,9 @@ unittest
             auto expectedComment =
 ("### Bugzilla references
 
-Auto-close | Bugzilla | Description
---- | --- | ---
-✓ | [8573](%s/show_bug.cgi?id=8573) | A simpler Phobos function that returns the index of the mix or max item
+Auto-close | Bugzilla | Severity | Description
+--- | --- | --- | ---
+✓ | [8573](%s/show_bug.cgi?id=8573) | regression | A simpler Phobos function that returns the index of the mix or max item
 
 ### ⚠️⚠️⚠️ Warnings ⚠️⚠️⚠️
 
