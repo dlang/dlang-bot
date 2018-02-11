@@ -19,14 +19,15 @@ public import dlangbot.github_api;
 
 void printBugList(W)(W app, in IssueRef[] refs, in Issue[] descs)
 {
-    auto combined = zip(refs.map!(r => r.id), refs.map!(r => r.fixed), descs.map!(d => d.desc));
-    app.put("Auto-close | Bugzilla | Description\n");
-    app.put("--- | --- | ---\n");
-    foreach (num, closed, desc; combined)
+    auto combined = zip(refs.map!(r => r.id), refs.map!(r => r.fixed),
+                        descs.map!(d => d.severity), descs.map!(d => d.desc));
+    app.put("Auto-close | Bugzilla | Severity | Description\n");
+    app.put("--- | --- | --- | ---\n");
+    foreach (num, closed, severity, desc; combined)
     {
         app.formattedWrite(
-            "%1$s | [%2$s](%4$s/show_bug.cgi?id=%2$s) | %3$s\n",
-            closed ? "✓" : "✗", num, desc, bugzillaURL);
+            "%1$s | [%2$s](%5$s/show_bug.cgi?id=%2$s) | %3$s | %4$s\n",
+            closed ? "✓" : "✗", num, severity, desc, bugzillaURL);
     }
 }
 
