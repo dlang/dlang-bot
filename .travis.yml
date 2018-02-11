@@ -6,8 +6,6 @@ d:
  - dmd-nightly
  - dmd-beta
  - dmd
- - ldc-beta
- - ldc
 
 script:
   # Tests are neither random- nor parallelizable atm., so use a --single serial thread.
@@ -20,7 +18,7 @@ addons:
 
 matrix:
   include:
-    - d: dmd-2.077.1 # the deployment compiler
+    - d: dmd-2.078.2 # the deployment compiler
       env: COVERAGE=true
       script:
         # Use --build-mode=singleFile to workaround https://issues.dlang.org/show_bug.cgi?id=13742
@@ -29,6 +27,5 @@ matrix:
       after_success:
         - bash <(curl -s https://codecov.io/bash)
   allow_failures:
-   - d: dmd
-   - d: dmd-nightly
-   - d: dmd-beta
+   - d: ldc-beta
+   - d: ldc

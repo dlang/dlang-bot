@@ -5,6 +5,7 @@ import std.functional, std.string;
 
 // forward commonly needed imports
 public import dlangbot.app;
+public import vibe.core.log;
 public import vibe.http.common : HTTPMethod, HTTPStatus;
 public import vibe.http.client : HTTPClientRequest;
 public import vibe.http.server : HTTPServerRequest, HTTPServerResponse;
@@ -52,7 +53,6 @@ shared static this()
     ghTestHookURL = testServerURL ~ "/github_hook";
     trelloTestHookURL = testServerURL ~ "/trello_hook";
 
-    import vibe.core.log;
     setLogLevel(LogLevel.info);
 
     runAsync = false;
@@ -75,6 +75,7 @@ void startFakeAPIServer()
     githubAPIURL = fakeAPIServerURL ~ "/github";
     trelloAPIURL = fakeAPIServerURL ~ "/trello";
     bugzillaURL = fakeAPIServerURL ~ "/bugzilla";
+    twitterURL = fakeAPIServerURL ~ "/twitter";
 }
 
 // serves saved GitHub API payloads

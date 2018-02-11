@@ -9,6 +9,7 @@ import dlangbot.utils;
 public import dlangbot.bugzilla : bugzillaURL;
 public import dlangbot.github_api   : githubAPIURL, githubAuth, hookSecret;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
+public import dlangbot.twitter : oAuth, tweet, twitterURL, twitterEnabled;
 
 import std.datetime : Clock, days, Duration, minutes, seconds, SysTime;
 
@@ -227,6 +228,13 @@ void handlePR(string action, PullRequest* _pr)
         pr.addLabels(labels);
     }
 
+    import std.format : format;
+    if (action == "merged")
+        if (twitterEnabled)
+            if (pr.base.user.login == "dlang")
+                tweet(`%s: PR #%d "%s" from @%s has been merged - %s`.format(
+                    pr.baseRepoSlug, pr.number, pr.title, pr.head.user.login, pr.htmlURL));
+
     if (runTrello)
     {
         logDebug("[github/handlePR](%s): updating trello card", _pr.pid);
@@ -277,6 +285,11 @@ else void main(string[] args)
     trelloSecret = environment["TRELLO_SECRET"];
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
     hookSecret = environment["GH_HOOK_SECRET"];
+    oAuth.config.consumerKey = environment["TWITTER_CONSUMER_KEY"];
+    oAuth.config.consumerKeySecret = environment["TWITTER_CONSUMER_KEY_SECRET"];
+    oAuth.config.accessToken = environment["TWITTER_ACCESS_TOKEN"];
+    oAuth.config.accessTokenSecret = environment["TWITTER_ACCESS_TOKEN_SECRET"];
+    twitterEnabled = true;
 
     // workaround for stupid openssl.conf on Heroku
     if (environment.get("DYNO") !is null)
