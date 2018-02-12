@@ -54,11 +54,10 @@ string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs
 "Thanks for your pull request and interest in making D better, @%s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
 Please verify that your PR follows this checklist:
 
-- [ ] My PR is fully covered with tests (you can see the annotated coverage diff directly on GitHub with [CodeCov's browser extension](https://github.com/codecov/browser-extension)
-- [ ] My PR is as minimal as possible (smaller, focused PRs are easier to review than big ones)
-- [ ] My PR follows the [DStyle](https://dlang.org/dstyle.html)
-- [ ] I have provided a detailed rationale explaining my changes
-- [ ] New or modified functions have Ddoc comments (with `Params:` and `Returns:`)
+- My PR is fully covered with tests (you can see the annotated coverage diff directly on GitHub with [CodeCov's browser extension](https://github.com/codecov/browser-extension)
+- My PR is as minimal as possible (smaller, focused PRs are easier to review than big ones)
+- I have provided a detailed rationale explaining my changes
+- New or modified functions have Ddoc comments (with `Params:` and `Returns:`)
 
 Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) for more information.
 
