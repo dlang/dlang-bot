@@ -164,10 +164,26 @@ void handlePR(string action, PullRequest* _pr)
     import std.algorithm : among, any;
     import vibe.core.core : setTimer;
     import dlangbot.warnings : checkForWarnings, UserMessage;
+    import std.format : format;
 
     const PullRequest pr = *_pr;
 
     Json[] commits;
+
+    // Twitter
+    try {
+        if (action == "merged")
+        {
+            if (twitterEnabled && pr.base.user.login == "dlang")
+            {
+                tweet(`%s: PR #%d "%s" by %s has been merged %s`.format(
+                    pr.baseRepoSlug, pr.number, pr.title, pr.head.user.login, pr.htmlURL));
+            }
+        }
+    } catch (Exception e) {
+        logInfo("The Twitter module failed: %s", e);
+    }
+    // End: Twitter
 
     if (action == "labeled" || action == "synchronize")
     {
@@ -226,16 +242,6 @@ void handlePR(string action, PullRequest* _pr)
             labels ~= "Bug Fix";
 
         pr.addLabels(labels);
-    }
-
-    import std.format : format;
-    if (action == "merged")
-    {
-        if (twitterEnabled && pr.base.user.login == "dlang")
-        {
-            tweet(`%s: PR #%d "%s" by %s has been merged %s`.format(
-                pr.baseRepoSlug, pr.number, pr.title, pr.head.user.login, pr.htmlURL));
-        }
     }
 
     if (runTrello)
