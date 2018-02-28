@@ -13,7 +13,7 @@ void tweet(string message)
     parameters["status"] = message;
     logInfo("Sending tweet: %s", message);
     scope res = twitterRequest("/statuses/update.json", parameters);
-    logInfo("Tweet sent: %d, %s", res.statusCode, res.statusPhrase);
+    //logInfo("Tweet sent: %d, %s", res.statusCode, res.statusPhrase);
 }
 
 // send a signed request with the Twitter API
@@ -31,11 +31,7 @@ auto twitterRequest(string path, OAuth.Parameters parameters, HTTPMethod method 
         req.method = method;
         req.headers["Authorization"] = oAuth.requestHeader(url, method.to!string, parameters);
     });
-    if (res.statusCode / 100 != 2)
-        logInfo("%s %s, %s - %s\n", method, url, res.statusPhrase, res.bodyReader.readAllUTF8);
-    else
-        res.dropBody;
-
+    logInfo("%s %s, %s - %s\n", method, url, res.statusPhrase, res.bodyReader.readAllUTF8);
     return res;
 }
 
