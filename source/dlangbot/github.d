@@ -65,6 +65,7 @@ Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) 
 
 If you have addressed all reviews or aren't sure how to proceed, don't hesitate to ping us with a simple comment.",
                            pr.user.login, pr.repoSlug);
+
     }
 
     static immutable bugzillaReferences = ["dlang/dmd", "dlang/druntime", "dlang/phobos",
@@ -91,6 +92,12 @@ If your PR contains non-trivial changes, please [reference a Bugzilla issue](htt
         app ~= "### ⚠️⚠️⚠️ Warnings ⚠️⚠️⚠️\n\n";
         app.printMessages(msgs);
     }
+    app.put(`
+### For anyone else
+
+Reactions help us determine how many people are interested in a pull request or have run across a similar bug. Please leave a +1 reaction (:+1:) if that applies to you. Any additional details you can provide, such as your usecase, environment, steps to reproduce, or workarounds you have found, can help out with getting pull requests merged.
+You don't need merge permissions to review a pull request. Review the diff and point out problematic bits you did encounter.`);
+
     return app.data;
 }
 
