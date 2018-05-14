@@ -101,6 +101,7 @@ If you don't have a [local development environment setup](https://wiki.dlang.org
 ```sh
 dub fetch digger
 dub run digger -- build \"%s + %s#%d\"
+dub run digger -- test
 ```
 ".format(pr.base.ref_, pr.base.repo.name, pr.number));
     }
