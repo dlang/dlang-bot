@@ -282,6 +282,21 @@ void codecovHook(HTTPServerRequest req, HTTPServerResponse res)
 
 //==============================================================================
 
+shared static this()
+{
+    import std.process : environment;
+    version (linux)
+    {
+        // register memory error handler on heroku
+        if ("DYNO" in environment)
+        {
+            import etc.linux.memoryerror : registerMemoryErrorHandler;
+            registerMemoryErrorHandler();
+        }
+    }
+
+}
+
 version (unittest) {}
 else void main(string[] args)
 {
