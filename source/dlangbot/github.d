@@ -1,5 +1,6 @@
 module dlangbot.github;
 
+string githubURL = "https://github.com";
 import dlangbot.bugzilla : bugzillaURL, Issue, IssueRef;
 import dlangbot.warnings : printMessages, UserMessage;
 

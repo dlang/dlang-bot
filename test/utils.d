@@ -65,7 +65,6 @@ void startFakeAPIServer()
     fakeSettings.port = getFreePort;
     fakeSettings.bindAddresses = ["0.0.0.0"];
     auto router = new URLRouter;
-    router.any("*", &payloadServer);
 
     listenHTTP(fakeSettings, router);
 
@@ -76,77 +75,6 @@ void startFakeAPIServer()
     trelloAPIURL = fakeAPIServerURL ~ "/trello";
     bugzillaURL = fakeAPIServerURL ~ "/bugzilla";
     twitterURL = fakeAPIServerURL ~ "/twitter";
-}
-
-// serves saved GitHub API payloads
-auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
-{
-    import std.path, std.file;
-    APIExpectation expectation = void;
-
-    // simple observer that checks whether a request is expected
-    auto idx = apiExpectations.map!(x => x.url).countUntil(req.requestURL);
-    if (idx >= 0)
-    {
-        expectation = apiExpectations[idx];
-        if (apiExpectations.length > 1)
-            apiExpectations = apiExpectations[0 .. idx] ~ apiExpectations[idx + 1 .. $];
-        else
-            apiExpectations.length = 0;
-    }
-    else
-    {
-        scope(failure) {
-            writeln("Remaining expected URLs:", apiExpectations.map!(x => x.url));
-        }
-        assert(0, "Request for unexpected URL received: " ~ req.requestURL);
-    }
-
-    res.statusCode = expectation.respStatusCode;
-    // set failure status code exception to suppress false errors
-    import dlangbot.utils : _expectedStatusCode;
-    if (expectation.respStatusCode / 100 != 2)
-        _expectedStatusCode = expectation.respStatusCode;
-
-    string filePath = buildPath(payloadDir, req.requestURL[1 .. $].replace("/", "_"));
-
-    if (expectation.reqHandler !is null)
-    {
-        scope(failure) {
-            writefln("Method: %s", req.method);
-            writefln("Json: %s", req.json);
-        }
-        expectation.reqHandler(req, res);
-        if (res.headerWritten)
-            return;
-        if (!filePath.exists)
-            return res.writeVoidBody;
-    }
-
-    if (!filePath.exists)
-    {
-        assert(0, "Please create payload: " ~ filePath);
-    }
-    else
-    {
-        logInfo("reading payload: %s", filePath);
-        auto payload = filePath.readText;
-        if (req.requestURL.startsWith("/github", "/trello"))
-        {
-            auto payloadJson = payload.parseJsonString;
-            replaceAPIReferences("https://api.github.com", githubAPIURL, payloadJson);
-            replaceAPIReferences("https://api.trello.com", trelloAPIURL, payloadJson);
-
-            if (expectation.jsonHandler !is null)
-                expectation.jsonHandler(payloadJson);
-
-            return res.writeJsonBody(payloadJson);
-        }
-        else
-        {
-            return res.writeBody(payload);
-        }
-    }
 }
 
 void replaceAPIReferences(string official, string local, ref Json json)

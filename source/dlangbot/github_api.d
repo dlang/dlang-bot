@@ -1,5 +1,6 @@
 module dlangbot.github_api;
 
+string githubURL = "https://github.com";
 string githubAPIURL = "https://api.github.com";
 string githubAuth, hookSecret;
 
@@ -166,7 +167,7 @@ struct PullRequest
     alias repoSlug = baseRepoSlug;
     bool isOpen() const { return state == GHState.open; }
 
-    string htmlURL() const { return "https://github.com/%s/pull/%d".format(repoSlug, number); }
+    string htmlURL() const { return "%s/%s/pull/%d".format(githubURL, repoSlug, number); }
     string commentsURL() const { return "%s/repos/%s/issues/%d/comments".format(githubAPIURL, repoSlug, number); }
     string reviewCommentsURL() const { return "%s/repos/%s/pulls/%d/comments".format(githubAPIURL, repoSlug, number); }
     string commitsURL() const { return "%s/repos/%s/pulls/%d/commits".format(githubAPIURL, repoSlug, number); }
@@ -176,6 +177,7 @@ struct PullRequest
     string mergeURL() const { return "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, repoSlug, number); }
     string combinedStatusURL() const { return "%s/repos/%s/commits/%s/status".format(githubAPIURL, repoSlug, head.sha); }
     string membersURL() const { return "%s/orgs/%s/public_members".format(githubAPIURL, base.repo.owner.login); }
+    string repoURL() const { return "%s/%s".format(githubURL, repoSlug); }
 
     string pid() const
     {
