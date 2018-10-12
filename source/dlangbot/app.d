@@ -7,7 +7,7 @@ import dlangbot.trello;
 import dlangbot.utils;
 
 public import dlangbot.bugzilla : bugzillaURL;
-public import dlangbot.github_api   : githubAPIURL, githubAuth, hookSecret;
+public import dlangbot.github_api   : githubAPIURL, githubAuth, githubHookSecret;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
 public import dlangbot.twitter : oAuth, tweet, twitterURL, twitterEnabled;
 
@@ -308,7 +308,7 @@ else void main(string[] args)
     githubAuth = "token "~environment["GH_TOKEN"];
     trelloSecret = environment["TRELLO_SECRET"];
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
-    hookSecret = environment["GH_HOOK_SECRET"];
+    githubHookSecret = environment["GH_HOOK_SECRET"];
     oAuth.config.consumerKey = environment["TWITTER_CONSUMER_KEY"];
     oAuth.config.consumerKeySecret = environment["TWITTER_CONSUMER_KEY_SECRET"];
     oAuth.config.accessToken = environment["TWITTER_ACCESS_TOKEN"];

@@ -1,7 +1,7 @@
 module dlangbot.github_api;
 
 string githubAPIURL = "https://api.github.com";
-string githubAuth, hookSecret;
+string githubAuth, githubHookSecret;
 
 import std.algorithm, std.range;
 import std.datetime : SysTime;
@@ -424,7 +424,7 @@ auto getSignature(string data)
     import std.digest.digest, std.digest.hmac, std.digest.sha;
     import std.string : representation;
 
-    auto hmac = HMAC!SHA1(hookSecret.representation);
+    auto hmac = HMAC!SHA1(githubHookSecret.representation);
     hmac.put(data.representation);
     return hmac.finish.toHexString!(LetterCase.lower);
 }
