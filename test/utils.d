@@ -19,6 +19,7 @@ public import std.algorithm;
 string testServerURL;
 string ghTestHookURL;
 string trelloTestHookURL;
+string buildkiteTestHookURL;
 
 string payloadDir = "./data/payloads";
 string hookDir = "./data/hooks";
@@ -41,6 +42,9 @@ shared static this()
     githubAuth = "GH_DUMMY_AUTH_TOKEN";
     githubHookSecret = "GH_DUMMY_HOOK_SECRET";
     trelloAuth = "key=01234&token=abcde";
+    buildkiteAuth = "Bearer abcdef";
+    buildkiteHookSecret = "1234567890";
+    scalewayAuth = "89f66bbd-f2f0-4f95-9382-56d141c1c09e";
 
     // start our hook server
     auto settings = new HTTPServerSettings;
@@ -52,6 +56,7 @@ shared static this()
                              ~ settings.port.to!string;
     ghTestHookURL = testServerURL ~ "/github_hook";
     trelloTestHookURL = testServerURL ~ "/trello_hook";
+    buildkiteTestHookURL = testServerURL ~ "/buildkite_hook";
 
     setLogLevel(LogLevel.info);
 
@@ -74,6 +79,8 @@ void startFakeAPIServer()
 
     githubAPIURL = fakeAPIServerURL ~ "/github";
     trelloAPIURL = fakeAPIServerURL ~ "/trello";
+    buildkiteAPIURL = fakeAPIServerURL ~ "/buildkite";
+    scalewayAPIURL = fakeAPIServerURL ~ "/scaleway";
     bugzillaURL = fakeAPIServerURL ~ "/bugzilla";
     twitterURL = fakeAPIServerURL ~ "/twitter";
 }
@@ -131,11 +138,12 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     {
         logInfo("reading payload: %s", filePath);
         auto payload = filePath.readText;
-        if (req.requestURL.startsWith("/github", "/trello"))
+        if (req.requestURL.startsWith("/github", "/trello", "/scaleway"))
         {
             auto payloadJson = payload.parseJsonString;
             replaceAPIReferences("https://api.github.com", githubAPIURL, payloadJson);
             replaceAPIReferences("https://api.trello.com", trelloAPIURL, payloadJson);
+            replaceAPIReferences("https://dp-par1.scaleway.com", scalewayAPIURL, payloadJson);
 
             if (expectation.jsonHandler !is null)
                 expectation.jsonHandler(payloadJson);
@@ -162,7 +170,7 @@ void replaceAPIReferences(string official, string local, ref Json json)
         case Json.Type.string:
             string v = j.get!string;
             if (v.countUntil(official) >= 0)
-                j = v.replace(official, githubAPIURL);
+                j = v.replace(official, local);
             break;
         default:
             break;
@@ -302,6 +310,44 @@ void postTrelloHook(string payload,
 
         auto respStr = payload.toString;
         req.headers["X-Trello-Webhook"] = getSignature(respStr, trelloHookURL);
+        req.writeBody(cast(ubyte[]) respStr);
+    });
+    scope(failure) {
+        if (req.statusCode != 200)
+            writeln(req.bodyReader.readAllUTF8);
+    }
+    assert(req.statusCode == 200);
+    assert(req.bodyReader.readAllUTF8 == "handled");
+    checkAPIExpectations;
+}
+
+void postBuildkiteHook(string payload,
+    void delegate(ref Json j, scope HTTPClientRequest req) postprocess = null,
+    int line = __LINE__, string file = __FILE__)
+{
+    import std.file : readText;
+    import std.path : buildPath;
+    import dlangbot.trello : getSignature;
+
+    payload = hookDir.buildPath("buildkite", payload);
+
+    logInfo("Starting test in %s:%d with payload: %s", file, line, payload);
+
+    auto req = requestHTTP(buildkiteTestHookURL, (scope req) {
+        req.method = HTTPMethod.POST;
+
+        auto payload = payload.readText.parseJsonString;
+
+        // localize accessed URLs
+        replaceAPIReferences("https://api.buildkite.com", buildkiteAPIURL, payload);
+
+        req.headers["X-Buildkite-Event"] = payload["event"].get!string;
+
+        if (postprocess !is null)
+            postprocess(payload, req);
+
+        auto respStr = payload.toString;
+        req.headers["X-Buildkite-Token"] = buildkiteHookSecret;
         req.writeBody(cast(ubyte[]) respStr);
     });
     scope(failure) {
