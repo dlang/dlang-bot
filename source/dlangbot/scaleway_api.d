@@ -12,7 +12,7 @@ import vibe.stream.operations : readAllUTF8;
 
 import dlangbot.utils : request;
 
-string scalewayAPIURL = "https://dp-par1.scaleway.com";
+string scalewayAPIURL = "https://cp-par1.scaleway.com";
 string scalewayAuth, scalewayOrg;
 
 //==============================================================================
