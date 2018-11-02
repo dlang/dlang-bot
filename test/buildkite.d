@@ -1,5 +1,9 @@
 import utils;
 
+//==============================================================================
+// buildkite hook
+//==============================================================================
+
 @("answers-ping")
 unittest
 {
@@ -7,6 +11,10 @@ unittest
 
     postBuildkiteHook("ping.json");
 }
+
+//==============================================================================
+// Release-Builders on Scaleway (Bare Metal)
+//==============================================================================
 
 @("spawns-release-builder")
 unittest
@@ -33,7 +41,7 @@ unittest
         }
     );
 
-    postBuildkiteHook("build_scheduled.json");
+    postBuildkiteHook("build_scheduled_build-release.json");
 }
 
 @("reuse-running-release-builder")
@@ -43,10 +51,10 @@ unittest
         "/scaleway/servers",
     );
 
-    postBuildkiteHook("build_scheduled.json");
+    postBuildkiteHook("build_scheduled_build-release.json");
 }
 
-@("spawns-additional-builder")
+@("spawns-additional-release-builders")
 unittest
 {
     setAPIExpectations(
@@ -69,16 +77,83 @@ unittest
         }
     );
 
-    postBuildkiteHook("build_scheduled.json", (ref Json j, scope req) {
+    postBuildkiteHook("build_scheduled_build-release.json", (ref Json j, scope req) {
         j["pipeline"]["scheduled_builds_count"] = 2;
     });
+}
+
+//==============================================================================
+// CI-Agents on Hetzner Cloud
+//==============================================================================
+
+@("spawns-ci-agent")
+unittest
+{
+    setAPIExpectations(
+        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
+            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
+        },
+        "/hcloud/servers", (ref Json j) {
+            j["servers"] = Json.emptyArray;
+        },
+        "/hcloud/images?type=snapshot",
+        "/hcloud/servers",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.POST);
+            auto name = req.json["name"].get!string;
+            assert(name.startsWith("ci-agent-"));
+            assert(req.json["image"] == "1456126");
+            auto resp = serializeToJson(["name": name, "status": "initializing"]);
+            resp["id"] = 1321993;
+            res.writeJsonBody(resp);
+        },
+    );
+
+    postBuildkiteHook("build_scheduled_dmd.json");
+}
+
+@("reuse-running-ci-agents")
+unittest
+{
+    setAPIExpectations(
+        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
+            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
+        },
+        "/hcloud/servers",
+    );
+
+    postBuildkiteHook("build_scheduled_dmd.json");
+}
+
+@("spawns-additional-ci-agents")
+unittest
+{
+    setAPIExpectations(
+        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
+            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 2;
+        },
+        "/hcloud/servers",
+        "/hcloud/images?type=snapshot",
+        "/hcloud/servers",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.POST);
+            auto name = req.json["name"].get!string;
+            assert(name.startsWith("ci-agent-"));
+            assert(req.json["image"] == "1456126");
+            auto resp = serializeToJson(["name": name, "status": "initializing"]);
+            resp["id"] = 1321994;
+            res.writeJsonBody(resp);
+        },
+    );
+
+    postBuildkiteHook("build_scheduled_dmd.json");
 }
 
 //==============================================================================
 // agent shutdown check
 //==============================================================================
 
-@("terminates-unneeded-server")
+@("terminates-unneeded-release-builders")
 unittest
 {
     setAPIExpectations(
@@ -98,7 +173,26 @@ unittest
     postAgentShutdownCheck("release-builder-123456");
 }
 
-@("keeps-needed-server")
+@("terminates-unneeded-ci-agents")
+unittest
+{
+    setAPIExpectations(
+        "/buildkite/organizations/dlang/pipelines",
+        "/hcloud/servers", (ref Json j) {
+            j["servers"][0]["name"] = "ci-agent-123456";
+            j["servers"][0]["id"] = 1321993;
+        },
+        "/hcloud/servers/1321993",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.DELETE);
+            res.writeBody("");
+        }
+    );
+
+    postAgentShutdownCheck("ci-agent-123456");
+}
+
+@("keeps-needed-release-builders")
 unittest
 {
     setAPIExpectations(
@@ -111,7 +205,20 @@ unittest
     postAgentShutdownCheck("release-builder-123456");
 }
 
-@("spawns-needed-server")
+@("keeps-needed-release-ci-agents")
+unittest
+{
+    setAPIExpectations(
+        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
+            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
+        },
+        "/hcloud/servers",
+    );
+
+    postAgentShutdownCheck("ci-agent-123456");
+}
+
+@("spawns-needed-release-builders")
 unittest
 {
     setAPIExpectations(
@@ -139,4 +246,29 @@ unittest
     );
 
     postAgentShutdownCheck("release-builder-123456");
+}
+
+@("spawns-needed-ci-agents")
+unittest
+{
+    setAPIExpectations(
+        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
+            j[].find!(p => p["name"] == "dmd")[0]["running_builds_count"] = 1;
+            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
+        },
+        "/hcloud/servers",
+        "/hcloud/images?type=snapshot",
+        "/hcloud/servers",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.POST);
+            auto name = req.json["name"].get!string;
+            assert(name.startsWith("ci-agent-"));
+            assert(req.json["image"] == "1456126");
+            auto resp = serializeToJson(["name": name, "status": "initializing"]);
+            resp["id"] = 1321994;
+            res.writeJsonBody(resp);
+        },
+    );
+
+    postAgentShutdownCheck("ci-agent-123456");
 }

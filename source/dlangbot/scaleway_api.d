@@ -32,6 +32,11 @@ struct Server
         import std.conv : to;
         scwPOST("/servers/%s/action".format(id), ["action": action.to!string]).dropBody;
     }
+
+    void decommission()
+    {
+        action(Action.terminate);
+    }
 }
 
 struct Image
@@ -44,16 +49,16 @@ Server[] servers()
 {
     return scwGET("/servers")
         .readJson["servers"]
-        .deserializeJson!(Server[]);
+        .deserializeJson!(typeof(return));
 }
 
-Server createServer(string name, string commercialType, Image image)
+Server createServer(string name, string serverType, Image image)
 {
     auto payload = serializeToJson([
             "organization": scalewayOrg,
             "name": name,
             "image": image.id,
-            "commercial_type": commercialType]);
+            "commercial_type": serverType]);
     payload["enable_ipv6"] = true;
     return scwPOST("/servers", payload)
         .readJson["server"]
@@ -64,7 +69,7 @@ Image[] images()
 {
     return scwGET("/images")
         .readJson["images"]
-        .deserializeJson!(Image[]);
+        .deserializeJson!(typeof(return));
 }
 
 private:

@@ -10,7 +10,7 @@ public import vibe.http.common : HTTPMethod, HTTPStatus;
 public import vibe.http.client : HTTPClientRequest;
 public import vibe.http.server : HTTPServerRequest, HTTPServerResponse;
 public import std.functional : toDelegate;
-public import vibe.data.json : deserializeJson, Json;
+public import vibe.data.json : deserializeJson, serializeToJson, Json;
 public import std.datetime : SysTime;
 public import std.algorithm;
 
@@ -46,6 +46,7 @@ shared static this()
     buildkiteHookSecret = "1234567890";
     scalewayAuth = "89f66bbd-f2f0-4f95-9382-56d141c1c09e";
     scalewayOrg = "aa435976-67f1-455c-b988-f4dc04c91f40";
+    hcloudAuth = "Bearer BDc2RZCKKvgdyF6Dgex1kg4NGwkScI9xzBZqGJemkR4GopohwatiH0IRD2iTg61o";
     dlangbotAgentAuth = "Bearer fjSL8ITFkOxS5PF9p5lM41mox";
 
     // start our hook server
@@ -83,6 +84,7 @@ void startFakeAPIServer()
     trelloAPIURL = fakeAPIServerURL ~ "/trello";
     buildkiteAPIURL = fakeAPIServerURL ~ "/buildkite";
     scalewayAPIURL = fakeAPIServerURL ~ "/scaleway";
+    hcloudAPIURL = fakeAPIServerURL ~ "/hcloud";
     bugzillaURL = fakeAPIServerURL ~ "/bugzilla";
     twitterURL = fakeAPIServerURL ~ "/twitter";
 }
@@ -140,7 +142,7 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     {
         logInfo("reading payload: %s", filePath);
         auto payload = filePath.readText;
-        if (req.requestURL.startsWith("/github", "/trello", "/scaleway", "/buildkite"))
+        if (req.requestURL.startsWith("/github", "/trello", "/scaleway", "/buildkite", "/hcloud"))
         {
             auto payloadJson = payload.parseJsonString;
             replaceAPIReferences("https://api.github.com", githubAPIURL, payloadJson);

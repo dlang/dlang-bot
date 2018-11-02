@@ -9,6 +9,7 @@ import vibe.http.common : enforceHTTP, HTTPStatus;
 
 import dlangbot.utils : request;
 static import scw=dlangbot.scaleway_api;
+static import hc=dlangbot.hcloud_api;
 
 string buildkiteAPIURL = "https://api.buildkite.com/v2";
 string buildkiteAuth, buildkiteHookSecret;
@@ -38,17 +39,21 @@ void handleBuild(in ref Build build, in ref Pipeline p)
 {
     if (p.name == "build-release")
         scaleReleaseBuilder(p.scheduledBuildsCount + p.runningBuildsCount);
+    else
+        scaleCIAgent(ciBuilds);
 }
 
 void agentShutdownCheck(string hostname)
 {
     import std.algorithm : startsWith;
 
-    if (hostname.startsWith("release-builder"))
+    if (hostname.startsWith("release-builder-"))
     {
-        immutable p = pipeline("build-release");
+        const p = pipeline("build-release");
         scaleReleaseBuilder(p.scheduledBuildsCount + p.runningBuildsCount, hostname);
     }
+    else if (hostname.startsWith("ci-agent-"))
+        scaleCIAgent(ciBuilds, hostname);
 }
 
 private void scaleReleaseBuilder(uint nbuilds, string serverToDecommision = null)
@@ -76,8 +81,45 @@ private void scaleReleaseBuilder(uint nbuilds, string serverToDecommision = null
         if (servers.empty)
             logWarn("Failed to find server to decommission %s", serverToDecommision);
         else
-            servers.front.action(scw.Server.Action.terminate);
+            servers.front.decommission();
     }
+}
+
+private void scaleCIAgent(uint nbuilds, string serverToDecommision = null)
+{
+    import std.algorithm : filter, find, startsWith;
+    import std.array : front;
+    import std.range : empty, walkLength;
+    import std.uuid : randomUUID;
+    import vibe.core.log : logWarn;
+
+    assert(serverToDecommision == null || serverToDecommision.startsWith("ci-agent-"));
+
+    auto servers = hc.servers;
+    immutable nservers = servers.filter!(s => s.name.startsWith("ci-agent-")).walkLength;
+
+    if (nservers < nbuilds)
+    {
+        immutable img = hc.images(hc.Image.Type.snapshot).find!(i => i.description == "ci-agent").front;
+        foreach (_; nservers .. nbuilds)
+            hc.createServer("ci-agent-" ~ randomUUID().toString, "cx51", img);
+    }
+    else if (nbuilds < nservers && serverToDecommision != null)
+    {
+        servers = servers.find!(s => s.name == serverToDecommision);
+        if (servers.empty)
+            logWarn("Failed to find server to decommission %s", serverToDecommision);
+        else
+            servers.front.decommission();
+    }
+}
+
+private uint ciBuilds()
+{
+    import std.algorithm : filter, fold;
+
+    return pipelines.filter!(p => p.defaultQueue)
+        .fold!((sum, p) => sum + p.scheduledBuildsCount + p.runningBuildsCount)(0);
 }
 
 //==============================================================================
@@ -89,6 +131,21 @@ struct Pipeline
     string name;
     @Name("scheduled_builds_count") uint scheduledBuildsCount;
     @Name("running_builds_count") uint runningBuildsCount;
+
+    /// returns whether pipeline runs (partially) on default queue
+    bool defaultQueue()
+    {
+        import std.algorithm : any, all, startsWith;
+
+        return steps.length > 0 &&
+            steps.any!(s => s.agentQueryRules.all!(a => a == "queue=default" || !a.startsWith("queue=")));
+    }
+
+    static struct Step
+    {
+        @Name("agent_query_rules") string[] agentQueryRules;
+    }
+    Step[] steps;
 }
 
 struct Build
