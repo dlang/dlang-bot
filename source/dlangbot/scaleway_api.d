@@ -25,9 +25,12 @@ struct Server
     enum State { running, stopped }
     @byName State state;
 
-    void action(string action)
+    enum Action { poweron, poweroff, terminate }
+
+    void action(Action action)
     {
-        scwPOST("/servers/%s/action".format(id), ["action": action]).dropBody;
+        import std.conv : to;
+        scwPOST("/servers/%s/action".format(id), ["action": action.to!string]).dropBody;
     }
 }
 

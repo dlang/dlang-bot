@@ -45,6 +45,7 @@ shared static this()
     buildkiteAuth = "Bearer abcdef";
     buildkiteHookSecret = "1234567890";
     scalewayAuth = "89f66bbd-f2f0-4f95-9382-56d141c1c09e";
+    dlangbotAgentAuth = "Bearer fjSL8ITFkOxS5PF9p5lM41mox";
 
     // start our hook server
     auto settings = new HTTPServerSettings;
@@ -138,12 +139,13 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     {
         logInfo("reading payload: %s", filePath);
         auto payload = filePath.readText;
-        if (req.requestURL.startsWith("/github", "/trello", "/scaleway"))
+        if (req.requestURL.startsWith("/github", "/trello", "/scaleway", "/buildkite"))
         {
             auto payloadJson = payload.parseJsonString;
             replaceAPIReferences("https://api.github.com", githubAPIURL, payloadJson);
             replaceAPIReferences("https://api.trello.com", trelloAPIURL, payloadJson);
             replaceAPIReferences("https://dp-par1.scaleway.com", scalewayAPIURL, payloadJson);
+            replaceAPIReferences("https://api.buildkite.com/v2", buildkiteAPIURL, payloadJson);
 
             if (expectation.jsonHandler !is null)
                 expectation.jsonHandler(payloadJson);
@@ -359,16 +361,15 @@ void postBuildkiteHook(string payload,
     checkAPIExpectations;
 }
 
-void openUrl(string url, string expectedResponse,
-    int line = __LINE__, string file = __FILE__)
+void postAgentShutdownCheck(string hostname, int line = __LINE__, string file = __FILE__)
 {
-    import std.file : readText;
-    import std.path : buildPath;
+    import vibe.textfilter.urlencode : urlEncode;
 
-    logInfo("Starting test in %s:%d with url: %s", file, line, url);
+    logInfo("Starting test in %s:%d with hostname %s", file, line, hostname);
 
-    auto req = requestHTTP(testServerURL ~ url, (scope req) {
-        req.method = HTTPMethod.GET;
+    auto req = requestHTTP(testServerURL ~ "/agent_shutdown_check?hostname=" ~ urlEncode(hostname), (scope req) {
+        req.method = HTTPMethod.POST;
+        req.headers["Authentication"] = dlangbotAgentAuth;
     });
     scope(failure) {
         if (req.statusCode != 200)
@@ -376,7 +377,7 @@ void openUrl(string url, string expectedResponse,
     }
     assert(req.statusCode == 200);
     checkAPIExpectations;
-    assert(req.bodyReader.readAllUTF8 == expectedResponse);
+    req.dropBody;
 }
 
 void testCronDaily(string[] repositories, int line = __LINE__, string file = __FILE__)

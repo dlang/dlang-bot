@@ -10,7 +10,7 @@ public import dlangbot.bugzilla : bugzillaURL;
 public import dlangbot.github_api   : githubAPIURL, githubAuth, githubHookSecret;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
 public import dlangbot.twitter : oAuth, tweet, twitterURL, twitterEnabled;
-public import dlangbot.buildkite : buildkiteAPIURL, buildkiteAuth, buildkiteHookSecret;
+public import dlangbot.buildkite : buildkiteAPIURL, buildkiteAuth, buildkiteHookSecret, dlangbotAgentAuth;
 public import dlangbot.scaleway_api : scalewayAPIURL, scalewayAuth;
 
 import std.datetime : Clock, days, Duration, minutes, seconds, SysTime;
@@ -50,6 +50,7 @@ void startServer(HTTPServerSettings settings)
         .post("/trello_hook", &trelloHook)
         .post("/codecov_hook", &codecovHook)
         .post("/buildkite_hook", &buildkiteHook)
+        .post("/agent_shutdown_check", &agentShutdownCheck)
         ;
 
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
@@ -314,6 +315,18 @@ void buildkiteHook(HTTPServerRequest req, HTTPServerResponse res)
 
 //==============================================================================
 
+void agentShutdownCheck(HTTPServerRequest req, HTTPServerResponse res)
+{
+    import dlangbot.buildkite : agentShutdownCheck, verifyAgentRequest;
+    import std.algorithm.searching : startsWith;
+
+    verifyAgentRequest(req.headers.get("Authentication"));
+    agentShutdownCheck(req.query.get("hostname"));
+    res.writeBody("");
+}
+
+//==============================================================================
+
 shared static this()
 {
     import std.process : environment;
@@ -344,6 +357,7 @@ else void main(string[] args)
     buildkiteAuth = "Bearer "~environment["BK_TOKEN"];
     buildkiteHookSecret = environment["BK_HOOK_SECRET"];
     scalewayAuth = environment["SCW_TOKEN"];
+    dlangbotAgentAuth = "Bearer "~environment["DB_AGENT_TOKEN"];
     oAuth.config.consumerKey = environment["TWITTER_CONSUMER_KEY"];
     oAuth.config.consumerKeySecret = environment["TWITTER_CONSUMER_KEY_SECRET"];
     oAuth.config.accessToken = environment["TWITTER_ACCESS_TOKEN"];

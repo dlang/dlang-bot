@@ -5,6 +5,7 @@ import std.datetime.systime;
 import vibe.data.json;
 import vibe.data.json : Name = name;
 import vibe.http.client : HTTPClientRequest;
+import vibe.http.common : enforceHTTP, HTTPStatus;
 
 import dlangbot.utils : request;
 static import scw=dlangbot.scaleway_api;
@@ -12,24 +13,79 @@ static import scw=dlangbot.scaleway_api;
 string buildkiteAPIURL = "https://api.buildkite.com/v2";
 string buildkiteAuth, buildkiteHookSecret;
 
+string dlangbotAgentAuth;
+
+//==============================================================================
+// Buildkite hooks and Dlang-bot API
+//==============================================================================
+
 Json verifyRequest(string secret, string body_)
 {
     import std.digest : secureEqual;
     import std.exception : enforce;
 
-    enforce(secureEqual(secret, buildkiteHookSecret), "hook secret mismatch");
+    enforceHTTP(secureEqual(secret, buildkiteHookSecret), HTTPStatus.unauthorized, "hook secret mismatch");
     return parseJsonString(body_);
 }
 
-void handleBuild(in ref Build build, in ref Pipeline pipeline)
+void verifyAgentRequest(string authentication)
 {
-    if (pipeline.name == "build-release")
-        scaleReleaseBuilders(pipeline.scheduledBuildsCount + pipeline.runningBuildsCount);
+    import std.digest : secureEqual;
+    enforceHTTP(secureEqual(authentication, dlangbotAgentAuth), HTTPStatus.unauthorized);
 }
+
+void handleBuild(in ref Build build, in ref Pipeline p)
+{
+    if (p.name == "build-release")
+        scaleReleaseBuilder(p.scheduledBuildsCount + p.runningBuildsCount);
+}
+
+void agentShutdownCheck(string hostname)
+{
+    import std.algorithm : startsWith;
+
+    if (hostname.startsWith("release-builder"))
+    {
+        immutable p = pipeline("build-release");
+        scaleReleaseBuilder(p.scheduledBuildsCount + p.runningBuildsCount, hostname);
+    }
+}
+
+private void scaleReleaseBuilder(uint nbuilds, string serverToDecommision = null)
+{
+    import std.algorithm : filter, find, startsWith;
+    import std.array : front;
+    import std.range : empty, walkLength;
+    import std.uuid : randomUUID;
+    import vibe.core.log : logWarn;
+
+    assert(serverToDecommision == null || serverToDecommision.startsWith("release-builder-"));
+
+    auto servers = scw.servers;
+    immutable nservers = servers.filter!(s => s.name.startsWith("release-builder-")).walkLength;
+
+    if (nservers < nbuilds)
+    {
+        immutable img = scw.images.find!(i => i.name == "release-builder").front;
+        foreach (_; nservers .. nbuilds)
+            scw.createServer("release-builder-" ~ randomUUID().toString, "C2S", img).action(scw.Server.Action.poweron);
+    }
+    else if (nbuilds < nservers && serverToDecommision != null)
+    {
+        servers = servers.find!(s => s.name == serverToDecommision);
+        if (servers.empty)
+            logWarn("Failed to find server to decommission %s", serverToDecommision);
+        else
+            servers.front.action(scw.Server.Action.terminate);
+    }
+}
+
+//==============================================================================
+// Buildkite API
+//==============================================================================
 
 struct Pipeline
 {
-    string url;
     string name;
     @Name("scheduled_builds_count") uint scheduledBuildsCount;
     @Name("running_builds_count") uint runningBuildsCount;
@@ -50,36 +106,21 @@ struct Agent
     @Name("last_job_finished_at") SysTime lastJobFinishedAt;
 }
 
-private:
-
-void scaleReleaseBuilders(uint needed)
+Pipeline pipeline(string name)
 {
-    import std.algorithm : filter, find, startsWith;
-    import std.array : front;
-    import std.range : walkLength;
-    import std.uuid : randomUUID;
+    import vibe.textfilter.urlencode : urlEncode;
 
-    immutable cnt = scw.servers.filter!(s => s.name.startsWith("release-builder-")).walkLength;
-    if (cnt >= needed)
-        return;
-    immutable img = scw.images.find!(i => i.name == "release-builder").front;
-    foreach (_; cnt .. needed)
-        scw.createServer("release-builder-" ~ randomUUID().toString, "C2S", img).action("poweron");
+    return bkGET("/organizations/dlang/pipelines/" ~ urlEncode(name))
+        .readJson
+        .deserializeJson!(Pipeline);
 }
 
-/// returns number of release builders
-/*size_t decommissionDefunctReleaseBuilders()
+Pipeline[] pipelines()
 {
-    auto servers = scw.servers().filter!(s => s.hostname.startsWith("release-builder-"));
-    auto agents = agents().filter!(a => a.hostname.startsWith("release-builder-"));
-    auto stale = servers.filter!(s =>
-        s.state == s.State.running &&
-        s.creationDate > Clock.currTime - 10.minutes &&
-        !agents.canFind!(a => a.hostname == s.hostname));
-    stale.each!(s => s.decommision);
-    // count servers not agents to account for booting ones (and undetected hanging servers)
-    return servers.walkLength - stale.walkLength;
-}*/
+    return bkGET("/organizations/dlang/pipelines")
+        .readJson
+        .deserializeJson!(Pipeline[]);
+}
 
 Agent[] agents()
 {
@@ -102,3 +143,17 @@ auto bkGET(scope void delegate(scope HTTPClientRequest req) userReq, string path
         userReq(req);
     });
 }
+
+/// returns number of release builders
+/*size_t decommissionDefunctReleaseBuilders()
+{
+    auto servers = scw.servers().filter!(s => s.hostname.startsWith("release-builder-"));
+    auto agents = agents().filter!(a => a.hostname.startsWith("release-builder-"));
+    auto stale = servers.filter!(s =>
+        s.state == s.State.running &&
+        s.creationDate > Clock.currTime - 10.minutes &&
+        !agents.canFind!(a => a.hostname == s.hostname));
+    stale.each!(s => s.decommision);
+    // count servers not agents to account for booting ones (and undetected hanging servers)
+    return servers.walkLength - stale.walkLength;
+}*/
