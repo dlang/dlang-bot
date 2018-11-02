@@ -1,0 +1,164 @@
+{
+  "servers": [
+    {
+      "id": 1321993,
+      "name": "ci-agent-88e9e60d-bfb0-4567-921e-c955eac25653",
+      "status": "running",
+      "created": "2018-11-02T17:19:52+00:00",
+      "public_net": {
+        "ipv4": {
+          "ip": "95.216.192.167",
+          "blocked": false,
+          "dns_ptr": "static.167.192.216.95.clients.your-server.de"
+        },
+        "ipv6": {
+          "ip": "2a01:4f9:c010:3085::/64",
+          "blocked": false,
+          "dns_ptr": []
+        },
+        "floating_ips": []
+      },
+      "server_type": {
+        "id": 9,
+        "name": "cx51",
+        "description": "CX51",
+        "cores": 8,
+        "memory": 32.0,
+        "disk": 240,
+        "prices": [
+          {
+            "location": "fsn1",
+            "price_hourly": {
+              "net": "0.0500000000",
+              "gross": "0.0595000000000000"
+            },
+            "price_monthly": {
+              "net": "29.9000000000",
+              "gross": "35.5810000000000000"
+            }
+          },
+          {
+            "location": "nbg1",
+            "price_hourly": {
+              "net": "0.0500000000",
+              "gross": "0.0595000000000000"
+            },
+            "price_monthly": {
+              "net": "29.9000000000",
+              "gross": "35.5810000000000000"
+            }
+          },
+          {
+            "location": "hel1",
+            "price_hourly": {
+              "net": "0.0500000000",
+              "gross": "0.0595000000000000"
+            },
+            "price_monthly": {
+              "net": "29.9000000000",
+              "gross": "35.5810000000000000"
+            }
+          }
+        ],
+        "storage_type": "local",
+        "cpu_type": "shared"
+      },
+      "datacenter": {
+        "id": 3,
+        "name": "hel1-dc2",
+        "description": "Helsinki 1 DC 2",
+        "location": {
+          "id": 3,
+          "name": "hel1",
+          "description": "Helsinki DC Park 1",
+          "country": "FI",
+          "city": "Helsinki",
+          "latitude": 60.169855,
+          "longitude": 24.938379
+        },
+        "server_types": {
+          "supported": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "available": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        }
+      },
+      "image": {
+        "id": 1382776,
+        "type": "snapshot",
+        "status": "available",
+        "name": null,
+        "description": "buildkite-agent-image",
+        "image_size": 1.14233689941406,
+        "disk_size": 20,
+        "created": "2018-10-26T23:02:35+00:00",
+        "created_from": {
+          "id": 1291529,
+          "name": "gen-buildkite-agent-image"
+        },
+        "bound_to": null,
+        "os_flavor": "ubuntu",
+        "os_version": null,
+        "rapid_deploy": false,
+        "protection": {
+          "delete": false
+        },
+        "deprecated": null,
+        "labels": {}
+      },
+      "iso": null,
+      "rescue_enabled": false,
+      "locked": false,
+      "backup_window": null,
+      "outgoing_traffic": 0,
+      "ingoing_traffic": 0,
+      "included_traffic": 21990232555520,
+      "protection": {
+        "delete": false,
+        "rebuild": false
+      },
+      "labels": {},
+      "volumes": []
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "per_page": 25,
+      "previous_page": null,
+      "next_page": null,
+      "last_page": 1,
+      "total_entries": 1
+    }
+  }
+}

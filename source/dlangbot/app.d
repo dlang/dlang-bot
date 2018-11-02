@@ -7,9 +7,12 @@ import dlangbot.trello;
 import dlangbot.utils;
 
 public import dlangbot.bugzilla : bugzillaURL;
-public import dlangbot.github_api   : githubAPIURL, githubAuth, hookSecret;
+public import dlangbot.github_api   : githubAPIURL, githubAuth, githubHookSecret;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
 public import dlangbot.twitter : oAuth, tweet, twitterURL, twitterEnabled;
+public import dlangbot.buildkite : buildkiteAPIURL, buildkiteAuth, buildkiteHookSecret, dlangbotAgentAuth;
+public import dlangbot.scaleway_api : scalewayAPIURL, scalewayAuth, scalewayOrg;
+public import dlangbot.hcloud_api : hcloudAPIURL, hcloudAuth;
 
 import std.datetime : Clock, days, Duration, minutes, seconds, SysTime;
 
@@ -47,6 +50,8 @@ void startServer(HTTPServerSettings settings)
         .match(HTTPMethod.HEAD, "/trello_hook", (HTTPServerRequest req, HTTPServerResponse res) => res.writeVoidBody)
         .post("/trello_hook", &trelloHook)
         .post("/codecov_hook", &codecovHook)
+        .post("/buildkite_hook", &buildkiteHook)
+        .post("/agent_shutdown_check", &agentShutdownCheck)
         ;
 
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
@@ -57,7 +62,7 @@ void startServer(HTTPServerSettings settings)
 }
 
 //==============================================================================
-// Github hook
+// Trello hook
 //==============================================================================
 
 void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
@@ -65,7 +70,7 @@ void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
     import std.array : array;
     import dlangbot.trello : verifyRequest;
 
-    auto json = verifyRequest(req.headers["X-Trello-Webhook"], req.bodyReader.readAllUTF8, trelloHookURL);
+    auto json = verifyRequest(req.headers.get("X-Trello-Webhook"), req.bodyReader.readAllUTF8, trelloHookURL);
     logDebug("trelloHook: %s", json);
     auto action = json["action"]["type"].get!string;
     switch (action)
@@ -80,17 +85,21 @@ void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
     }
 }
 
+//==============================================================================
+// Github hook
+//==============================================================================
+
 void githubHook(HTTPServerRequest req, HTTPServerResponse res)
 {
     import std.functional : toDelegate;
     import dlangbot.github : verifyRequest;
 
-    auto json = verifyRequest(req.headers["X-Hub-Signature"], req.bodyReader.readAllUTF8);
+    auto json = verifyRequest(req.headers.get("X-Hub-Signature"), req.bodyReader.readAllUTF8);
     logDebug("githubHook: %s", json);
-    switch (req.headers["X-GitHub-Event"])
+    switch (req.headers.get("X-GitHub-Event"))
     {
     case "ping":
-        return res.writeBody("pong");
+        return res.writeBody("handled");
 
     case "status":
         auto state = json["state"].get!string;
@@ -282,6 +291,43 @@ void codecovHook(HTTPServerRequest req, HTTPServerResponse res)
 
 //==============================================================================
 
+void buildkiteHook(HTTPServerRequest req, HTTPServerResponse res)
+{
+    import dlangbot.buildkite : Build, handleBuild, Pipeline, verifyRequest;
+
+    auto json = verifyRequest(req.headers.get("X-Buildkite-Token"), req.bodyReader.readAllUTF8);
+    logDebug("buildkiteHook: %s", json);
+    switch (req.headers.get("X-Buildkite-Event"))
+    {
+    case "ping":
+        return res.writeBody("handled");
+
+    case "build.scheduled":
+        auto build = json["build"].deserializeJson!Build;
+        auto pipeline = json["pipeline"].deserializeJson!Pipeline;
+        handleBuild(build, pipeline);
+        break;
+
+    default:
+        return res.writeVoidBody();
+    }
+    return res.writeBody("handled");
+}
+
+//==============================================================================
+
+void agentShutdownCheck(HTTPServerRequest req, HTTPServerResponse res)
+{
+    import dlangbot.buildkite : agentShutdownCheck, verifyAgentRequest;
+    import std.algorithm.searching : startsWith;
+
+    verifyAgentRequest(req.headers.get("Authentication"));
+    agentShutdownCheck(req.query.get("hostname"));
+    res.writeBody("");
+}
+
+//==============================================================================
+
 shared static this()
 {
     import std.process : environment;
@@ -306,9 +352,15 @@ else void main(string[] args)
     import vibe.core.args : readOption;
 
     githubAuth = "token "~environment["GH_TOKEN"];
+    githubHookSecret = environment["GH_HOOK_SECRET"];
     trelloSecret = environment["TRELLO_SECRET"];
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
-    hookSecret = environment["GH_HOOK_SECRET"];
+    buildkiteAuth = "Bearer "~environment["BK_TOKEN"];
+    buildkiteHookSecret = environment["BK_HOOK_SECRET"];
+    scalewayAuth = environment["SCW_TOKEN"];
+    scalewayOrg = environment["SCW_ORG"];
+    hcloudAuth = "Bearer "~environment["HCLOUD_TOKEN"];
+    dlangbotAgentAuth = "Bearer "~environment["DB_AGENT_TOKEN"];
     oAuth.config.consumerKey = environment["TWITTER_CONSUMER_KEY"];
     oAuth.config.consumerKeySecret = environment["TWITTER_CONSUMER_KEY_SECRET"];
     oAuth.config.accessToken = environment["TWITTER_ACCESS_TOKEN"];

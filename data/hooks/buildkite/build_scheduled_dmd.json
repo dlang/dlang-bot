@@ -1,0 +1,99 @@
+{
+  "event": "build.scheduled",
+  "build": {
+    "id": "c3dbb63d-26d7-4804-a10d-a4eef33b3f02",
+    "url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/dmd/builds/2297",
+    "web_url": "https://buildkite.com/dlang/dmd/builds/2297",
+    "number": 2297,
+    "state": "scheduled",
+    "blocked": false,
+    "message": "Refactor aliasthis checks into functions",
+    "commit": "25df6fc9205dd3493fa953b1850f76e30514f3e9",
+    "branch": "RazvanN7:Refactor_aliasthis",
+    "tag": null,
+    "source": "webhook",
+    "creator": {
+      "id": "cdc22883-ff52-464b-b4d5-45ca090a246f",
+      "name": "Razvan Nitu",
+      "email": "razvan.nitu1305@gmail.com",
+      "avatar_url": "https://www.gravatar.com/avatar/c80b862237d13cb0cf02640cc8fdc87f",
+      "created_at": "2018-07-11 09:56:25 UTC"
+    },
+    "created_at": "2018-11-02 10:22:21 UTC",
+    "scheduled_at": "2018-11-02 10:22:21 UTC",
+    "started_at": null,
+    "finished_at": null,
+    "meta_data": {
+    },
+    "pull_request": {
+      "id": "8902",
+      "base": "master",
+      "repository": "git://github.com/RazvanN7/dmd.git"
+    }
+  },
+  "pipeline": {
+    "id": "beafcb1e-38bd-4988-b80b-da327e525b02",
+    "url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/dmd",
+    "web_url": "https://buildkite.com/dlang/dmd",
+    "name": "dmd",
+    "description": "",
+    "slug": "dmd",
+    "repository": "https://github.com/dlang/dmd.git",
+    "branch_configuration": null,
+    "default_branch": "master",
+    "skip_queued_branch_builds": true,
+    "skip_queued_branch_builds_filter": "!master !stable",
+    "cancel_running_branch_builds": true,
+    "cancel_running_branch_builds_filter": "!master !stable",
+    "provider": {
+      "id": "github",
+      "settings": {
+        "trigger_mode": "code",
+        "build_pull_requests": true,
+        "pull_request_branch_filter_enabled": false,
+        "skip_pull_request_builds_for_existing_commits": true,
+        "build_pull_request_forks": true,
+        "prefix_pull_request_fork_branch_names": true,
+        "build_tags": false,
+        "publish_commit_status": true,
+        "publish_commit_status_per_step": false,
+        "publish_blocked_as_pending": false,
+        "repository": "dlang/dmd",
+        "pull_request_branch_filter_configuration": ""
+      },
+      "webhook_url": "https://webhook.buildkite.com/deliver/d3b3b8dba42c4a3dbe7c6c98867b8501f6bd30404604a4b034"
+    },
+    "builds_url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/dmd/builds",
+    "badge_url": "https://badge.buildkite.com/01239dde8424d69809d08769015bbdb9b90d05082e534d2f82.svg",
+    "created_at": "2018-07-11 09:40:38 UTC",
+    "env": {
+      "CODECOV_TOKEN": "bb98e9c9-5a86-4d53-b8dd-69d98efa3c13"
+    },
+    "scheduled_builds_count": 1,
+    "running_builds_count": 0,
+    "scheduled_jobs_count": 1,
+    "running_jobs_count": 0,
+    "waiting_jobs_count": 0,
+    "steps": [
+      {
+        "type": "script",
+        "name": ":pipeline:",
+        "command": "wget https://github.com/dlang/ci/raw/master/buildkite.sh\r\n\r\nbash buildkite.sh | buildkite-agent pipeline upload",
+        "artifact_paths": "",
+        "branch_configuration": "",
+        "env": {
+        },
+        "timeout_in_minutes": null,
+        "agent_query_rules": [
+
+        ],
+        "concurrency": null,
+        "parallelism": null
+      }
+    ]
+  },
+  "sender": {
+    "id": "cdc22883-ff52-464b-b4d5-45ca090a246f",
+    "name": "Razvan Nitu"
+  }
+}

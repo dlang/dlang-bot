@@ -1,0 +1,500 @@
+[
+  {
+    "id": "c25fe05b-39b1-47f5-95d5-92fdda76a0a6",
+    "url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/build-release",
+    "web_url": "https://buildkite.com/dlang/build-release",
+    "name": "build-release",
+    "description": "Build a nightly release or a feature preview",
+    "slug": "build-release",
+    "repository": "https://github.com/MartinNowak/ci.git",
+    "branch_configuration": null,
+    "default_branch": "release_builder",
+    "skip_queued_branch_builds": false,
+    "skip_queued_branch_builds_filter": null,
+    "cancel_running_branch_builds": false,
+    "cancel_running_branch_builds_filter": null,
+    "provider": {
+      "id": "github",
+      "settings": {
+        "trigger_mode": "none",
+        "build_pull_requests": true,
+        "pull_request_branch_filter_enabled": false,
+        "skip_pull_request_builds_for_existing_commits": true,
+        "build_pull_request_forks": false,
+        "prefix_pull_request_fork_branch_names": true,
+        "build_tags": false,
+        "publish_commit_status": true,
+        "publish_commit_status_per_step": false,
+        "separate_pull_request_statuses": false,
+        "publish_blocked_as_pending": false,
+        "repository": "MartinNowak/ci",
+        "pull_request_branch_filter_configuration": ""
+      },
+      "webhook_url": "https://webhook.buildkite.com/deliver/24ac1cc4000e9ce5eef1d6a4b42c8a15050ff76080b51da621"
+    },
+    "builds_url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/build-release/builds",
+    "badge_url": "https://badge.buildkite.com/27449ac26b44387fe48d54a99df69947aaf94d5863aab641a3.svg",
+    "created_at": "2018-10-08T16:19:59.196Z",
+    "env": {
+      "BRANCH": "master"
+    },
+    "scheduled_builds_count": 0,
+    "running_builds_count": 0,
+    "scheduled_jobs_count": 1,
+    "running_jobs_count": 1,
+    "waiting_jobs_count": 0,
+    "steps": [
+      {
+        "type": "script",
+        "name": ":pipeline:",
+        "command": "buildkite-agent pipeline upload ./buildkite/build_release_pipeline.yml",
+        "artifact_paths": "",
+        "branch_configuration": "",
+        "env": {
+
+        },
+        "timeout_in_minutes": null,
+        "agent_query_rules": [
+          "queue=release-builder"
+        ],
+        "concurrency": null,
+        "parallelism": null
+      }
+    ]
+  },
+  {
+    "id": "6d3de242-0733-4100-ba78-820ef389a27f",
+    "url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/ci-test",
+    "web_url": "https://buildkite.com/dlang/ci-test",
+    "name": "ci-test",
+    "description": "test new CI agents on queue=test",
+    "slug": "ci-test",
+    "repository": "https://github.com/dlang/ci.git",
+    "branch_configuration": null,
+    "default_branch": "master",
+    "skip_queued_branch_builds": false,
+    "skip_queued_branch_builds_filter": null,
+    "cancel_running_branch_builds": false,
+    "cancel_running_branch_builds_filter": null,
+    "provider": {
+      "id": "github",
+      "settings": {
+        "trigger_mode": "code",
+        "build_pull_requests": true,
+        "pull_request_branch_filter_enabled": false,
+        "skip_pull_request_builds_for_existing_commits": true,
+        "build_pull_request_forks": false,
+        "prefix_pull_request_fork_branch_names": true,
+        "build_tags": false,
+        "publish_commit_status": true,
+        "publish_commit_status_per_step": false,
+        "publish_blocked_as_pending": false,
+        "repository": "dlang/ci"
+      },
+      "webhook_url": "https://webhook.buildkite.com/deliver/43b7146202e226a7859f67ce24f37830b7e471922b7b275016"
+    },
+    "builds_url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/ci-test/builds",
+    "badge_url": "https://badge.buildkite.com/a7a8542421cd0d7981a6fa7c9b3ee89da05d0e980c1cc65897.svg",
+    "created_at": "2018-09-04T14:46:40.227Z",
+    "env": {
+      "CODECOV_TOKEN": "bb98e9c9-5a86-4d53-b8dd-69d98efa3c13"
+    },
+    "scheduled_builds_count": 0,
+    "running_builds_count": 0,
+    "scheduled_jobs_count": 0,
+    "running_jobs_count": 8,
+    "waiting_jobs_count": 0,
+    "steps": [
+      {
+        "type": "script",
+        "name": ":pipeline:",
+        "command": "wget https://raw.githubusercontent.com/MartinNowak/ci/541311a5f8f6f45f24d86120b4fecf4702a718ee/buildkite.sh -O buildkite.sh\r\n\r\nbash buildkite.sh | buildkite-agent pipeline upload",
+        "artifact_paths": "",
+        "branch_configuration": "",
+        "env": {
+
+        },
+        "timeout_in_minutes": null,
+        "agent_query_rules": [
+          "queue=test"
+        ],
+        "concurrency": null,
+        "parallelism": null
+      }
+    ]
+  },
+  {
+    "id": "4f3e3b83-b540-4c37-8c4b-688819f4d75b",
+    "url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/dub",
+    "web_url": "https://buildkite.com/dlang/dub",
+    "name": "dub",
+    "description": "",
+    "slug": "dub",
+    "repository": "https://github.com/dlang/dub.git",
+    "branch_configuration": null,
+    "default_branch": "master",
+    "skip_queued_branch_builds": true,
+    "skip_queued_branch_builds_filter": "!master !stable",
+    "cancel_running_branch_builds": true,
+    "cancel_running_branch_builds_filter": "!master !stable",
+    "provider": {
+      "id": "github",
+      "settings": {
+        "trigger_mode": "code",
+        "build_pull_requests": true,
+        "pull_request_branch_filter_enabled": false,
+        "skip_pull_request_builds_for_existing_commits": true,
+        "build_pull_request_forks": true,
+        "prefix_pull_request_fork_branch_names": true,
+        "build_tags": false,
+        "publish_commit_status": true,
+        "publish_commit_status_per_step": false,
+        "publish_blocked_as_pending": false,
+        "repository": "dlang/dub",
+        "pull_request_branch_filter_configuration": ""
+      },
+      "webhook_url": "https://webhook.buildkite.com/deliver/0427a32f8c154fa3307fb33be4ab09a7729a254815ad35ceea"
+    },
+    "builds_url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/dub/builds",
+    "badge_url": "https://badge.buildkite.com/c54d71c42284a042b9d578e28e093dff35f20cc8528319b1b6.svg",
+    "created_at": "2018-07-13T08:02:27.590Z",
+    "env": {
+
+    },
+    "scheduled_builds_count": 0,
+    "running_builds_count": 0,
+    "scheduled_jobs_count": 0,
+    "running_jobs_count": 12,
+    "waiting_jobs_count": 0,
+    "steps": [
+      {
+        "type": "script",
+        "name": ":pipeline:",
+        "command": "wget https://github.com/dlang/ci/raw/master/buildkite.sh\r\n\r\nbash buildkite.sh | buildkite-agent pipeline upload",
+        "artifact_paths": "",
+        "branch_configuration": "",
+        "env": {
+
+        },
+        "timeout_in_minutes": null,
+        "agent_query_rules": [
+
+        ],
+        "concurrency": null,
+        "parallelism": null
+      }
+    ]
+  },
+  {
+    "id": "8f53aef2-67c3-47eb-a36a-eda0eda32616",
+    "url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/phobos",
+    "web_url": "https://buildkite.com/dlang/phobos",
+    "name": "phobos",
+    "description": "",
+    "slug": "phobos",
+    "repository": "https://github.com/dlang/phobos.git",
+    "branch_configuration": null,
+    "default_branch": "master",
+    "skip_queued_branch_builds": true,
+    "skip_queued_branch_builds_filter": "!master !stable",
+    "cancel_running_branch_builds": true,
+    "cancel_running_branch_builds_filter": "!master !stable",
+    "provider": {
+      "id": "github",
+      "settings": {
+        "trigger_mode": "code",
+        "build_pull_requests": true,
+        "pull_request_branch_filter_enabled": false,
+        "skip_pull_request_builds_for_existing_commits": true,
+        "build_pull_request_forks": true,
+        "prefix_pull_request_fork_branch_names": true,
+        "build_tags": false,
+        "publish_commit_status": true,
+        "publish_commit_status_per_step": false,
+        "publish_blocked_as_pending": false,
+        "repository": "dlang/phobos",
+        "pull_request_branch_filter_configuration": ""
+      },
+      "webhook_url": "https://webhook.buildkite.com/deliver/1eabb88c3883923d66571ed4506cc6dd54630b341b7b7f7b2f"
+    },
+    "builds_url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/phobos/builds",
+    "badge_url": "https://badge.buildkite.com/01509e75200b3e9576028fe52c4546d6a6a9ad81aaf31a8790.svg",
+    "created_at": "2018-07-13T08:00:26.538Z",
+    "env": {
+      "CODECOV_TOKEN": "3f2d3077-87e1-43ba-8d96-1e5f5d3ee8dc"
+    },
+    "scheduled_builds_count": 0,
+    "running_builds_count": 0,
+    "scheduled_jobs_count": 0,
+    "running_jobs_count": 12,
+    "waiting_jobs_count": 0,
+    "steps": [
+      {
+        "type": "script",
+        "name": ":pipeline:",
+        "command": "wget https://github.com/dlang/ci/raw/master/buildkite.sh\r\n\r\nbash buildkite.sh | buildkite-agent pipeline upload",
+        "artifact_paths": "",
+        "branch_configuration": "",
+        "env": {
+
+        },
+        "timeout_in_minutes": null,
+        "agent_query_rules": [
+
+        ],
+        "concurrency": null,
+        "parallelism": null
+      }
+    ]
+  },
+  {
+    "id": "24ad6f2d-b931-45b2-8142-f3e4f65b8801",
+    "url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/druntime",
+    "web_url": "https://buildkite.com/dlang/druntime",
+    "name": "druntime",
+    "description": "",
+    "slug": "druntime",
+    "repository": "https://github.com/dlang/druntime.git",
+    "branch_configuration": null,
+    "default_branch": "master",
+    "skip_queued_branch_builds": true,
+    "skip_queued_branch_builds_filter": "!master !stable",
+    "cancel_running_branch_builds": true,
+    "cancel_running_branch_builds_filter": "!master !stable",
+    "provider": {
+      "id": "github",
+      "settings": {
+        "trigger_mode": "code",
+        "build_pull_requests": true,
+        "pull_request_branch_filter_enabled": false,
+        "skip_pull_request_builds_for_existing_commits": true,
+        "build_pull_request_forks": true,
+        "prefix_pull_request_fork_branch_names": true,
+        "build_tags": false,
+        "publish_commit_status": true,
+        "publish_commit_status_per_step": false,
+        "publish_blocked_as_pending": false,
+        "repository": "dlang/druntime",
+        "pull_request_branch_filter_configuration": ""
+      },
+      "webhook_url": "https://webhook.buildkite.com/deliver/c644e480144e780b6b6cb6af9d26128b12ec0341a19eaf1510"
+    },
+    "builds_url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/druntime/builds",
+    "badge_url": "https://badge.buildkite.com/48ab4b9005c947aa3dbf0eeb4125391989c00c9545342b7b24.svg",
+    "created_at": "2018-07-13T07:59:07.880Z",
+    "env": {
+      "CODECOV_TOKEN": "f7b6d243-7bd4-4219-a162-b3e0acdae777"
+    },
+    "scheduled_builds_count": 0,
+    "running_builds_count": 0,
+    "scheduled_jobs_count": 0,
+    "running_jobs_count": 12,
+    "waiting_jobs_count": 0,
+    "steps": [
+      {
+        "type": "script",
+        "name": ":pipeline:",
+        "command": "wget https://github.com/dlang/ci/raw/master/buildkite.sh\r\n\r\nbash buildkite.sh | buildkite-agent pipeline upload",
+        "artifact_paths": "",
+        "branch_configuration": "",
+        "env": {
+
+        },
+        "timeout_in_minutes": null,
+        "agent_query_rules": [
+
+        ],
+        "concurrency": null,
+        "parallelism": null
+      }
+    ]
+  },
+  {
+    "id": "ca4ec211-3eb5-4b3a-ab9d-e31241908e0d",
+    "url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/tools",
+    "web_url": "https://buildkite.com/dlang/tools",
+    "name": "tools",
+    "description": "",
+    "slug": "tools",
+    "repository": "https://github.com/dlang/tools.git",
+    "branch_configuration": null,
+    "default_branch": "master",
+    "skip_queued_branch_builds": true,
+    "skip_queued_branch_builds_filter": "!master !stable",
+    "cancel_running_branch_builds": true,
+    "cancel_running_branch_builds_filter": "!master !stable",
+    "provider": {
+      "id": "github",
+      "settings": {
+        "trigger_mode": "code",
+        "build_pull_requests": true,
+        "pull_request_branch_filter_enabled": false,
+        "skip_pull_request_builds_for_existing_commits": true,
+        "build_pull_request_forks": true,
+        "prefix_pull_request_fork_branch_names": true,
+        "build_tags": false,
+        "publish_commit_status": true,
+        "publish_commit_status_per_step": false,
+        "publish_blocked_as_pending": false,
+        "repository": "dlang/tools",
+        "pull_request_branch_filter_configuration": ""
+      },
+      "webhook_url": "https://webhook.buildkite.com/deliver/2cf26cfa2cf537c3d6946cc11118d5bc1ce612a646643493c8"
+    },
+    "builds_url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/tools/builds",
+    "badge_url": "https://badge.buildkite.com/8cc605b3a89338bc41b144efcd5226acfe6b91c844a8a27ad9.svg",
+    "created_at": "2018-07-13T07:57:23.824Z",
+    "env": {
+
+    },
+    "scheduled_builds_count": 0,
+    "running_builds_count": 0,
+    "scheduled_jobs_count": 0,
+    "running_jobs_count": 0,
+    "waiting_jobs_count": 0,
+    "steps": [
+      {
+        "type": "script",
+        "name": ":pipeline:",
+        "command": "wget https://github.com/dlang/ci/raw/master/buildkite.sh\r\n\r\nbash buildkite.sh | buildkite-agent pipeline upload",
+        "artifact_paths": "",
+        "branch_configuration": "",
+        "env": {
+
+        },
+        "timeout_in_minutes": null,
+        "agent_query_rules": [
+
+        ],
+        "concurrency": null,
+        "parallelism": null
+      }
+    ]
+  },
+  {
+    "id": "beafcb1e-38bd-4988-b80b-da327e525b02",
+    "url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/dmd",
+    "web_url": "https://buildkite.com/dlang/dmd",
+    "name": "dmd",
+    "description": "",
+    "slug": "dmd",
+    "repository": "https://github.com/dlang/dmd.git",
+    "branch_configuration": null,
+    "default_branch": "master",
+    "skip_queued_branch_builds": true,
+    "skip_queued_branch_builds_filter": "!master !stable",
+    "cancel_running_branch_builds": true,
+    "cancel_running_branch_builds_filter": "!master !stable",
+    "provider": {
+      "id": "github",
+      "settings": {
+        "trigger_mode": "code",
+        "build_pull_requests": true,
+        "pull_request_branch_filter_enabled": false,
+        "skip_pull_request_builds_for_existing_commits": true,
+        "build_pull_request_forks": true,
+        "prefix_pull_request_fork_branch_names": true,
+        "build_tags": false,
+        "publish_commit_status": true,
+        "publish_commit_status_per_step": false,
+        "publish_blocked_as_pending": false,
+        "repository": "dlang/dmd",
+        "pull_request_branch_filter_configuration": ""
+      },
+      "webhook_url": "https://webhook.buildkite.com/deliver/d3b3b8dba42c4a3dbe7c6c98867b8501f6bd30404604a4b034"
+    },
+    "builds_url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/dmd/builds",
+    "badge_url": "https://badge.buildkite.com/01239dde8424d69809d08769015bbdb9b90d05082e534d2f82.svg",
+    "created_at": "2018-07-11T09:40:38.772Z",
+    "env": {
+      "CODECOV_TOKEN": "bb98e9c9-5a86-4d53-b8dd-69d98efa3c13"
+    },
+    "scheduled_builds_count": 0,
+    "running_builds_count": 0,
+    "scheduled_jobs_count": 0,
+    "running_jobs_count": 10,
+    "waiting_jobs_count": 0,
+    "steps": [
+      {
+        "type": "script",
+        "name": ":pipeline:",
+        "command": "wget https://github.com/dlang/ci/raw/master/buildkite.sh\r\n\r\nbash buildkite.sh | buildkite-agent pipeline upload",
+        "artifact_paths": "",
+        "branch_configuration": "",
+        "env": {
+
+        },
+        "timeout_in_minutes": null,
+        "agent_query_rules": [
+
+        ],
+        "concurrency": null,
+        "parallelism": null
+      }
+    ]
+  },
+  {
+    "id": "be796035-9c3d-4f51-88b6-48738bad3d0f",
+    "url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/ci",
+    "web_url": "https://buildkite.com/dlang/ci",
+    "name": "ci",
+    "description": "",
+    "slug": "ci",
+    "repository": "https://github.com/dlang/ci.git",
+    "branch_configuration": null,
+    "default_branch": "master",
+    "skip_queued_branch_builds": true,
+    "skip_queued_branch_builds_filter": "!master !stable",
+    "cancel_running_branch_builds": true,
+    "cancel_running_branch_builds_filter": "!master !stable",
+    "provider": {
+      "id": "github",
+      "settings": {
+        "trigger_mode": "code",
+        "build_pull_requests": true,
+        "pull_request_branch_filter_enabled": false,
+        "skip_pull_request_builds_for_existing_commits": true,
+        "build_pull_request_forks": true,
+        "prefix_pull_request_fork_branch_names": true,
+        "build_tags": false,
+        "publish_commit_status": true,
+        "publish_commit_status_per_step": false,
+        "publish_blocked_as_pending": false,
+        "repository": "dlang/ci",
+        "commit_status_404s": 4,
+        "pull_request_branch_filter_configuration": "",
+        "commit_status_error": false
+      },
+      "webhook_url": "https://webhook.buildkite.com/deliver/b195fc6d11a5ec305dea47a6f2ac95a7f3c559abe77888d9ef"
+    },
+    "builds_url": "https://api.buildkite.com/v2/organizations/dlang/pipelines/ci/builds",
+    "badge_url": "https://badge.buildkite.com/7e4ed28182279b460ce787dbc36ba2f5a142843225a9c9ecb8.svg",
+    "created_at": "2018-07-08T19:46:26.978Z",
+    "env": {
+
+    },
+    "scheduled_builds_count": 0,
+    "running_builds_count": 0,
+    "scheduled_jobs_count": 0,
+    "running_jobs_count": 12,
+    "waiting_jobs_count": 0,
+    "steps": [
+      {
+        "type": "script",
+        "name": ":pipeline:",
+        "command": "set -x\r\nif [ \"${BUILDKITE_PULL_REQUEST:-false}\" != \"false\" ]; then\r\n    if ! $(git remote | grep -q upstream) ; then\r\n        git remote add upstream \"${BUILDKITE_REPO}\";\r\n    fi\r\n    git fetch -q upstream \"+refs/pull/${BUILDKITE_PULL_REQUEST}/merge:\";\r\n    git checkout -f FETCH_HEAD;\r\nfi\r\n\r\nbash buildkite.sh | buildkite-agent pipeline upload",
+        "artifact_paths": "",
+        "branch_configuration": "",
+        "env": {
+
+        },
+        "timeout_in_minutes": null,
+        "agent_query_rules": [
+
+        ],
+        "concurrency": null,
+        "parallelism": null
+      }
+    ]
+  }
+]
