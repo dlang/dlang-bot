@@ -21,9 +21,8 @@ matrix:
     - d: dmd-2.078.2 # the deployment compiler
       env: COVERAGE=true
       script:
-        # Use --build-mode=singleFile to workaround https://issues.dlang.org/show_bug.cgi?id=13742
         # Tests are neither random- nor parallelizable atm., so use a --single serial thread.
-        - dub test --compiler=$DC --build=unittest-cov --build-mode=singleFile -- --single --trace
+        - dub test --compiler=$DC --build=unittest-cov -- --single --trace
       after_success:
         - bash <(curl -s https://codecov.io/bash)
   allow_failures:
