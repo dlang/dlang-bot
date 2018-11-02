@@ -35,6 +35,7 @@ struct Server
 
     void decommission()
     {
+        logInfo("decommission scaleway server %s", name);
         action(Action.terminate);
     }
 }
@@ -54,6 +55,8 @@ Server[] servers()
 
 Server createServer(string name, string serverType, Image image)
 {
+    logInfo("provision scaleway %s server %s with image %s", serverType, name, image.name);
+
     auto payload = serializeToJson([
             "organization": scalewayOrg,
             "name": name,
