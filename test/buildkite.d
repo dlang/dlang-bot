@@ -20,6 +20,9 @@ unittest
 unittest
 {
     setAPIExpectations(
+        "/buildkite/organizations/dlang/pipelines/build-release", (ref Json j) {
+            j["scheduled_builds_count"] = 1;
+        },
         "/scaleway/servers", (ref Json j) {
             j["servers"] = Json.emptyArray;
         },
@@ -48,6 +51,9 @@ unittest
 unittest
 {
     setAPIExpectations(
+        "/buildkite/organizations/dlang/pipelines/build-release", (ref Json j) {
+            j["scheduled_builds_count"] = 1;
+        },
         "/scaleway/servers",
     );
 
@@ -58,6 +64,9 @@ unittest
 unittest
 {
     setAPIExpectations(
+        "/buildkite/organizations/dlang/pipelines/build-release", (ref Json j) {
+            j["scheduled_builds_count"] = 2;
+        },
         "/scaleway/servers",
         "/scaleway/images",
         "/scaleway/servers",
@@ -77,9 +86,7 @@ unittest
         }
     );
 
-    postBuildkiteHook("build_scheduled_build-release.json", (ref Json j, scope req) {
-        j["pipeline"]["scheduled_builds_count"] = 2;
-    });
+    postBuildkiteHook("build_scheduled_build-release.json");
 }
 
 //==============================================================================

@@ -42,7 +42,7 @@ void verifyAgentRequest(string authentication)
 void handleBuild(in ref Build build, in ref Pipeline p)
 {
     if (p.name == "build-release")
-        provisionReleaseBuilder(p.scheduledBuildsCount + p.runningBuildsCount);
+        provisionReleaseBuilder(numReleaseBuilds);
     else
         provisionCIAgent(numCIBuilds);
 }
