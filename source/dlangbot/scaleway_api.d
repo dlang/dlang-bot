@@ -13,7 +13,7 @@ import vibe.stream.operations : readAllUTF8;
 import dlangbot.utils : request;
 
 string scalewayAPIURL = "https://dp-par1.scaleway.com";
-string scalewayAuth;
+string scalewayAuth, scalewayOrg;
 
 //==============================================================================
 // Scaleway (Bare Metal) servers
@@ -50,7 +50,7 @@ Server[] servers()
 Server createServer(string name, string commercialType, Image image)
 {
     auto payload = serializeToJson([
-            "organization": image.organization,
+            "organization": scalewayOrg,
             "name": name,
             "image": image.id,
             "commercial_type": commercialType]);

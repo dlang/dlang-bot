@@ -45,6 +45,7 @@ shared static this()
     buildkiteAuth = "Bearer abcdef";
     buildkiteHookSecret = "1234567890";
     scalewayAuth = "89f66bbd-f2f0-4f95-9382-56d141c1c09e";
+    scalewayOrg = "aa435976-67f1-455c-b988-f4dc04c91f40";
     dlangbotAgentAuth = "Bearer fjSL8ITFkOxS5PF9p5lM41mox";
 
     // start our hook server

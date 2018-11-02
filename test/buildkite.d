@@ -22,6 +22,7 @@ unittest
             assert(req.json["name"].get!string.startsWith("release-builder-"));
             auto name = req.json["name"].get!string;
             assert(req.json["image"] == "5e2333ca-278b-40cb-8a50-22ed6a659063");
+            assert(req.json["organization"] == "aa435976-67f1-455c-b988-f4dc04c91f40");
             res.writeJsonBody(["server": ["id": "a4919456-92a2-4cab-b503-ca13aa14c786", "name": name, "state": "stopped"]]);
         },
         "/scaleway/servers/a4919456-92a2-4cab-b503-ca13aa14c786/action",
@@ -57,6 +58,7 @@ unittest
             assert(req.json["name"].get!string.startsWith("release-builder-"));
             auto name = req.json["name"].get!string;
             assert(req.json["image"] == "5e2333ca-278b-40cb-8a50-22ed6a659063");
+            assert(req.json["organization"] == "aa435976-67f1-455c-b988-f4dc04c91f40");
             res.writeJsonBody(["server": ["id": "c9660dc8-cdd9-426c-99c8-1155a568d53e", "name": name, "state": "stopped"]]);
         },
         "/scaleway/servers/c9660dc8-cdd9-426c-99c8-1155a568d53e/action",
@@ -125,6 +127,7 @@ unittest
             assert(req.json["name"].get!string.startsWith("release-builder-"));
             auto name = req.json["name"].get!string;
             assert(req.json["image"] == "5e2333ca-278b-40cb-8a50-22ed6a659063");
+            assert(req.json["organization"] == "aa435976-67f1-455c-b988-f4dc04c91f40");
             res.writeJsonBody(["server": ["id": "c9660dc8-cdd9-426c-99c8-1155a568d53e", "name": name, "state": "stopped"]]);
         },
         "/scaleway/servers/c9660dc8-cdd9-426c-99c8-1155a568d53e/action",

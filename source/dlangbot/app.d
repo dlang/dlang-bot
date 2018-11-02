@@ -11,7 +11,7 @@ public import dlangbot.github_api   : githubAPIURL, githubAuth, githubHookSecret
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
 public import dlangbot.twitter : oAuth, tweet, twitterURL, twitterEnabled;
 public import dlangbot.buildkite : buildkiteAPIURL, buildkiteAuth, buildkiteHookSecret, dlangbotAgentAuth;
-public import dlangbot.scaleway_api : scalewayAPIURL, scalewayAuth;
+public import dlangbot.scaleway_api : scalewayAPIURL, scalewayAuth, scalewayOrg;
 
 import std.datetime : Clock, days, Duration, minutes, seconds, SysTime;
 
