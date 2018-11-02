@@ -69,7 +69,7 @@ void trelloHook(HTTPServerRequest req, HTTPServerResponse res)
     import std.array : array;
     import dlangbot.trello : verifyRequest;
 
-    auto json = verifyRequest(req.headers["X-Trello-Webhook"], req.bodyReader.readAllUTF8, trelloHookURL);
+    auto json = verifyRequest(req.headers.get("X-Trello-Webhook"), req.bodyReader.readAllUTF8, trelloHookURL);
     logDebug("trelloHook: %s", json);
     auto action = json["action"]["type"].get!string;
     switch (action)
@@ -93,9 +93,9 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
     import std.functional : toDelegate;
     import dlangbot.github : verifyRequest;
 
-    auto json = verifyRequest(req.headers["X-Hub-Signature"], req.bodyReader.readAllUTF8);
+    auto json = verifyRequest(req.headers.get("X-Hub-Signature"), req.bodyReader.readAllUTF8);
     logDebug("githubHook: %s", json);
-    switch (req.headers["X-GitHub-Event"])
+    switch (req.headers.get("X-GitHub-Event"))
     {
     case "ping":
         return res.writeBody("handled");
@@ -294,9 +294,9 @@ void buildkiteHook(HTTPServerRequest req, HTTPServerResponse res)
 {
     import dlangbot.buildkite : Build, handleBuild, Pipeline, verifyRequest;
 
-    auto json = verifyRequest(req.headers["X-Buildkite-Token"], req.bodyReader.readAllUTF8);
+    auto json = verifyRequest(req.headers.get("X-Buildkite-Token"), req.bodyReader.readAllUTF8);
     logDebug("buildkiteHook: %s", json);
-    switch (req.headers["X-Buildkite-Event"])
+    switch (req.headers.get("X-Buildkite-Event"))
     {
     case "ping":
         return res.writeBody("handled");
