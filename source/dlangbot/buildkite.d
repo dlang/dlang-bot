@@ -1,9 +1,13 @@
 module dlangbot.buildkite;
 
+import std.algorithm : filter, find, startsWith;
 import std.datetime.systime;
+import std.range : empty, front, walkLength;
+import std.uuid : randomUUID;
 
-import vibe.data.json;
+import vibe.core.log : logWarn;
 import vibe.data.json : Name = name;
+import vibe.data.json;
 import vibe.http.client : HTTPClientRequest;
 import vibe.http.common : enforceHTTP, HTTPStatus;
 
@@ -38,9 +42,9 @@ void verifyAgentRequest(string authentication)
 void handleBuild(in ref Build build, in ref Pipeline p)
 {
     if (p.name == "build-release")
-        scaleReleaseBuilder(p.scheduledBuildsCount + p.runningBuildsCount);
+        provisionReleaseBuilder(p.scheduledBuildsCount + p.runningBuildsCount);
     else
-        scaleCIAgent(ciBuilds);
+        provisionCIAgent(numCIBuilds);
 }
 
 void agentShutdownCheck(string hostname)
@@ -48,73 +52,78 @@ void agentShutdownCheck(string hostname)
     import std.algorithm : startsWith;
 
     if (hostname.startsWith("release-builder-"))
-    {
-        const p = pipeline("build-release");
-        scaleReleaseBuilder(p.scheduledBuildsCount + p.runningBuildsCount, hostname);
-    }
+        decommissionReleaseBuilder(numReleaseBuilds, hostname);
     else if (hostname.startsWith("ci-agent-"))
-        scaleCIAgent(ciBuilds, hostname);
+        decommissionCIAgent(numCIBuilds, hostname);
 }
 
-private void scaleReleaseBuilder(uint nbuilds, string serverToDecommision = null)
+private void provisionReleaseBuilder(uint nbuilds)
 {
-    import std.algorithm : filter, find, startsWith;
-    import std.array : front;
-    import std.range : empty, walkLength;
-    import std.uuid : randomUUID;
-    import vibe.core.log : logWarn;
+    auto servers = scw.servers;
+    immutable nservers = servers.filter!(s => s.name.startsWith("release-builder-")).walkLength;
 
-    assert(serverToDecommision == null || serverToDecommision.startsWith("release-builder-"));
+    if (nservers >= nbuilds)
+        return;
+
+    immutable img = scw.images.find!(i => i.name == "release-builder").front;
+    foreach (_; nservers .. nbuilds)
+        scw.createServer("release-builder-" ~ randomUUID().toString, "C2S", img).action(scw.Server.Action.poweron);
+}
+
+private void decommissionReleaseBuilder(uint nbuilds, string hostname)
+{
+    assert(hostname.startsWith("release-builder-"));
 
     auto servers = scw.servers;
     immutable nservers = servers.filter!(s => s.name.startsWith("release-builder-")).walkLength;
 
-    if (nservers < nbuilds)
-    {
-        immutable img = scw.images.find!(i => i.name == "release-builder").front;
-        foreach (_; nservers .. nbuilds)
-            scw.createServer("release-builder-" ~ randomUUID().toString, "C2S", img).action(scw.Server.Action.poweron);
-    }
-    else if (nbuilds < nservers && serverToDecommision != null)
-    {
-        servers = servers.find!(s => s.name == serverToDecommision);
-        if (servers.empty)
-            logWarn("Failed to find server to decommission %s", serverToDecommision);
-        else
-            servers.front.decommission();
-    }
+    if (nbuilds >= nservers)
+        return;
+
+    servers = servers.find!(s => s.name == hostname);
+    if (servers.empty)
+        logWarn("Failed to find server to decommission %s", hostname);
+    else
+        servers.front.decommission();
 }
 
-private void scaleCIAgent(uint nbuilds, string serverToDecommision = null)
+private void provisionCIAgent(uint nbuilds)
 {
-    import std.algorithm : filter, find, startsWith;
-    import std.array : front;
-    import std.range : empty, walkLength;
-    import std.uuid : randomUUID;
-    import vibe.core.log : logWarn;
+    auto servers = hc.servers;
+    immutable nservers = servers.filter!(s => s.name.startsWith("ci-agent-")).walkLength;
 
-    assert(serverToDecommision == null || serverToDecommision.startsWith("ci-agent-"));
+    if (nservers >= nbuilds)
+        return;
+
+    immutable img = hc.images(hc.Image.Type.snapshot).find!(i => i.description == "ci-agent").front;
+    foreach (_; nservers .. nbuilds)
+        hc.createServer("ci-agent-" ~ randomUUID().toString, "cx51", img);
+}
+
+private void decommissionCIAgent(uint nbuilds, string hostname)
+{
+    assert(hostname.startsWith("ci-agent-"));
 
     auto servers = hc.servers;
     immutable nservers = servers.filter!(s => s.name.startsWith("ci-agent-")).walkLength;
 
-    if (nservers < nbuilds)
-    {
-        immutable img = hc.images(hc.Image.Type.snapshot).find!(i => i.description == "ci-agent").front;
-        foreach (_; nservers .. nbuilds)
-            hc.createServer("ci-agent-" ~ randomUUID().toString, "cx51", img);
-    }
-    else if (nbuilds < nservers && serverToDecommision != null)
-    {
-        servers = servers.find!(s => s.name == serverToDecommision);
-        if (servers.empty)
-            logWarn("Failed to find server to decommission %s", serverToDecommision);
-        else
-            servers.front.decommission();
-    }
+    if (nbuilds >= nservers)
+        return;
+
+    servers = servers.find!(s => s.name == hostname);
+    if (servers.empty)
+        logWarn("Failed to find server to decommission %s", hostname);
+    else
+        servers.front.decommission();
 }
 
-private uint ciBuilds()
+private uint numReleaseBuilds()
+{
+    auto p = pipeline("build-release");
+    return p.scheduledBuildsCount + p.runningBuildsCount;
+}
+
+private uint numCIBuilds()
 {
     import std.algorithm : filter, fold;
 
