@@ -12,7 +12,7 @@ import vibe.stream.operations : readAllUTF8;
 
 import dlangbot.utils : request;
 
-string scalewayAPIURL = "https://dp-par1.scaleway.com";
+string scalewayAPIURL = "https://cp-par1.scaleway.com";
 string scalewayAuth, scalewayOrg;
 
 //==============================================================================
@@ -35,6 +35,7 @@ struct Server
 
     void decommission()
     {
+        logInfo("decommission scaleway server %s", name);
         action(Action.terminate);
     }
 }
@@ -54,6 +55,8 @@ Server[] servers()
 
 Server createServer(string name, string serverType, Image image)
 {
+    logInfo("provision scaleway %s server %s with image %s", serverType, name, image.name);
+
     auto payload = serializeToJson([
             "organization": scalewayOrg,
             "name": name,

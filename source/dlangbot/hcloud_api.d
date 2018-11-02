@@ -29,6 +29,7 @@ struct Server
 
     void decommission()
     {
+        logInfo("decommission hcloud server %s", name);
         hcloudDELETE("/servers/%s".format(id));
     }
 }
@@ -50,6 +51,8 @@ Server[] servers()
 Server createServer(string name, string serverType, Image image)
 {
     import std.conv : to;
+
+    logInfo("provision hcloud %s server %s with image %s", serverType, name, image.description);
 
     return hcloudPOST("/servers",
         [
