@@ -13,7 +13,7 @@ import vibe.stream.operations : readAllUTF8;
 
 import dlangbot.utils : request;
 
-string hcloudAPIURL = "https://api.hetzner.cloud/v1/";
+string hcloudAPIURL = "https://api.hetzner.cloud/v1";
 string hcloudAuth;
 
 //==============================================================================
