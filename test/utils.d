@@ -370,9 +370,10 @@ void postAgentShutdownCheck(string hostname, int line = __LINE__, string file = 
 
     logInfo("Starting test in %s:%d with hostname %s", file, line, hostname);
 
-    auto req = requestHTTP(testServerURL ~ "/agent_shutdown_check?hostname=" ~ urlEncode(hostname), (scope req) {
+    auto req = requestHTTP(testServerURL ~ "/agent_shutdown_check", (scope req) {
         req.method = HTTPMethod.POST;
         req.headers["Authentication"] = dlangbotAgentAuth;
+        req.writeFormBody(["hostname": hostname]);
     });
     scope(failure) {
         if (req.statusCode != 200)
