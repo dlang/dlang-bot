@@ -128,7 +128,8 @@ private uint numCIBuilds()
     import std.algorithm : filter, fold;
 
     return pipelines.filter!(p => p.defaultQueue)
-        .fold!((sum, p) => sum + p.scheduledBuildsCount + p.runningBuildsCount)(0);
+        .fold!((sum, p) => sum + p.scheduledBuildsCount + 0.99f * p.runningBuildsCount)(0.0f)
+        .to!uint;
 }
 
 //==============================================================================
