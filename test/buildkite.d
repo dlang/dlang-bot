@@ -156,6 +156,31 @@ unittest
     postBuildkiteHook("build_scheduled_dmd.json");
 }
 
+@("reuses-existing-agent-from-current-build")
+unittest
+{
+    setAPIExpectations(
+        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
+            j[].find!(p => p["name"] == "dmd")[0]["running_builds_count"] = 2;
+            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
+        },
+        "/hcloud/servers",
+        "/hcloud/images?type=snapshot",
+        "/hcloud/servers",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.POST);
+            auto name = req.json["name"].get!string;
+            assert(name.startsWith("ci-agent-"));
+            assert(req.json["image"] == "1456126");
+            auto resp = serializeToJson(["name": name, "status": "initializing"]);
+            resp["id"] = 1321994;
+            res.writeJsonBody(resp);
+        },
+    );
+
+    postBuildkiteHook("build_scheduled_dmd.json");
+}
+
 //==============================================================================
 // agent shutdown check
 //==============================================================================
