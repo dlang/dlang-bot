@@ -99,7 +99,7 @@ private void provisionCIAgent(uint nbuilds)
 
     immutable img = hc.images(hc.Image.Type.snapshot).find!(i => i.description == "ci-agent").front;
     foreach (_; nservers .. nbuilds)
-        hc.createServer("ci-agent-" ~ randomUUID().toString, "cx51", img);
+        hc.createServer("ci-agent-" ~ randomUUID().toString, "cx41", img);
 }
 
 private void decommissionCIAgent(uint nbuilds, string hostname)
