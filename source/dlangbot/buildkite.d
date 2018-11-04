@@ -5,7 +5,7 @@ import std.datetime.systime;
 import std.range : empty, front, walkLength;
 import std.uuid : randomUUID;
 
-import vibe.core.log : logInfo, logWarn;
+import vibe.core.log : logDebug, logInfo, logWarn;
 import vibe.data.json : Name = name;
 import vibe.data.json;
 import vibe.http.client : HTTPClientRequest;
@@ -125,14 +125,45 @@ private uint numReleaseBuilds()
     return p.scheduledBuildsCount + p.runningBuildsCount;
 }
 
+/// estimate number of scheduled compute-hours
 private uint numCIBuilds()
 {
-    import std.algorithm : filter, fold;
+    import core.time : Duration, hours, minutes, seconds;
+    import std.algorithm : clamp, filter, fold, map, max, mean, sum;
     import std.conv : to;
+    import std.datetime.timezone : UTC;
+    import std.math : ceil;
 
-    return pipelines.filter!(p => p.defaultQueue)
-        .fold!((sum, p) => sum + p.scheduledBuildsCount + 0.99f * p.runningBuildsCount)(0.0f)
-        .to!uint;
+    immutable now = Clock.currTime(UTC());
+    auto workload = Duration.zero;
+
+    foreach (p; pipelines.filter!(p => p.defaultQueue))
+    {
+        if (!p.scheduledBuildsCount && !p.runningBuildsCount)
+            continue;
+
+        auto builds = p.builds(Build.State.passed, 10);
+        immutable avgTime = builds.map!(b => b.finishedAt - b.startedAt).mean(Duration.zero);
+
+        if (avgTime <= Duration.zero) // assume 1 hour per build
+        {
+            logWarn("avgTime for %s is unknown", p.name);
+            workload += (p.scheduledBuildsCount + p.runningBuildsCount).hours;
+            continue;
+        }
+        logDebug("avgTime for %s is %s", p.name, avgTime);
+
+        workload += p.scheduledBuildsCount * avgTime;
+        if (p.runningBuildsCount)
+        {
+            builds = p.builds(Build.State.running);
+            workload += builds.map!(b => clamp(avgTime - (now - b.startedAt), 1.seconds, avgTime)).sum(Duration.zero);
+        }
+    }
+    // round up to number of compute-hours to match hourly billing
+    immutable workloadHours = (workload.total!"seconds" / 3600.0).ceil.to!uint;
+    logInfo("scheduled ci workload ≅ %s, rounded to %s hours", workload, workloadHours);
+    return workloadHours;
 }
 
 //==============================================================================
@@ -159,14 +190,24 @@ struct Pipeline
         @Name("agent_query_rules") string[] agentQueryRules;
     }
     Step[] steps;
+
+    Build[] builds(Build.State state, uint perPage=100, uint page=1)
+    {
+        import std.string : format;
+
+        return bkGET("/organizations/dlang/pipelines/%s/builds?state=%s&per_page=%s&page=%s".format(
+                name, state, perPage, page))
+            .readJson
+            .deserializeJson!(typeof(return));
+    }
 }
 
 struct Build
 {
-    enum State { scheduled, passed, failed, cancelled }
+    enum State { running, scheduled, passed, failed, blocked, canceled, canceling, skipped, not_run, finished }
     @byName State state;
-    string branch, commit;
-    @Name("meta_data") string[string] metadata;
+    @optional @Name("started_at") SysTime startedAt;
+    @optional @Name("finished_at") SysTime finishedAt;
 }
 
 struct Agent
