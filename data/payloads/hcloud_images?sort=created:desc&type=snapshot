@@ -1,6 +1,29 @@
 {
   "images": [
     {
+      "id": 1461991,
+      "type": "snapshot",
+      "status": "available",
+      "name": null,
+      "description": "ci-agent",
+      "image_size": 1.13463800878906,
+      "disk_size": 20,
+      "created": "2018-11-03T01:28:33+00:00",
+      "created_from": {
+        "id": 1323136,
+        "name": "gen-ci-agent-image"
+      },
+      "bound_to": null,
+      "os_flavor": "ubuntu",
+      "os_version": null,
+      "rapid_deploy": false,
+      "protection": {
+        "delete": false
+      },
+      "deprecated": null,
+      "labels": {}
+    },
+    {
       "id": 1456126,
       "type": "snapshot",
       "status": "available",
