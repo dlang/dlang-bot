@@ -322,7 +322,9 @@ void agentShutdownCheck(HTTPServerRequest req, HTTPServerResponse res)
     import std.algorithm.searching : startsWith;
 
     verifyAgentRequest(req.headers.get("Authentication"));
-    agentShutdownCheck(req.form.get("hostname"));
+    auto hostname = req.form.get("hostname");
+    logInfo("agentShutdownCheck hostname:%s", hostname);
+    agentShutdownCheck(hostname);
     res.writeBody("");
 }
 
