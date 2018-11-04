@@ -66,7 +66,7 @@ Server createServer(string name, string serverType, Image image)
 
 Image[] images()
 {
-    return hcloudGET("/images")
+    return hcloudGET("/images?sort=created:desc")
         .readJson
         .deserializeJson!(typeof(return));
 }
@@ -76,7 +76,7 @@ Image[] images(Image.Type type)
     import std.conv : to;
     import vibe.textfilter.urlencode : urlEncode;
 
-    return hcloudGET("/images?type="~type.to!string.urlEncode)
+    return hcloudGET("/images?sort=created:desc&type="~type.to!string.urlEncode)
         .readJson["images"]
         .deserializeJson!(typeof(return));
 }

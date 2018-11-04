@@ -72,7 +72,9 @@ Image[] images()
 {
     return scwGET("/images")
         .readJson["images"]
-        .deserializeJson!(typeof(return));
+        .deserializeJson!(typeof(return))
+        .sort!((a, b) => a.creationDate > b.creationDate)
+        .release;
 }
 
 private:
