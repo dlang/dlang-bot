@@ -93,6 +93,28 @@ unittest
 // CI-Agents on Hetzner Cloud
 //==============================================================================
 
+Json hcloudCreateServerResp(ulong id, string name)
+{
+    import core.time : Duration;
+    import std.datetime.systime : Clock;
+    import std.datetime.timezone : SimpleTimeZone;
+    import std.file : readText;
+    import vibe.data.json : parseJsonString;
+
+    // use zulu to get +00:00 instead of Z suffix
+    static zulu = new immutable SimpleTimeZone(Duration.zero, "Etc/Zulu");
+    auto now = Clock.currTime(zulu);
+    now.fracSecs = Duration.zero;
+    auto time = now.toISOExtString;
+
+    auto json = "data/payloads/hcloud_servers_post".readText.parseJsonString;
+    json["server"]["id"] = id;
+    json["server"]["name"] = name;
+    json["server"]["created"] = time;
+    json["action"]["started"] = time;
+    return json;
+}
+
 @("spawns-ci-agent")
 unittest
 {
@@ -110,9 +132,7 @@ unittest
             auto name = req.json["name"].get!string;
             assert(name.startsWith("ci-agent-"));
             assert(req.json["image"] == "1456126");
-            auto resp = serializeToJson(["name": name, "status": "initializing"]);
-            resp["id"] = 1321993;
-            res.writeJsonBody(resp);
+            res.writeJsonBody(hcloudCreateServerResp(1321993, name));
         },
     );
 
@@ -147,9 +167,7 @@ unittest
             auto name = req.json["name"].get!string;
             assert(name.startsWith("ci-agent-"));
             assert(req.json["image"] == "1456126");
-            auto resp = serializeToJson(["name": name, "status": "initializing"]);
-            resp["id"] = 1321994;
-            res.writeJsonBody(resp);
+            res.writeJsonBody(hcloudCreateServerResp(1321994, name));
         },
     );
 
@@ -172,9 +190,7 @@ unittest
             auto name = req.json["name"].get!string;
             assert(name.startsWith("ci-agent-"));
             assert(req.json["image"] == "1456126");
-            auto resp = serializeToJson(["name": name, "status": "initializing"]);
-            resp["id"] = 1321994;
-            res.writeJsonBody(resp);
+            res.writeJsonBody(hcloudCreateServerResp(1321994, name));
         },
     );
 
