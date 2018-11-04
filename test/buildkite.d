@@ -122,6 +122,7 @@ unittest
         "/buildkite/organizations/dlang/pipelines", (ref Json j) {
             j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
         },
+        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=passed&per_page=10&page=1",
         "/hcloud/servers", (ref Json j) {
             j["servers"] = Json.emptyArray;
         },
@@ -146,6 +147,7 @@ unittest
         "/buildkite/organizations/dlang/pipelines", (ref Json j) {
             j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
         },
+        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=passed&per_page=10&page=1",
         "/hcloud/servers",
     );
 
@@ -158,7 +160,10 @@ unittest
     setAPIExpectations(
         "/buildkite/organizations/dlang/pipelines", (ref Json j) {
             j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 2;
+            j[].find!(p => p["name"] == "phobos")[0]["scheduled_builds_count"] = 1;
         },
+        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=passed&per_page=10&page=1",
+        "/buildkite/organizations/dlang/pipelines/phobos/builds?state=passed&per_page=10&page=1",
         "/hcloud/servers",
         "/hcloud/images?sort=created:desc&type=snapshot",
         "/hcloud/servers",
@@ -174,24 +179,26 @@ unittest
     postBuildkiteHook("build_scheduled_dmd.json");
 }
 
-@("reuses-existing-agent-from-current-build")
+@("reuses-existing-agent-from-running-builds")
 unittest
 {
+    import core.time : minutes;
+    import std.datetime.systime : Clock;
+    import std.datetime.timezone : UTC;
+
     setAPIExpectations(
         "/buildkite/organizations/dlang/pipelines", (ref Json j) {
             j[].find!(p => p["name"] == "dmd")[0]["running_builds_count"] = 2;
-            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
+            j[].find!(p => p["name"] == "phobos")[0]["scheduled_builds_count"] = 1;
+        },
+        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=passed&per_page=10&page=1",
+        "/buildkite/organizations/dlang/pipelines/phobos/builds?state=passed&per_page=10&page=1",
+        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=running&per_page=100&page=1", (ref Json j) {
+            j ~= j[0].clone;
+            j[0]["started_at"] = (Clock.currTime(UTC()) - 15.minutes).toISOExtString;
+            j[1]["started_at"] = (Clock.currTime(UTC()) - 5.minutes).toISOExtString;
         },
         "/hcloud/servers",
-        "/hcloud/images?sort=created:desc&type=snapshot",
-        "/hcloud/servers",
-        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
-            assert(req.method == HTTPMethod.POST);
-            auto name = req.json["name"].get!string;
-            assert(name.startsWith("ci-agent-"));
-            assert(req.json["image"] == "1461991");
-            res.writeJsonBody(hcloudCreateServerResp(1321994, name));
-        },
     );
 
     postBuildkiteHook("build_scheduled_dmd.json");
@@ -260,6 +267,7 @@ unittest
         "/buildkite/organizations/dlang/pipelines", (ref Json j) {
             j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
         },
+        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=passed&per_page=10&page=1",
         "/hcloud/servers",
     );
 
