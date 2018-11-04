@@ -60,7 +60,7 @@ Server createServer(string name, string serverType, Image image)
             "server_type": serverType,
             "image": image.id.to!string,
         ])
-        .readJson
+        .readJson["server"]
         .deserializeJson!(typeof(return));
 }
 

@@ -5,7 +5,7 @@ import std.datetime.systime;
 import std.range : empty, front, walkLength;
 import std.uuid : randomUUID;
 
-import vibe.core.log : logWarn;
+import vibe.core.log : logInfo, logWarn;
 import vibe.data.json : Name = name;
 import vibe.data.json;
 import vibe.http.client : HTTPClientRequest;
@@ -62,6 +62,7 @@ private void provisionReleaseBuilder(uint nbuilds)
     auto servers = scw.servers;
     immutable nservers = servers.filter!(s => s.name.startsWith("release-builder-")).walkLength;
 
+    logInfo("check provision release-builder nservers: %s, nbuilds: %s", nservers, nbuilds);
     if (nservers >= nbuilds)
         return;
 
@@ -92,6 +93,7 @@ private void provisionCIAgent(uint nbuilds)
     auto servers = hc.servers;
     immutable nservers = servers.filter!(s => s.name.startsWith("ci-agent-")).walkLength;
 
+    logInfo("check provision ci-agent nservers: %s, nbuilds: %s", nservers, nbuilds);
     if (nservers >= nbuilds)
         return;
 
@@ -126,6 +128,7 @@ private uint numReleaseBuilds()
 private uint numCIBuilds()
 {
     import std.algorithm : filter, fold;
+    import std.conv : to;
 
     return pipelines.filter!(p => p.defaultQueue)
         .fold!((sum, p) => sum + p.scheduledBuildsCount + 0.99f * p.runningBuildsCount)(0.0f)

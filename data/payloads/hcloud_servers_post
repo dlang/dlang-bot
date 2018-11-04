@@ -1,0 +1,168 @@
+{
+  "action": {
+    "id": 7520113,
+    "command": "create_server",
+    "finished": null,
+    "progress": 0,
+    "started": "2018-11-04T14:27:32+00:00",
+    "resources": [
+      {
+        "type": "server",
+        "id": 1327609
+      }
+    ],
+    "error": null,
+    "status": "running"
+  },
+  "root_password": "GtcME1gnfIyRot7PPNTw",
+  "server": {
+    "outgoing_traffic": 0,
+    "id": 1327609,
+    "rescue_enabled": false,
+    "image": {
+      "protection": {
+        "delete": false
+      },
+      "image_size": 1.13463800878906,
+      "id": 1461991,
+      "created_from": {
+        "id": 1323136,
+        "name": "gen-ci-agent-image"
+      },
+      "disk_size": 20,
+      "deprecated": null,
+      "bound_to": null,
+      "name": null,
+      "labels": {},
+      "os_version": null,
+      "type": "snapshot",
+      "description": "ci-agent",
+      "created": "2018-11-03T01:28:33+00:00",
+      "os_flavor": "ubuntu",
+      "rapid_deploy": false,
+      "status": "available"
+    },
+    "locked": false,
+    "datacenter": {
+      "description": "Helsinki 1 DC 2",
+      "location": {
+        "country": "FI",
+        "id": 3,
+        "name": "hel1",
+        "city": "Helsinki",
+        "longitude": 24.938379,
+        "description": "Helsinki DC Park 1",
+        "latitude": 60.169855
+      },
+      "server_types": {
+        "supported": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "available": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "id": 3,
+      "name": "hel1-dc2"
+    },
+    "iso": null,
+    "included_traffic": 21990232555520,
+    "name": "ci-agent-d9f239eb-1434-4a5c-9568-4897b36ff061",
+    "server_type": {
+      "prices": [
+        {
+          "location": "fsn1",
+          "price_hourly": {
+            "gross": "0.0047600000000000",
+            "net": "0.0040000000"
+          },
+          "price_monthly": {
+            "gross": "2.9631000000000000",
+            "net": "2.4900000000"
+          }
+        },
+        {
+          "location": "nbg1",
+          "price_hourly": {
+            "gross": "0.0047600000000000",
+            "net": "0.0040000000"
+          },
+          "price_monthly": {
+            "gross": "2.9631000000000000",
+            "net": "2.4900000000"
+          }
+        },
+        {
+          "location": "hel1",
+          "price_hourly": {
+            "gross": "0.0047600000000000",
+            "net": "0.0040000000"
+          },
+          "price_monthly": {
+            "gross": "2.9631000000000000",
+            "net": "2.4900000000"
+          }
+        }
+      ],
+      "id": 1,
+      "memory": 2,
+      "name": "cx51",
+      "cpu_type": "shared",
+      "description": "CX51",
+      "storage_type": "local",
+      "disk": 20,
+      "cores": 1
+    },
+    "labels": {},
+    "volumes": [],
+    "ingoing_traffic": 0,
+    "public_net": {
+      "ipv6": {
+        "blocked": false,
+        "ip": "2a01:4f9:c010:292b::/64",
+        "dns_ptr": []
+      },
+      "ipv4": {
+        "blocked": false,
+        "ip": "95.216.192.196",
+        "dns_ptr": "static.196.192.216.95.clients.your-server.de"
+      },
+      "floating_ips": []
+    },
+    "backup_window": null,
+    "created": "2018-11-04T14:27:32+00:00",
+    "protection": {
+      "rebuild": false,
+      "delete": false
+    },
+    "status": "initializing"
+  }
+}

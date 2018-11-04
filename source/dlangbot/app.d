@@ -47,7 +47,7 @@ void startServer(HTTPServerSettings settings)
         .get("/", (req, res) => res.render!"index.dt")
         .get("*", serveStaticFiles("public"))
         .post("/github_hook", &githubHook)
-        .match(HTTPMethod.HEAD, "/trello_hook", (HTTPServerRequest req, HTTPServerResponse res) => res.writeVoidBody)
+        .match(HTTPMethod.HEAD, "/trello_hook", (HTTPServerRequest req, HTTPServerResponse res) => res.writeBody(""))
         .post("/trello_hook", &trelloHook)
         .post("/codecov_hook", &codecovHook)
         .post("/buildkite_hook", &buildkiteHook)
@@ -144,7 +144,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
         return res.writeBody("handled");
 
     default:
-        return res.writeVoidBody();
+        return res.writeBody("");
     }
 }
 
@@ -309,7 +309,7 @@ void buildkiteHook(HTTPServerRequest req, HTTPServerResponse res)
         break;
 
     default:
-        return res.writeVoidBody();
+        return res.writeBody("");
     }
     return res.writeBody("handled");
 }
@@ -322,7 +322,9 @@ void agentShutdownCheck(HTTPServerRequest req, HTTPServerResponse res)
     import std.algorithm.searching : startsWith;
 
     verifyAgentRequest(req.headers.get("Authentication"));
-    agentShutdownCheck(req.form.get("hostname"));
+    auto hostname = req.form.get("hostname");
+    logInfo("agentShutdownCheck hostname:%s", hostname);
+    agentShutdownCheck(hostname);
     res.writeBody("");
 }
 
