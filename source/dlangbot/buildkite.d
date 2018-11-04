@@ -128,6 +128,7 @@ private uint numReleaseBuilds()
 private uint numCIBuilds()
 {
     import std.algorithm : filter, fold;
+    import std.conv : to;
 
     return pipelines.filter!(p => p.defaultQueue)
         .fold!((sum, p) => sum + p.scheduledBuildsCount + 0.99f * p.runningBuildsCount)(0.0f)
