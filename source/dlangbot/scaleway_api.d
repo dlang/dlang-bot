@@ -22,7 +22,7 @@ string scalewayAuth, scalewayOrg;
 struct Server
 {
     string id, name;
-    enum State { running, stopped }
+    enum State { running, stopped, starting }
     @byName State state;
 
     enum Action { poweron, poweroff, terminate }
