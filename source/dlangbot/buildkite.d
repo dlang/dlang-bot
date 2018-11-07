@@ -1,7 +1,8 @@
 module dlangbot.buildkite;
 
-import std.algorithm : filter, find, startsWith;
+import std.algorithm : canFind, filter, find, startsWith;
 import std.datetime.systime;
+import std.exception : enforce;
 import std.range : empty, front, walkLength;
 import std.uuid : randomUUID;
 
@@ -9,13 +10,13 @@ import vibe.core.log : logDebug, logInfo, logWarn;
 import vibe.data.json : Name = name;
 import vibe.data.json;
 import vibe.http.client : HTTPClientRequest;
-import vibe.http.common : enforceHTTP, HTTPStatus;
+import vibe.http.common : enforceHTTP, HTTPStatus, HTTPMethod;
 
 import dlangbot.utils : request;
 static import scw=dlangbot.scaleway_api;
 static import hc=dlangbot.hcloud_api;
 
-string buildkiteAPIURL = "https://api.buildkite.com/v2";
+string buildkiteAPIURL = "https://graphql.buildkite.com/v1";
 string buildkiteAuth, buildkiteHookSecret;
 
 string dlangbotAgentAuth;
@@ -39,9 +40,9 @@ void verifyAgentRequest(string authentication)
     enforceHTTP(secureEqual(authentication, dlangbotAgentAuth), HTTPStatus.unauthorized);
 }
 
-void handleBuild(in ref Build build, in ref Pipeline p)
+void handleBuild(string pipeline)
 {
-    if (p.name == "build-release")
+    if (pipeline == "build-release")
         provisionReleaseBuilder(numReleaseBuilds);
     else
         provisionCIAgent(numCIBuilds);
@@ -122,7 +123,7 @@ private void decommissionCIAgent(uint nbuilds, string hostname)
 private uint numReleaseBuilds()
 {
     auto p = pipeline("build-release");
-    return p.scheduledBuildsCount + p.runningBuildsCount;
+    return cast(uint)(p.scheduledBuilds.length + p.runningBuilds.length);
 }
 
 /// estimate number of scheduled compute-hours
@@ -139,27 +140,23 @@ private uint numCIBuilds()
 
     foreach (p; pipelines.filter!(p => p.defaultQueue))
     {
-        if (!p.scheduledBuildsCount && !p.runningBuildsCount)
+        if (!p.scheduledBuilds.length && !p.runningBuilds.length)
             continue;
 
-        auto builds = p.builds(Build.State.passed, 10);
-        immutable avgTime = builds.map!(b => b.finishedAt - b.startedAt).mean(Duration.zero);
-
+        immutable avgTime = p.passedBuilds.map!(b => b.finishedAt - b.startedAt).mean(Duration.zero);
         if (avgTime <= Duration.zero) // assume 1 hour per build
         {
             logWarn("avgTime for %s is unknown", p.name);
-            workload += (p.scheduledBuildsCount + p.runningBuildsCount).hours;
+            workload += (p.scheduledBuilds.length && p.runningBuilds.length).hours;
             continue;
         }
         logDebug("avgTime for %s is %s", p.name, avgTime);
 
-        workload += p.scheduledBuildsCount * avgTime;
-        if (p.runningBuildsCount)
-        {
-            builds = p.builds(Build.State.running);
-            workload += builds.map!(b => clamp(avgTime - (now - b.startedAt), 1.seconds, avgTime)).sum(Duration.zero);
-        }
+        workload += p.scheduledBuilds.length * avgTime;
+        if (p.runningBuilds.length)
+            workload += p.runningBuilds.map!(b => clamp(avgTime - (now - b.startedAt), 1.seconds, avgTime)).sum(Duration.zero);
     }
+
     // round up to number of compute-hours to match hourly billing
     immutable workloadHours = (workload.total!"seconds" / 3600.0).ceil.to!uint;
     logInfo("scheduled ci workload ≅ %s, rounded to %s hours", workload, workloadHours);
@@ -170,101 +167,124 @@ private uint numCIBuilds()
 // Buildkite API
 //==============================================================================
 
+// dummy wrappers to flatten graphql pagination
+struct Node(T)
+{
+    T node;
+    alias node this;
+}
+struct Edges(T)
+{
+    Node!T[] edges;
+    alias edges this;
+}
+
+struct Organization
+{
+    Edges!Pipeline pipelines;
+}
+
 struct Pipeline
 {
+    static struct Steps { string yaml; }
     string name;
-    @Name("scheduled_builds_count") uint scheduledBuildsCount;
-    @Name("running_builds_count") uint runningBuildsCount;
+    Steps steps;
+    Edges!Build passedBuilds, scheduledBuilds, runningBuilds;
 
     /// returns whether pipeline runs (partially) on default queue
-    bool defaultQueue()
+    bool defaultQueue() const
     {
-        import std.algorithm : any, all, startsWith;
-
-        return steps.length > 0 &&
-            steps.any!(s => s.agentQueryRules.all!(a => a == "queue=default" || !a.startsWith("queue=")));
-    }
-
-    static struct Step
-    {
-        @Name("agent_query_rules") string[] agentQueryRules;
-    }
-    Step[] steps;
-
-    Build[] builds(Build.State state, uint perPage=100, uint page=1)
-    {
-        import std.string : format;
-
-        return bkGET("/organizations/dlang/pipelines/%s/builds?state=%s&per_page=%s&page=%s".format(
-                name, state, perPage, page))
-            .readJson
-            .deserializeJson!(typeof(return));
+        return !steps.yaml.canFind("queue=");
     }
 }
 
 struct Build
 {
-    enum State { running, scheduled, passed, failed, blocked, canceled, canceling, skipped, not_run, finished }
-    @byName State state;
-    @optional @Name("started_at") SysTime startedAt;
-    @optional @Name("finished_at") SysTime finishedAt;
-}
-
-struct Agent
-{
-    string id, name, hostname;
-    @Name("created_at") SysTime createdAt;
-    @Name("last_job_finished_at") SysTime lastJobFinishedAt;
+    @optional SysTime startedAt;
+    @optional SysTime finishedAt;
 }
 
 Pipeline pipeline(string name)
 {
-    import vibe.textfilter.urlencode : urlEncode;
-
-    return bkGET("/organizations/dlang/pipelines/" ~ urlEncode(name))
-        .readJson
-        .deserializeJson!(Pipeline);
+    auto resp = bkQuery(pipelineQuery, ["pipeline": "dlang/"~name])
+        .readJson;
+    enforce("errors" !in resp, "Error in GraphQL query\n"~resp["errors"].toString);
+    return resp["data"]["pipeline"]
+        .deserializeJson!Pipeline;
 }
 
-Pipeline[] pipelines()
+Node!Pipeline[] pipelines()
 {
-    return bkGET("/organizations/dlang/pipelines")
-        .readJson
-        .deserializeJson!(Pipeline[]);
+    auto resp = bkQuery(pipelinesQuery)
+        .readJson;
+    enforce("errors" !in resp, "Error in GraphQL query\n"~resp["errors"].toString);
+    return resp["data"]["organization"]
+        .deserializeJson!Organization
+        .pipelines;
 }
 
-Agent[] agents()
+auto bkQuery(string query, string[string] variables = null)
 {
-    return bkGET("/organizations/dlang/agents")
-        .readJson
-        .deserializeJson!(Agent[]);
-}
-
-auto bkGET(string path)
-{
-    return request(buildkiteAPIURL ~ path, (scope req) {
+    return request(buildkiteAPIURL, (scope req) {
         req.headers["Authorization"] = buildkiteAuth;
+        req.method = HTTPMethod.POST;
+        req.writeJsonBody(["query": Json(query), "variables": variables.serializeToJson]);
     });
 }
 
-auto bkGET(scope void delegate(scope HTTPClientRequest req) userReq, string path)
-{
-    return request(buildkiteAPIURL ~ path, (scope req) {
-        req.headers["Authorization"] = buildkiteAuth;
-        userReq(req);
-    });
-}
+//==============================================================================
+// Buildkite GraphQL queries
+//==============================================================================
 
-/// returns number of release builders
-/*size_t decommissionDefunctReleaseBuilders()
-{
-    auto servers = scw.servers().filter!(s => s.hostname.startsWith("release-builder-"));
-    auto agents = agents().filter!(a => a.hostname.startsWith("release-builder-"));
-    auto stale = servers.filter!(s =>
-        s.state == s.State.running &&
-        s.creationDate > Clock.currTime - 10.minutes &&
-        !agents.canFind!(a => a.hostname == s.hostname));
-    stale.each!(s => s.decommision);
-    // count servers not agents to account for booting ones (and undetected hanging servers)
-    return servers.walkLength - stale.walkLength;
-}*/
+enum pipelineQuery = q"GQL
+query($pipeline:ID!) {
+  pipeline(slug: $pipeline) {
+    ...pipelineFields
+  }
+}
+GQL"~pipelineFragment;
+
+enum pipelinesQuery = q"GQL
+query {
+  organization(slug: dlang) {
+    pipelines(first: 100) {
+      edges {
+        node {
+          ...pipelineFields
+        }
+      }
+    }
+  }
+}
+GQL"~pipelineFragment;
+
+enum pipelineFragment = q"GQL
+fragment pipelineFields on Pipeline {
+  name
+  steps {
+    yaml
+  }
+  passedBuilds: builds(first: 10, state: PASSED) {
+    edges {
+      node {
+        startedAt
+        finishedAt
+      }
+    }
+  }
+  runningBuilds: builds(first: 100, state: RUNNING) {
+    edges {
+      node {
+        startedAt
+      }
+    }
+  }
+  scheduledBuilds: builds(first: 100, state: SCHEDULED) {
+    edges {
+      node {
+        branch
+      }
+    }
+  }
+}
+GQL";

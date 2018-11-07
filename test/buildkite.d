@@ -1,5 +1,7 @@
 import utils;
 
+import core.time : minutes;
+
 //==============================================================================
 // buildkite hook
 //==============================================================================
@@ -20,9 +22,10 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines/build-release", (ref Json j) {
-            j["scheduled_builds_count"] = 1;
-        },
+        "/buildkite", &graphQL!("buildkite_pipeline", (ref Json j) {
+            j["data"]["pipeline"]["scheduledBuilds"]["edges"] ~=
+                ["node": ["branch": "master"]].serializeToJson;
+        }),
         "/scaleway/servers", (ref Json j) {
             j["servers"] = Json.emptyArray;
         },
@@ -51,9 +54,10 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines/build-release", (ref Json j) {
-            j["scheduled_builds_count"] = 1;
-        },
+        "/buildkite", &graphQL!("buildkite_pipeline", (ref Json j) {
+            j["data"]["pipeline"]["scheduledBuilds"]["edges"] ~=
+                ["node": ["branch": "master"]].serializeToJson;
+        }),
         "/scaleway/servers",
     );
 
@@ -64,9 +68,12 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines/build-release", (ref Json j) {
-            j["scheduled_builds_count"] = 2;
-        },
+        "/buildkite", &graphQL!("buildkite_pipeline", (ref Json j) {
+            j["data"]["pipeline"]["scheduledBuilds"]["edges"] ~=
+                ["node": ["branch": "master"]].serializeToJson;
+            j["data"]["pipeline"]["runningBuilds"]["edges"] ~=
+                ["node": ["startedAt": (now - 30.minutes).toISOExtString]].serializeToJson;
+        }),
         "/scaleway/servers",
         "/scaleway/images",
         "/scaleway/servers",
@@ -96,16 +103,13 @@ unittest
 Json hcloudCreateServerResp(ulong id, string name)
 {
     import core.time : Duration;
-    import std.datetime.systime : Clock;
     import std.datetime.timezone : SimpleTimeZone;
     import std.file : readText;
     import vibe.data.json : parseJsonString;
 
     // use zulu to get +00:00 instead of Z suffix
     static zulu = new immutable SimpleTimeZone(Duration.zero, "Etc/Zulu");
-    auto now = Clock.currTime(zulu);
-    now.fracSecs = Duration.zero;
-    auto time = now.toISOExtString;
+    auto time = now(zulu).toISOExtString;
 
     auto json = "data/payloads/hcloud_servers_post".readText.parseJsonString;
     json["server"]["id"] = id;
@@ -115,14 +119,21 @@ Json hcloudCreateServerResp(ulong id, string name)
     return json;
 }
 
+// gets pipeline from buildkite GraphQL query for all pipelines
+Json findPipeline(Json j, string name)
+{
+    return j["data"]["organization"]["pipelines"]["edges"][]
+        .find!(p => p["node"]["name"] == name)[0]["node"];
+}
+
 @("spawns-ci-agent")
 unittest
 {
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
-            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
-        },
-        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=passed&per_page=10&page=1",
+        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
+            j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
+                ["node": ["branch": "master"]].serializeToJson;
+        }),
         "/hcloud/servers", (ref Json j) {
             j["servers"] = Json.emptyArray;
         },
@@ -144,10 +155,10 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
-            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
-        },
-        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=passed&per_page=10&page=1",
+        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
+            j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
+                ["node": ["branch": "master"]].serializeToJson;
+        }),
         "/hcloud/servers",
     );
 
@@ -158,12 +169,14 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
-            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 2;
-            j[].find!(p => p["name"] == "phobos")[0]["scheduled_builds_count"] = 1;
-        },
-        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=passed&per_page=10&page=1",
-        "/buildkite/organizations/dlang/pipelines/phobos/builds?state=passed&per_page=10&page=1",
+        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
+            j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
+                ["node": ["branch": "master"]].serializeToJson;
+            j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
+                ["node": ["branch": "master"]].serializeToJson;
+            j.findPipeline("phobos")["scheduledBuilds"]["edges"] ~=
+                ["node": ["branch": "MartinNowak:fix19337"]].serializeToJson;
+        }),
         "/hcloud/servers",
         "/hcloud/images?sort=created:desc&type=snapshot",
         "/hcloud/servers",
@@ -182,22 +195,18 @@ unittest
 @("reuses-existing-agent-from-running-builds")
 unittest
 {
-    import core.time : minutes;
     import std.datetime.systime : Clock;
     import std.datetime.timezone : UTC;
 
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
-            j[].find!(p => p["name"] == "dmd")[0]["running_builds_count"] = 2;
-            j[].find!(p => p["name"] == "phobos")[0]["scheduled_builds_count"] = 1;
-        },
-        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=passed&per_page=10&page=1",
-        "/buildkite/organizations/dlang/pipelines/phobos/builds?state=passed&per_page=10&page=1",
-        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=running&per_page=100&page=1", (ref Json j) {
-            j ~= j[0].clone;
-            j[0]["started_at"] = (Clock.currTime(UTC()) - 15.minutes).toISOExtString;
-            j[1]["started_at"] = (Clock.currTime(UTC()) - 5.minutes).toISOExtString;
-        },
+        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
+            j.findPipeline("dmd")["runningBuilds"]["edges"] ~=
+                ["node": ["startedAt": (now - 15.minutes).toISOExtString]].serializeToJson;
+            j.findPipeline("dmd")["runningBuilds"]["edges"] ~=
+                ["node": ["startedAt": (now - 5.minutes).toISOExtString]].serializeToJson;
+            j.findPipeline("phobos")["scheduledBuilds"]["edges"] ~=
+                ["node": ["branch": "master"]].serializeToJson;
+        }),
         "/hcloud/servers",
     );
 
@@ -212,7 +221,7 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines/build-release",
+        "/buildkite", &graphQL!"buildkite_pipeline",
         "/scaleway/servers", (ref Json j) {
             j["servers"][0]["name"] = "release-builder-123456";
             j["servers"][0]["id"] = "a4919456-92a2-4cab-b503-ca13aa14c786";
@@ -232,7 +241,7 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines",
+        "/buildkite", &graphQL!"buildkite_pipelines",
         "/hcloud/servers", (ref Json j) {
             j["servers"][0]["name"] = "ci-agent-123456";
             j["servers"][0]["id"] = 1321993;
@@ -251,9 +260,10 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines/build-release", (ref Json j) {
-            j["running_builds_count"] = 1;
-        },
+        "/buildkite", &graphQL!("buildkite_pipeline", (ref Json j) {
+            j["data"]["pipeline"]["runningBuilds"]["edges"] ~=
+                ["node": ["startedAt": (now - 30.minutes).toISOExtString]].serializeToJson;
+        }),
         "/scaleway/servers",
     );
 
@@ -264,10 +274,10 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite/organizations/dlang/pipelines", (ref Json j) {
-            j[].find!(p => p["name"] == "dmd")[0]["scheduled_builds_count"] = 1;
-        },
-        "/buildkite/organizations/dlang/pipelines/dmd/builds?state=passed&per_page=10&page=1",
+        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
+            j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
+                ["node": ["branch": "master"]].serializeToJson;
+        }),
         "/hcloud/servers",
     );
 

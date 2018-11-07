@@ -11,8 +11,9 @@ public import vibe.http.client : HTTPClientRequest;
 public import vibe.http.server : HTTPServerRequest, HTTPServerResponse;
 public import std.functional : toDelegate;
 public import vibe.data.json : deserializeJson, serializeToJson, Json;
-public import std.datetime : SysTime;
+public import std.datetime.systime : SysTime;
 public import std.algorithm;
+import std.datetime.timezone : TimeZone, UTC;
 
 // existing dlang bot comment -> update comment
 
@@ -21,8 +22,9 @@ string ghTestHookURL;
 string trelloTestHookURL;
 string buildkiteTestHookURL;
 
-string payloadDir = "./data/payloads";
-string hookDir = "./data/hooks";
+enum payloadDir = "./data/payloads";
+enum graphqlDir = payloadDir ~ "/graphql";
+enum hookDir = "./data/hooks";
 
 /// Tries to find a free port
 ushort getFreePort()
@@ -244,6 +246,19 @@ void setAPIExpectations(Args...)(Args args)
     }
 }
 
+void graphQL(string path, alias process=(ref Json){})(scope HTTPServerRequest req, scope HTTPServerResponse res)
+{
+    import std.file : readText;
+    import std.path : buildPath;
+
+    assert(req.method == HTTPMethod.POST);
+    assert(req.json["query"].get!string.canFind("query"));
+
+    auto json = buildPath(graphqlDir, path).readText.parseJsonString;
+    process(json);
+    res.writeJsonBody(json);
+}
+
 void checkAPIExpectations()
 {
     scope(failure) {
@@ -397,4 +412,13 @@ void testCronDaily(string[] repositories, int line = __LINE__, string file = __F
     };
     cronDaily(repositories, config);
     checkAPIExpectations;
+}
+
+SysTime now(immutable TimeZone tz = UTC())
+{
+    import std.datetime.systime : Clock;
+
+    auto now = Clock.currTime(tz);
+    now.fracSecs = Duration.zero;
+    return now;
 }

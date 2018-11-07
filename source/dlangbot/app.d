@@ -303,9 +303,7 @@ void buildkiteHook(HTTPServerRequest req, HTTPServerResponse res)
         return res.writeBody("handled");
 
     case "build.scheduled":
-        auto build = json["build"].deserializeJson!Build;
-        auto pipeline = json["pipeline"].deserializeJson!Pipeline;
-        handleBuild(build, pipeline);
+        handleBuild(json["pipeline"]["name"].get!string);
         break;
 
     default:

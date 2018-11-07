@@ -1,0 +1,592 @@
+{
+  "data": {
+    "organization": {
+      "pipelines": {
+        "edges": [
+          {
+            "node": {
+              "name": "build-release",
+              "steps": {
+                "yaml": "steps:\n  - command: \"buildkite-agent pipeline upload ./buildkite/build_release_pipeline.yml\"\n    label: \":pipeline:\"\n    agents:\n      - \"queue=release-builder\"\n    env:\n      BRANCH: \"master\""
+              },
+              "passedBuilds": {
+                "edges": [
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T02:09:02Z",
+                      "finishedAt": "2018-11-07T05:40:51Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T00:16:32Z",
+                      "finishedAt": "2018-11-06T03:43:40Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-04T17:48:43Z",
+                      "finishedAt": "2018-11-04T21:16:23Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-03T17:46:40Z",
+                      "finishedAt": "2018-11-03T21:17:46Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-02T21:06:38Z",
+                      "finishedAt": "2018-11-03T00:33:37Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-01T11:37:39Z",
+                      "finishedAt": "2018-11-01T15:11:21Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-10-31T20:34:19Z",
+                      "finishedAt": "2018-11-01T00:01:35Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-10-30T16:16:20Z",
+                      "finishedAt": "2018-10-30T19:27:14Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-10-29T12:01:02Z",
+                      "finishedAt": "2018-10-29T15:05:46Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-10-26T16:03:53Z",
+                      "finishedAt": "2018-10-26T19:13:52Z"
+                    }
+                  }
+                ]
+              },
+              "runningBuilds": {
+                "edges": []
+              },
+              "scheduledBuilds": {
+                "edges": []
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "ci-test",
+              "steps": {
+                "yaml": "steps:\n  - command: \"wget https://raw.githubusercontent.com/MartinNowak/ci/541311a5f8f6f45f24d86120b4fecf4702a718ee/buildkite.sh -O buildkite.sh\\n\\nbash buildkite.sh | buildkite-agent pipeline upload\"\n    label: \":pipeline:\"\n    agents:\n      - \"queue=test\"\n    env:\n      CODECOV_TOKEN: \"bb98e9c9-5a86-4d53-b8dd-69d98efa3c13\""
+              },
+              "passedBuilds": {
+                "edges": [
+                  {
+                    "node": {
+                      "startedAt": "2018-09-05T09:25:41Z",
+                      "finishedAt": "2018-09-05T09:47:37Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-09-04T16:45:37Z",
+                      "finishedAt": "2018-09-04T17:23:06Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-09-04T16:08:46Z",
+                      "finishedAt": "2018-09-04T16:38:00Z"
+                    }
+                  }
+                ]
+              },
+              "runningBuilds": {
+                "edges": []
+              },
+              "scheduledBuilds": {
+                "edges": []
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "dub",
+              "steps": {
+                "yaml": "steps:\n  - command: \"wget https://github.com/dlang/ci/raw/master/buildkite.sh\\n\\nbash buildkite.sh | buildkite-agent pipeline upload\"\n    label: \":pipeline:\""
+              },
+              "passedBuilds": {
+                "edges": [
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T10:17:02Z",
+                      "finishedAt": "2018-11-07T10:44:06Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T02:57:56Z",
+                      "finishedAt": "2018-11-07T03:21:06Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T22:25:42Z",
+                      "finishedAt": "2018-11-06T22:44:32Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T21:31:54Z",
+                      "finishedAt": "2018-11-06T21:47:25Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T20:51:30Z",
+                      "finishedAt": "2018-11-06T21:12:57Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T19:45:40Z",
+                      "finishedAt": "2018-11-06T20:06:48Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T19:07:50Z",
+                      "finishedAt": "2018-11-06T19:31:05Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T18:51:20Z",
+                      "finishedAt": "2018-11-06T19:08:13Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T16:58:00Z",
+                      "finishedAt": "2018-11-06T17:19:52Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T16:03:51Z",
+                      "finishedAt": "2018-11-06T16:17:52Z"
+                    }
+                  }
+                ]
+              },
+              "runningBuilds": {
+                "edges": []
+              },
+              "scheduledBuilds": {
+                "edges": []
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "phobos",
+              "steps": {
+                "yaml": "steps:\n  - command: \"wget https://github.com/dlang/ci/raw/master/buildkite.sh\\n\\nbash buildkite.sh | buildkite-agent pipeline upload\"\n    label: \":pipeline:\"\n    env:\n      CODECOV_TOKEN: \"3f2d3077-87e1-43ba-8d96-1e5f5d3ee8dc\""
+              },
+              "passedBuilds": {
+                "edges": [
+                  {
+                    "node": {
+                      "startedAt": "2018-11-05T19:15:16Z",
+                      "finishedAt": "2018-11-05T19:31:17Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-05T18:45:27Z",
+                      "finishedAt": "2018-11-05T19:15:07Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-05T18:47:19Z",
+                      "finishedAt": "2018-11-05T19:25:21Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-05T07:00:47Z",
+                      "finishedAt": "2018-11-05T07:27:34Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-02T04:54:30Z",
+                      "finishedAt": "2018-11-02T05:07:51Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-01T21:25:47Z",
+                      "finishedAt": "2018-11-01T21:39:47Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-01T18:24:56Z",
+                      "finishedAt": "2018-11-01T18:39:17Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-01T15:29:46Z",
+                      "finishedAt": "2018-11-01T16:07:09Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-01T14:50:00Z",
+                      "finishedAt": "2018-11-01T15:27:01Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-01T14:11:21Z",
+                      "finishedAt": "2018-11-01T14:50:06Z"
+                    }
+                  }
+                ]
+              },
+              "runningBuilds": {
+                "edges": []
+              },
+              "scheduledBuilds": {
+                "edges": []
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "druntime",
+              "steps": {
+                "yaml": "steps:\n  - command: \"wget https://github.com/dlang/ci/raw/master/buildkite.sh\\n\\nbash buildkite.sh | buildkite-agent pipeline upload\"\n    label: \":pipeline:\"\n    env:\n      CODECOV_TOKEN: \"f7b6d243-7bd4-4219-a162-b3e0acdae777\""
+              },
+              "passedBuilds": {
+                "edges": [
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T06:26:47Z",
+                      "finishedAt": "2018-11-07T06:47:52Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T04:11:14Z",
+                      "finishedAt": "2018-11-07T04:28:44Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T08:36:12Z",
+                      "finishedAt": "2018-11-06T09:02:36Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T08:02:29Z",
+                      "finishedAt": "2018-11-06T08:20:43Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T07:25:23Z",
+                      "finishedAt": "2018-11-06T07:53:32Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T06:26:09Z",
+                      "finishedAt": "2018-11-06T06:54:41Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T06:00:02Z",
+                      "finishedAt": "2018-11-06T06:34:19Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-05T07:11:25Z",
+                      "finishedAt": "2018-11-05T07:26:38Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-05T06:21:04Z",
+                      "finishedAt": "2018-11-05T06:35:07Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-02T05:52:05Z",
+                      "finishedAt": "2018-11-02T06:05:30Z"
+                    }
+                  }
+                ]
+              },
+              "runningBuilds": {
+                "edges": []
+              },
+              "scheduledBuilds": {
+                "edges": []
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "tools",
+              "steps": {
+                "yaml": "steps:\n  - command: \"wget https://github.com/dlang/ci/raw/master/buildkite.sh\\n\\nbash buildkite.sh | buildkite-agent pipeline upload\"\n    label: \":pipeline:\""
+              },
+              "passedBuilds": {
+                "edges": [
+                  {
+                    "node": {
+                      "startedAt": "2018-08-20T15:33:27Z",
+                      "finishedAt": "2018-08-20T15:58:47Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-08-16T22:05:41Z",
+                      "finishedAt": "2018-08-17T01:09:14Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-08-14T14:53:11Z",
+                      "finishedAt": "2018-08-14T16:17:49Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-08-13T19:34:56Z",
+                      "finishedAt": "2018-08-13T21:33:10Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-08-02T16:25:52Z",
+                      "finishedAt": "2018-08-02T17:13:06Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-08-01T04:21:38Z",
+                      "finishedAt": "2018-08-01T05:37:19Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-07-31T17:13:51Z",
+                      "finishedAt": "2018-07-31T17:36:54Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-07-31T14:37:33Z",
+                      "finishedAt": "2018-07-31T14:58:00Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-07-31T14:16:55Z",
+                      "finishedAt": "2018-07-31T14:36:59Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-07-29T14:48:00Z",
+                      "finishedAt": "2018-07-29T15:08:26Z"
+                    }
+                  }
+                ]
+              },
+              "runningBuilds": {
+                "edges": []
+              },
+              "scheduledBuilds": {
+                "edges": []
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "dmd",
+              "steps": {
+                "yaml": "steps:\n  - command: \"wget https://github.com/dlang/ci/raw/master/buildkite.sh\\n\\nbash buildkite.sh | buildkite-agent pipeline upload\"\n    label: \":pipeline:\"\n    env:\n      CODECOV_TOKEN: \"bb98e9c9-5a86-4d53-b8dd-69d98efa3c13\""
+              },
+              "passedBuilds": {
+                "edges": [
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T10:24:33Z",
+                      "finishedAt": "2018-11-07T10:38:00Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T09:37:12Z",
+                      "finishedAt": "2018-11-07T10:04:16Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T08:59:06Z",
+                      "finishedAt": "2018-11-07T09:15:27Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T08:18:46Z",
+                      "finishedAt": "2018-11-07T08:44:14Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T06:59:37Z",
+                      "finishedAt": "2018-11-07T07:17:40Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T06:48:17Z",
+                      "finishedAt": "2018-11-07T07:09:51Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T06:26:56Z",
+                      "finishedAt": "2018-11-07T06:51:06Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T05:49:37Z",
+                      "finishedAt": "2018-11-07T06:07:49Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T05:31:17Z",
+                      "finishedAt": "2018-11-07T05:49:41Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T04:48:46Z",
+                      "finishedAt": "2018-11-07T05:07:21Z"
+                    }
+                  }
+                ]
+              },
+              "runningBuilds": {
+                "edges": []
+              },
+              "scheduledBuilds": {
+                "edges": []
+              }
+            }
+          },
+          {
+            "node": {
+              "name": "ci",
+              "steps": {
+                "yaml": "steps:\n  - command: \"set -x\\nif [ \\\"${BUILDKITE_PULL_REQUEST:-false}\\\" != \\\"false\\\" ]; then\\n    if ! $(git remote | grep -q upstream) ; then\\n        git remote add upstream \\\"${BUILDKITE_REPO}\\\";\\n    fi\\n    git fetch -q upstream \\\"+refs/pull/${BUILDKITE_PULL_REQUEST}/merge:\\\";\\n    git checkout -f FETCH_HEAD;\\nfi\\n\\nbash buildkite.sh | buildkite-agent pipeline upload\"\n    label: \":pipeline:\""
+              },
+              "passedBuilds": {
+                "edges": [
+                  {
+                    "node": {
+                      "startedAt": "2018-11-07T03:00:22Z",
+                      "finishedAt": "2018-11-07T03:18:29Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T17:54:48Z",
+                      "finishedAt": "2018-11-06T18:20:19Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T17:35:41Z",
+                      "finishedAt": "2018-11-06T17:49:04Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T13:20:24Z",
+                      "finishedAt": "2018-11-06T13:56:36Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T13:04:11Z",
+                      "finishedAt": "2018-11-06T13:31:50Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T13:04:10Z",
+                      "finishedAt": "2018-11-06T14:06:21Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T12:50:21Z",
+                      "finishedAt": "2018-11-06T14:03:19Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T12:50:21Z",
+                      "finishedAt": "2018-11-06T13:19:22Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-06T03:00:16Z",
+                      "finishedAt": "2018-11-06T03:16:01Z"
+                    }
+                  },
+                  {
+                    "node": {
+                      "startedAt": "2018-11-05T03:00:45Z",
+                      "finishedAt": "2018-11-05T03:36:18Z"
+                    }
+                  }
+                ]
+              },
+              "runningBuilds": {
+                "edges": []
+              },
+              "scheduledBuilds": {
+                "edges": []
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

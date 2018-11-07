@@ -1,0 +1,80 @@
+{
+  "data": {
+    "pipeline": {
+      "name": "build-release",
+      "steps": {
+        "yaml": "steps:\n  - command: \"buildkite-agent pipeline upload ./buildkite/build_release_pipeline.yml\"\n    label: \":pipeline:\"\n    agents:\n      - \"queue=release-builder\"\n    env:\n      BRANCH: \"master\""
+      },
+      "passedBuilds": {
+        "edges": [
+          {
+            "node": {
+              "startedAt": "2018-11-07T02:09:02Z",
+              "finishedAt": "2018-11-07T05:40:51Z"
+            }
+          },
+          {
+            "node": {
+              "startedAt": "2018-11-06T00:16:32Z",
+              "finishedAt": "2018-11-06T03:43:40Z"
+            }
+          },
+          {
+            "node": {
+              "startedAt": "2018-11-04T17:48:43Z",
+              "finishedAt": "2018-11-04T21:16:23Z"
+            }
+          },
+          {
+            "node": {
+              "startedAt": "2018-11-03T17:46:40Z",
+              "finishedAt": "2018-11-03T21:17:46Z"
+            }
+          },
+          {
+            "node": {
+              "startedAt": "2018-11-02T21:06:38Z",
+              "finishedAt": "2018-11-03T00:33:37Z"
+            }
+          },
+          {
+            "node": {
+              "startedAt": "2018-11-01T11:37:39Z",
+              "finishedAt": "2018-11-01T15:11:21Z"
+            }
+          },
+          {
+            "node": {
+              "startedAt": "2018-10-31T20:34:19Z",
+              "finishedAt": "2018-11-01T00:01:35Z"
+            }
+          },
+          {
+            "node": {
+              "startedAt": "2018-10-30T16:16:20Z",
+              "finishedAt": "2018-10-30T19:27:14Z"
+            }
+          },
+          {
+            "node": {
+              "startedAt": "2018-10-29T12:01:02Z",
+              "finishedAt": "2018-10-29T15:05:46Z"
+            }
+          },
+          {
+            "node": {
+              "startedAt": "2018-10-26T16:03:53Z",
+              "finishedAt": "2018-10-26T19:13:52Z"
+            }
+          }
+        ]
+      },
+      "runningBuilds": {
+        "edges": []
+      },
+      "scheduledBuilds": {
+        "edges": []
+      }
+    }
+  }
+}
