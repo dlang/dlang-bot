@@ -61,7 +61,7 @@ void agentShutdownCheck(string hostname)
 private void provisionReleaseBuilder(uint nbuilds)
 {
     auto servers = scw.servers;
-    immutable nservers = servers.filter!(s => s.name.startsWith("release-builder-")).walkLength;
+    immutable nservers = servers.filter!(s => s.healthy && s.name.startsWith("release-builder-")).walkLength;
 
     logInfo("check provision release-builder nservers: %s, nbuilds: %s", nservers, nbuilds);
     if (nservers >= nbuilds)
@@ -92,7 +92,7 @@ private void decommissionReleaseBuilder(uint nbuilds, string hostname)
 private void provisionCIAgent(uint nbuilds)
 {
     auto servers = hc.servers;
-    immutable nservers = servers.filter!(s => s.name.startsWith("ci-agent-")).walkLength;
+    immutable nservers = servers.filter!(s => s.healthy && s.name.startsWith("ci-agent-")).walkLength;
 
     logInfo("check provision ci-agent nservers: %s, nbuilds: %s", nservers, nbuilds);
     if (nservers >= nbuilds)

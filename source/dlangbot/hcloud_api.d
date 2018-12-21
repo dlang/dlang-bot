@@ -32,6 +32,14 @@ struct Server
         logInfo("decommission hcloud server %s", name);
         hcloudDELETE("/servers/%s".format(id));
     }
+
+    @property bool healthy() const
+    {
+        import std.range : only;
+
+        with (Status)
+            return only(running, initializing, starting, migrating).canFind(status);
+    }
 }
 
 struct Image

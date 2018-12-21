@@ -22,7 +22,7 @@ string scalewayAuth, scalewayOrg;
 struct Server
 {
     string id, name;
-    enum State { running, stopped, starting }
+    enum State { starting, running, stopped }
     @byName State state;
 
     enum Action { poweron, poweroff, terminate }
@@ -37,6 +37,14 @@ struct Server
     {
         logInfo("decommission scaleway server %s", name);
         action(Action.terminate);
+    }
+
+    @property bool healthy() const
+    {
+        import std.range : only;
+
+        with (State)
+            return only(starting, running).canFind(state);
     }
 }
 
