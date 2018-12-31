@@ -1,7 +1,7 @@
 module dlangbot.trello;
 
-string trelloAPIURL = "https://api.trello.com";
-string trelloSecret, trelloAuth;
+shared string trelloAPIURL = "https://api.trello.com";
+shared string trelloSecret, trelloAuth;
 
 import dlangbot.bugzilla : Issue, IssueRef;
 import dlangbot.utils : request;

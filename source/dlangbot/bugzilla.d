@@ -2,7 +2,7 @@ module dlangbot.bugzilla;
 
 import vibe.data.json : Json;
 
-string bugzillaURL = "https://issues.dlang.org";
+shared string bugzillaURL = "https://issues.dlang.org";
 
 import std.algorithm, std.conv, std.range, std.string;
 import std.format : format;

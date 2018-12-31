@@ -13,8 +13,8 @@ import vibe.stream.operations : readAllUTF8;
 
 import dlangbot.utils : request;
 
-string hcloudAPIURL = "https://api.hetzner.cloud/v1";
-string hcloudAuth;
+shared string hcloudAPIURL = "https://api.hetzner.cloud/v1";
+shared string hcloudAuth;
 
 //==============================================================================
 // Hetzner Cloud (KVM) servers

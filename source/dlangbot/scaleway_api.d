@@ -12,8 +12,8 @@ import vibe.stream.operations : readAllUTF8;
 
 import dlangbot.utils : request;
 
-string scalewayAPIURL = "https://cp-par1.scaleway.com";
-string scalewayAuth, scalewayOrg;
+shared string scalewayAPIURL = "https://cp-par1.scaleway.com";
+shared string scalewayAuth, scalewayOrg;
 
 //==============================================================================
 // Scaleway (Bare Metal) servers

@@ -19,8 +19,8 @@ import dlangbot.utils : request;
 static import scw=dlangbot.scaleway_api;
 static import hc=dlangbot.hcloud_api;
 
-string buildkiteAPIURL = "https://graphql.buildkite.com/v1";
-string buildkiteAuth, buildkiteHookSecret;
+shared string buildkiteAPIURL = "https://graphql.buildkite.com/v1";
+shared string buildkiteAuth, buildkiteHookSecret;
 
 string dlangbotAgentAuth;
 
@@ -115,11 +115,15 @@ struct Info
 Info queryState(string pipelineSearch=null)
 {
     import std.algorithm : remove;
+    import vibe.core.concurrency : async;
 
     typeof(return) ret;
-    ret.organization = organization(pipelineSearch);
-    ret.hcServers = hc.servers.remove!(s => !s.name.startsWith("ci-agent-"));
-    ret.scwServers = scw.servers.remove!(s => !s.name.startsWith("release-builder-"));
+    auto org = async(&organization, pipelineSearch),
+        hcS = async(&hc.servers),
+        scwS = async(&scw.servers);
+    ret.organization = org.getResult;
+    ret.hcServers = hcS.getResult.remove!(s => !s.name.startsWith("ci-agent-"));
+    ret.scwServers = scwS.getResult.remove!(s => !s.name.startsWith("release-builder-"));
     return ret;
 }
 
