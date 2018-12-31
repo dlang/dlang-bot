@@ -1,9 +1,12 @@
 module dlangbot.buildkite;
 
+import core.time : Duration, hours, minutes, seconds;
 import std.algorithm : canFind, filter, find, startsWith;
-import std.datetime.systime;
+import std.datetime.systime : Clock, SysTime;
+import std.datetime.timezone : UTC;
 import std.exception : enforce;
 import std.range : empty, front, walkLength;
+import std.typecons : Tuple;
 import std.uuid : randomUUID;
 
 import vibe.core.log : logDebug, logInfo, logWarn;
@@ -42,27 +45,78 @@ void verifyAgentRequest(string authentication)
 
 void handleBuild(string pipeline)
 {
+    auto info = queryState(pipeline == "build-release" ? pipeline : null);
+    try
+        info = reapDeadServers(info);
+    catch (Exception e)
+        logWarn("reapDeadServers failed %s", e);
     if (pipeline == "build-release")
-        provisionReleaseBuilder(numReleaseBuilds);
+        provisionReleaseBuilder(numReleaseBuilds(info.pipelines), info.scwServers);
     else
-        provisionCIAgent(numCIBuilds);
+        provisionCIAgent(numCIBuilds(info.pipelines), info.hcServers);
 }
 
 void agentShutdownCheck(string hostname)
 {
     import std.algorithm : startsWith;
 
+    auto info = queryState(hostname.startsWith("release-builder-") ? "build-release" : null);
+    try
+        info = reapDeadServers(info);
+    catch (Exception e)
+        logWarn("reapDeadServers failed %s", e);
     if (hostname.startsWith("release-builder-"))
-        decommissionReleaseBuilder(numReleaseBuilds, hostname);
+        decommissionReleaseBuilder(numReleaseBuilds(info.pipelines), info.scwServers, hostname);
     else if (hostname.startsWith("ci-agent-"))
-        decommissionCIAgent(numCIBuilds, hostname);
+        decommissionCIAgent(numCIBuilds(info.pipelines), info.hcServers, hostname);
 }
 
-private void provisionReleaseBuilder(uint nbuilds)
+Info reapDeadServers(Info info, Duration bootTimeout = 10.minutes)
 {
-    auto servers = scw.servers;
-    immutable nservers = servers.filter!(s => s.healthy && s.name.startsWith("release-builder-")).walkLength;
+    import std.algorithm : each, fold, map, partition, remove, sort;
+    import std.array : array;
 
+    auto runningAgentHosts = info.agents.edges.sort!((a, b) => a.hostname < b.hostname).groupBy
+        .map!(agents => agents.fold!((hn, a) => a.connectionState == "connected" ? a.hostname : hn)(cast(string) null))
+        .filter!(hn => !hn.empty).array;
+    immutable now = Clock.currTime(UTC());
+    auto deadHCServers = info.hcServers
+        .partition!(s => runningAgentHosts.canFind(s.name) || s.created > now - bootTimeout);
+    auto deadSCWServers = info.scwServers
+        .partition!(s => runningAgentHosts.canFind(s.name) || s.creation_date > now - bootTimeout);
+    if (deadHCServers.length || deadSCWServers.length)
+    {
+        logInfo("found dead servers hcloud: %s, scaleway: %s", deadHCServers.length, deadSCWServers.length);
+        deadHCServers.each!(s => s.decommission);
+        deadSCWServers.each!(s => s.decommission);
+    }
+    info.hcServers.length -= deadHCServers.length;
+    info.scwServers.length -= deadSCWServers.length;
+    return info;
+}
+
+struct Info
+{
+    Organization organization;
+    alias organization this;
+    hc.Server[] hcServers;
+    scw.Server[] scwServers;
+}
+
+Info queryState(string pipelineSearch=null)
+{
+    import std.algorithm : remove;
+
+    typeof(return) ret;
+    ret.organization = organization(pipelineSearch);
+    ret.hcServers = hc.servers.remove!(s => !s.name.startsWith("ci-agent-"));
+    ret.scwServers = scw.servers.remove!(s => !s.name.startsWith("release-builder-"));
+    return ret;
+}
+
+private void provisionReleaseBuilder(uint nbuilds, scw.Server[] servers)
+{
+    immutable nservers = servers.length;
     logInfo("check provision release-builder nservers: %s, nbuilds: %s", nservers, nbuilds);
     if (nservers >= nbuilds)
         return;
@@ -72,14 +126,11 @@ private void provisionReleaseBuilder(uint nbuilds)
         scw.createServer("release-builder-" ~ randomUUID().toString, "C2S", img).action(scw.Server.Action.poweron);
 }
 
-private void decommissionReleaseBuilder(uint nbuilds, string hostname)
+private void decommissionReleaseBuilder(uint nbuilds, scw.Server[] servers, string hostname)
 {
     assert(hostname.startsWith("release-builder-"));
 
-    auto servers = scw.servers;
-    immutable nservers = servers.filter!(s => s.name.startsWith("release-builder-")).walkLength;
-
-    if (nbuilds >= nservers)
+    if (nbuilds >= servers.length)
         return;
 
     servers = servers.find!(s => s.name == hostname);
@@ -89,11 +140,9 @@ private void decommissionReleaseBuilder(uint nbuilds, string hostname)
         servers.front.decommission();
 }
 
-private void provisionCIAgent(uint nbuilds)
+private void provisionCIAgent(uint nbuilds, hc.Server[] servers)
 {
-    auto servers = hc.servers;
-    immutable nservers = servers.filter!(s => s.healthy && s.name.startsWith("ci-agent-")).walkLength;
-
+    immutable nservers = servers.length;
     logInfo("check provision ci-agent nservers: %s, nbuilds: %s", nservers, nbuilds);
     if (nservers >= nbuilds)
         return;
@@ -103,14 +152,11 @@ private void provisionCIAgent(uint nbuilds)
         hc.createServer("ci-agent-" ~ randomUUID().toString, "cx41", img);
 }
 
-private void decommissionCIAgent(uint nbuilds, string hostname)
+private void decommissionCIAgent(uint nbuilds, hc.Server[] servers, string hostname)
 {
     assert(hostname.startsWith("ci-agent-"));
 
-    auto servers = hc.servers;
-    immutable nservers = servers.filter!(s => s.name.startsWith("ci-agent-")).walkLength;
-
-    if (nbuilds >= nservers)
+    if (nbuilds >= servers.length)
         return;
 
     servers = servers.find!(s => s.name == hostname);
@@ -120,19 +166,18 @@ private void decommissionCIAgent(uint nbuilds, string hostname)
         servers.front.decommission();
 }
 
-private uint numReleaseBuilds()
+private uint numReleaseBuilds(Node!Pipeline[] pipelines)
 {
-    auto p = pipeline("build-release");
+    pipelines = pipelines.find!(p => p.name == "build-release");
+    auto p = pipelines.empty ? Pipeline.init : pipelines.front;
     return cast(uint)(p.scheduledBuilds.length + p.runningBuilds.length);
 }
 
 /// estimate number of scheduled compute-hours
-private uint numCIBuilds()
+private uint numCIBuilds(Node!Pipeline[] pipelines)
 {
-    import core.time : Duration, hours, minutes, seconds;
     import std.algorithm : clamp, filter, fold, map, max, mean, sum;
     import std.conv : to;
-    import std.datetime.timezone : UTC;
     import std.math : ceil;
 
     immutable now = Clock.currTime(UTC());
@@ -179,11 +224,6 @@ struct Edges(T)
     alias edges this;
 }
 
-struct Organization
-{
-    Edges!Pipeline pipelines;
-}
-
 struct Pipeline
 {
     static struct Steps { string yaml; }
@@ -204,26 +244,29 @@ struct Build
     @optional SysTime finishedAt;
 }
 
-Pipeline pipeline(string name)
+struct Agent
 {
-    auto resp = bkQuery(pipelineQuery, ["pipeline": "dlang/"~name])
-        .readJson;
-    enforce("errors" !in resp, "Error in GraphQL query\n"~resp["errors"].toString);
-    return resp["data"]["pipeline"]
-        .deserializeJson!Pipeline;
+    string id, name, hostname;
+    // connected, stopping, stopped, ... (e.g. lost or so)
+    string connectionState;
 }
 
-Node!Pipeline[] pipelines()
+struct Organization
 {
-    auto resp = bkQuery(pipelinesQuery)
+    Edges!Pipeline pipelines;
+    Edges!Agent agents;
+}
+
+Organization organization(string pipelineSearch=null)
+{
+    auto resp = bkQuery(organizationQuery, ["pipelineSearch": pipelineSearch])
         .readJson;
     enforce("errors" !in resp, "Error in GraphQL query\n"~resp["errors"].toString);
     return resp["data"]["organization"]
-        .deserializeJson!Organization
-        .pipelines;
+        .deserializeJson!Organization;
 }
 
-auto bkQuery(string query, string[string] variables = null)
+private auto bkQuery(string query, string[string] variables = null)
 {
     return request(buildkiteAPIURL, (scope req) {
         req.headers["Authorization"] = buildkiteAuth;
@@ -236,53 +279,49 @@ auto bkQuery(string query, string[string] variables = null)
 // Buildkite GraphQL queries
 //==============================================================================
 
-enum pipelineQuery = q"GQL
-query($pipeline:ID!) {
-  pipeline(slug: $pipeline) {
-    ...pipelineFields
-  }
-}
-GQL"~pipelineFragment;
-
-enum pipelinesQuery = q"GQL
-query {
+enum organizationQuery = q"GQL
+query($pipelineSearch:String) {
   organization(slug: dlang) {
-    pipelines(first: 100) {
+    pipelines(first: 100, search: $pipelineSearch) {
       edges {
         node {
-          ...pipelineFields
+          name
+          steps {
+            yaml
+          }
+          passedBuilds: builds(first: 10, state: PASSED) {
+            edges {
+              node {
+                startedAt
+                finishedAt
+              }
+            }
+          }
+          runningBuilds: builds(first: 100, state: RUNNING) {
+            edges {
+              node {
+                startedAt
+              }
+            }
+          }
+          scheduledBuilds: builds(first: 100, state: SCHEDULED) {
+            edges {
+              node {
+                branch
+              }
+            }
+          }
         }
       }
     }
-  }
-}
-GQL"~pipelineFragment;
-
-enum pipelineFragment = q"GQL
-fragment pipelineFields on Pipeline {
-  name
-  steps {
-    yaml
-  }
-  passedBuilds: builds(first: 10, state: PASSED) {
-    edges {
-      node {
-        startedAt
-        finishedAt
-      }
-    }
-  }
-  runningBuilds: builds(first: 100, state: RUNNING) {
-    edges {
-      node {
-        startedAt
-      }
-    }
-  }
-  scheduledBuilds: builds(first: 100, state: SCHEDULED) {
-    edges {
-      node {
-        branch
+    agents(first: 100) {
+      edges {
+        node {
+          id
+          name
+          hostname
+          connectionState
+        }
       }
     }
   }

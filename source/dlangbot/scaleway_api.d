@@ -24,6 +24,7 @@ struct Server
     string id, name;
     enum State { starting, running, stopped }
     @byName State state;
+    SysTime creation_date;
 
     enum Action { poweron, poweroff, terminate }
 

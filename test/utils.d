@@ -254,16 +254,17 @@ void graphQL(string path, alias process=(ref Json){})(scope HTTPServerRequest re
     assert(req.method == HTTPMethod.POST);
     assert(req.json["query"].get!string.canFind("query"));
 
-    auto json = buildPath(graphqlDir, path).readText.parseJsonString;
+    auto filePath = buildPath(graphqlDir, path);
+    logInfo("reading payload: %s", filePath);
+    auto json = filePath.readText.parseJsonString;
     process(json);
     res.writeJsonBody(json);
 }
 
 void checkAPIExpectations()
 {
-    scope(failure) {
-        writefln("Didn't request: %s", apiExpectations.map!(x => x.url));
-    }
+    if (apiExpectations.length != 0)
+        logWarn("Didn't request: %s", apiExpectations.map!(x => x.url));
     assert(apiExpectations.length == 0);
 }
 

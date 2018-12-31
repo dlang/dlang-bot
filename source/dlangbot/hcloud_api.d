@@ -26,6 +26,7 @@ struct Server
     string name;
     enum Status { running, initializing, starting, stopping, off, deleting, migrating, rebuilding, unknown }
     @byName Status status;
+    SysTime created;
 
     void decommission()
     {
