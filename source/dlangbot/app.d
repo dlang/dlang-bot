@@ -61,6 +61,24 @@ void startServer(HTTPServerSettings settings)
     listenHTTP(settings, router);
 }
 
+void startCrons()
+{
+    import core.time : hours, seconds;
+    import std.random : uniform;
+
+    import dlangbot.buildkite : cronReapDeadServers;
+
+    static void arm(Duration interval, void delegate() nothrow @safe callback)
+    {
+        enum periodic = true;
+        setTimer(uniform(0, interval.total!"seconds").seconds,
+            { setTimer(interval, callback, periodic); },
+            !periodic
+        );
+    }
+    arm(1.hours, { cronReapDeadServers(); });
+}
+
 //==============================================================================
 // Trello hook
 //==============================================================================
@@ -380,6 +398,7 @@ else void main(string[] args)
     settings.port = 8080;
     readOption("port|p", &settings.port, "Sets the port used for serving.");
     readOption("simulate-cron-daily", &runDailyCronSimulation, "Sets the port used for serving.");
+    // TODO: move (currently) unused cli crons to timer-based ones
     readOption("cron-daily", &runDailyCron, "Run daily cron tasks.");
     if (!finalizeCommandLineOptions())
         return;
@@ -402,6 +421,7 @@ else void main(string[] args)
     }
 
     startServer(settings);
+    startCrons();
     lowerPrivileges();
     runEventLoop();
 }

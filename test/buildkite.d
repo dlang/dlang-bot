@@ -396,7 +396,7 @@ auto findAgents(Json j, string hostname)
 @("reaps-dead-servers")
 unittest
 {
-    import dlangbot.buildkite : queryState, reapDeadServers;
+    import dlangbot.buildkite : cronReapDeadServers;
 
     setAPIExpectations(
         "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
@@ -430,14 +430,13 @@ unittest
         },
     );
 
-    auto info = queryState();
-    reapDeadServers(info);
+    cronReapDeadServers();
 }
 
 @("does-not-reap-running-servers")
 unittest
 {
-    import dlangbot.buildkite : queryState, reapDeadServers;
+    import dlangbot.buildkite : cronReapDeadServers;
 
     setAPIExpectations(
         "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
@@ -460,6 +459,5 @@ unittest
         },
     );
 
-    auto info = queryState();
-    reapDeadServers(info);
+    cronReapDeadServers();
 }

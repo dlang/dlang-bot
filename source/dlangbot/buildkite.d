@@ -95,6 +95,15 @@ Info reapDeadServers(Info info, Duration bootTimeout = 10.minutes)
     return info;
 }
 
+// for use as cron-job
+void cronReapDeadServers() nothrow @trusted
+{
+    try
+        reapDeadServers(queryState());
+    catch (Exception e)
+        logWarn("cronReapDeadServers failed %s", e);
+}
+
 struct Info
 {
     Organization organization;
