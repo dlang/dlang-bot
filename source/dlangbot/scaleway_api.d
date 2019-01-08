@@ -5,7 +5,7 @@ import std.array : array, empty, front;
 import std.datetime.systime;
 import std.string : format;
 
-import vibe.core.log : logError, logInfo;
+import vibe.core.log : logDebug, logError, logInfo;
 import vibe.data.json : byName, Name = name, deserializeJson, serializeToJson, Json;
 import vibe.http.common : enforceHTTP, HTTPMethod, HTTPStatus;
 import vibe.stream.operations : readAllUTF8;
@@ -25,6 +25,7 @@ struct Server
     enum State { starting, running, stopped }
     @byName State state;
     SysTime creation_date;
+    Volume[string] volumes;
 
     enum Action { poweron, poweroff, terminate }
 
@@ -37,7 +38,13 @@ struct Server
     void decommission()
     {
         logInfo("decommission scaleway server %s", name);
-        action(Action.terminate);
+        if (healthy)
+            action(Action.terminate);
+        else
+        {
+            scwDELETE("/servers/%s".format(id)).dropBody;
+            volumes.each!(v => v.delete_);
+        }
     }
 
     @property bool healthy() const
@@ -53,6 +60,16 @@ struct Image
 {
     string id, name, organization;
     @Name("creation_date") SysTime creationDate;
+}
+
+struct Volume
+{
+    string id, name;
+
+    void delete_()
+    {
+        scwDELETE("/volumes/%s".format(id)).dropBody;
+    }
 }
 
 Server[] servers()
@@ -92,6 +109,14 @@ auto scwGET(string path)
 {
     return request(scalewayAPIURL ~ path, (scope req) {
         req.headers["X-Auth-Token"] = scalewayAuth;
+    });
+}
+
+auto scwDELETE(string path)
+{
+    return request(scalewayAPIURL ~ path, (scope req) {
+        req.headers["X-Auth-Token"] = scalewayAuth;
+        req.method = HTTPMethod.DELETE;
     });
 }
 

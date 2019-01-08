@@ -131,10 +131,16 @@ unittest
         "/scaleway/servers", (ref Json j) {
             j["servers"][0]["state"] = "stopped";
         },
-        "/scaleway/servers/a4919456-92a2-4cab-b503-ca13aa14c786/action",
+        "/scaleway/servers/a4919456-92a2-4cab-b503-ca13aa14c786",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
-            assert(req.method == HTTPMethod.POST);
-            assert(req.json["action"] == "terminate");
+            assert(req.method == HTTPMethod.DELETE);
+            res.statusCode = 204;
+            res.writeBody("");
+        },
+        "/scaleway/volumes/33e87570-fbf6-40f8-9afd-af77fadf781a",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.DELETE);
+            res.statusCode = 204;
             res.writeBody("");
         },
         "/scaleway/images",
