@@ -18,14 +18,34 @@ unittest
 // Release-Builders on Scaleway (Bare Metal)
 //==============================================================================
 
+Json scwCreateServerResp(string id, string name)
+{
+    import core.time : Duration;
+    import std.datetime.timezone : SimpleTimeZone;
+    import std.file : readText;
+    import vibe.data.json : parseJsonString;
+
+    // use zulu to get +00:00 instead of Z suffix
+    static zulu = new immutable SimpleTimeZone(Duration.zero, "Etc/Zulu");
+    auto time = now(zulu).toISOExtString;
+
+    auto json = "data/payloads/scaleway_servers_post".readText.parseJsonString;
+    json["server"]["id"] = id;
+    json["server"]["name"] = name;
+    json["server"]["state"] = "stopped";
+    json["server"]["creation_date"] = time;
+    return json;
+}
+
 @("spawns-release-builder")
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipeline", (ref Json j) {
-            j["data"]["pipeline"]["scheduledBuilds"]["edges"] ~=
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
+            j.findPipeline("build-release")["scheduledBuilds"]["edges"] ~=
                 ["node": ["branch": "master"]].serializeToJson;
         }),
+        "/hcloud/servers",
         "/scaleway/servers", (ref Json j) {
             j["servers"] = Json.emptyArray;
         },
@@ -37,7 +57,7 @@ unittest
             auto name = req.json["name"].get!string;
             assert(req.json["image"] == "487de557-88fe-4029-a404-831c19744ebd");
             assert(req.json["organization"] == "aa435976-67f1-455c-b988-f4dc04c91f40");
-            res.writeJsonBody(["server": ["id": "a4919456-92a2-4cab-b503-ca13aa14c786", "name": name, "state": "stopped"]]);
+            res.writeJsonBody(scwCreateServerResp("a4919456-92a2-4cab-b503-ca13aa14c786", name));
         },
         "/scaleway/servers/a4919456-92a2-4cab-b503-ca13aa14c786/action",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
@@ -54,10 +74,11 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipeline", (ref Json j) {
-            j["data"]["pipeline"]["scheduledBuilds"]["edges"] ~=
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
+            j.findPipeline("build-release")["scheduledBuilds"]["edges"] ~=
                 ["node": ["branch": "master"]].serializeToJson;
         }),
+        "/hcloud/servers",
         "/scaleway/servers",
     );
 
@@ -68,12 +89,13 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipeline", (ref Json j) {
-            j["data"]["pipeline"]["scheduledBuilds"]["edges"] ~=
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
+            j.findPipeline("build-release")["scheduledBuilds"]["edges"] ~=
                 ["node": ["branch": "master"]].serializeToJson;
-            j["data"]["pipeline"]["runningBuilds"]["edges"] ~=
+            j.findPipeline("build-release")["runningBuilds"]["edges"] ~=
                 ["node": ["startedAt": (now - 30.minutes).toISOExtString]].serializeToJson;
         }),
+        "/hcloud/servers",
         "/scaleway/servers",
         "/scaleway/images",
         "/scaleway/servers",
@@ -83,7 +105,7 @@ unittest
             auto name = req.json["name"].get!string;
             assert(req.json["image"] == "487de557-88fe-4029-a404-831c19744ebd");
             assert(req.json["organization"] == "aa435976-67f1-455c-b988-f4dc04c91f40");
-            res.writeJsonBody(["server": ["id": "c9660dc8-cdd9-426c-99c8-1155a568d53e", "name": name, "state": "stopped"]]);
+            res.writeJsonBody(scwCreateServerResp("c9660dc8-cdd9-426c-99c8-1155a568d53e", name));
         },
         "/scaleway/servers/c9660dc8-cdd9-426c-99c8-1155a568d53e/action",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
@@ -96,16 +118,24 @@ unittest
     postBuildkiteHook("build_scheduled_build-release.json");
 }
 
-@("ignore-dead-release-builders")
+@("reaps-dead-release-builders")
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipeline", (ref Json j) {
-            j["data"]["pipeline"]["scheduledBuilds"]["edges"] ~=
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
+            j.findPipeline("build-release")["scheduledBuilds"]["edges"] ~=
                 ["node": ["branch": "master"]].serializeToJson;
+            j.findAgents("release-builder-89cd08ef-e418-4b0f-9453-7a218662fbdb").front["node"]["connectionState"] = "lost";
         }),
+        "/hcloud/servers",
         "/scaleway/servers", (ref Json j) {
             j["servers"][0]["state"] = "stopped";
+        },
+        "/scaleway/servers/a4919456-92a2-4cab-b503-ca13aa14c786/action",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.POST);
+            assert(req.json["action"] == "terminate");
+            res.writeBody("");
         },
         "/scaleway/images",
         "/scaleway/servers",
@@ -115,7 +145,7 @@ unittest
             auto name = req.json["name"].get!string;
             assert(req.json["image"] == "487de557-88fe-4029-a404-831c19744ebd");
             assert(req.json["organization"] == "aa435976-67f1-455c-b988-f4dc04c91f40");
-            res.writeJsonBody(["server": ["id": "c9660dc8-cdd9-426c-99c8-1155a568d53e", "name": name, "state": "stopped"]]);
+            res.writeJsonBody(scwCreateServerResp("c9660dc8-cdd9-426c-99c8-1155a568d53e", name));
         },
         "/scaleway/servers/c9660dc8-cdd9-426c-99c8-1155a568d53e/action",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
@@ -162,13 +192,14 @@ Json findPipeline(Json j, string name)
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
             j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
                 ["node": ["branch": "master"]].serializeToJson;
         }),
         "/hcloud/servers", (ref Json j) {
             j["servers"] = Json.emptyArray;
         },
+        "/scaleway/servers",
         "/hcloud/images?sort=created:desc&type=snapshot",
         "/hcloud/servers",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
@@ -187,11 +218,12 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
             j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
                 ["node": ["branch": "master"]].serializeToJson;
         }),
         "/hcloud/servers",
+        "/scaleway/servers",
     );
 
     postBuildkiteHook("build_scheduled_dmd.json");
@@ -201,7 +233,7 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
             j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
                 ["node": ["branch": "master"]].serializeToJson;
             j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
@@ -210,6 +242,7 @@ unittest
                 ["node": ["branch": "MartinNowak:fix19337"]].serializeToJson;
         }),
         "/hcloud/servers",
+        "/scaleway/servers",
         "/hcloud/images?sort=created:desc&type=snapshot",
         "/hcloud/servers",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
@@ -227,34 +260,38 @@ unittest
 @("reuses-existing-agent-from-running-builds")
 unittest
 {
-    import std.datetime.systime : Clock;
-    import std.datetime.timezone : UTC;
-
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
             j.findPipeline("dmd")["runningBuilds"]["edges"] ~=
-                ["node": ["startedAt": (now - 15.minutes).toISOExtString]].serializeToJson;
-            j.findPipeline("dmd")["runningBuilds"]["edges"] ~=
+                ["node": ["startedAt": (now - 10.minutes).toISOExtString]].serializeToJson;
+            j.findPipeline("phobos")["runningBuilds"]["edges"] ~=
                 ["node": ["startedAt": (now - 5.minutes).toISOExtString]].serializeToJson;
-            j.findPipeline("phobos")["scheduledBuilds"]["edges"] ~=
-                ["node": ["branch": "master"]].serializeToJson;
         }),
         "/hcloud/servers",
+        "/scaleway/servers",
     );
 
     postBuildkiteHook("build_scheduled_dmd.json");
 }
 
-@("ignore-dead-ci-agents")
+@("reaps-dead-ci-agents")
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
-            j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
-                ["node": ["branch": "master"]].serializeToJson;
-        }),
+        "/buildkite", &graphQL!"buildkite_organization",
         "/hcloud/servers", (ref Json j) {
             j["servers"][0]["status"] = "off";
+            j["servers"][0]["id"] = 1321993;
+            j["servers"][0]["name"] = "ci-agent-without-bk-agent";
+            j["servers"][0]["created"] = (now - 30.minutes).toISOExtString;
+        },
+        "/scaleway/servers", (ref Json j) {
+            j["servers"] = Json.emptyArray;
+        },
+        "/hcloud/servers/1321993",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.DELETE);
+            res.writeBody("");
         },
         "/hcloud/images?sort=created:desc&type=snapshot",
         "/hcloud/servers",
@@ -278,7 +315,8 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!"buildkite_pipeline",
+        "/buildkite", &graphQL!"buildkite_organization",
+        "/hcloud/servers",
         "/scaleway/servers", (ref Json j) {
             j["servers"][0]["name"] = "release-builder-123456";
             j["servers"][0]["id"] = "a4919456-92a2-4cab-b503-ca13aa14c786";
@@ -298,11 +336,12 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!"buildkite_pipelines",
+        "/buildkite", &graphQL!"buildkite_organization",
         "/hcloud/servers", (ref Json j) {
             j["servers"][0]["name"] = "ci-agent-123456";
             j["servers"][0]["id"] = 1321993;
         },
+        "/scaleway/servers",
         "/hcloud/servers/1321993",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.method == HTTPMethod.DELETE);
@@ -317,10 +356,11 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipeline", (ref Json j) {
-            j["data"]["pipeline"]["runningBuilds"]["edges"] ~=
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
+            j.findPipeline("build-release")["runningBuilds"]["edges"] ~=
                 ["node": ["startedAt": (now - 30.minutes).toISOExtString]].serializeToJson;
         }),
+        "/hcloud/servers",
         "/scaleway/servers",
     );
 
@@ -331,12 +371,93 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/buildkite", &graphQL!("buildkite_pipelines", (ref Json j) {
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
             j.findPipeline("dmd")["scheduledBuilds"]["edges"] ~=
                 ["node": ["branch": "master"]].serializeToJson;
         }),
         "/hcloud/servers",
+        "/scaleway/servers",
     );
 
     postAgentShutdownCheck("ci-agent-123456");
+}
+
+//==============================================================================
+// dead server reaper
+//==============================================================================
+
+// gets agent from buildkite GraphQL query for all agents
+auto findAgents(Json j, string hostname)
+{
+    return j["data"]["organization"]["agents"]["edges"][]
+        .filter!(p => p["node"]["hostname"] == hostname);
+}
+
+@("reaps-dead-servers")
+unittest
+{
+    import dlangbot.buildkite : cronReapDeadServers;
+
+    setAPIExpectations(
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
+            j.findAgents("ci-agent-88e9e60d-bfb0-4567-921e-c955eac25653").each!((ref j) { j["node"]["connectionState"] = "stopping"; });
+            j.findAgents("release-builder-89cd08ef-e418-4b0f-9453-7a218662fbdb").front["node"]["connectionState"] = "lost";
+        }),
+        "/hcloud/servers", (ref Json j) {
+            j["servers"][0]["id"] = 1321993;
+            j["servers"][0]["name"] = "ci-agent-88e9e60d-bfb0-4567-921e-c955eac25653";
+            j["servers"][0]["created"] = (now - 30.minutes).toISOExtString;
+            j["servers"] ~= j["servers"][0].clone;
+            j["servers"][1]["id"] = 1321994;
+            j["servers"][1]["name"] = "ci-agent-93faf8ca-6633-4b96-9abb-3d9cb1c4018e";
+            j["servers"][1]["created"] = (now - 40.minutes).toISOExtString;
+        },
+        "/scaleway/servers", (ref Json j) {
+            j["servers"][0]["id"] = "a4919456-92a2-4cab-b503-ca13aa14c786";
+            j["servers"][0]["name"] = "release-builder-89cd08ef-e418-4b0f-9453-7a218662fbdb";
+            j["servers"][0]["creation_date"] = (now - 60.minutes).toISOExtString;
+        },
+        "/hcloud/servers/1321993",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.DELETE);
+            res.writeBody("");
+        },
+        "/scaleway/servers/a4919456-92a2-4cab-b503-ca13aa14c786/action",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.POST);
+            assert(req.json["action"] == "terminate");
+            res.writeBody("");
+        },
+    );
+
+    cronReapDeadServers();
+}
+
+@("does-not-reap-running-servers")
+unittest
+{
+    import dlangbot.buildkite : cronReapDeadServers;
+
+    setAPIExpectations(
+        "/buildkite", &graphQL!("buildkite_organization", (ref Json j) {
+            // keep hosts running when some of it's agents are dead (might be due to updates or clean shutdown)
+            j.findAgents("ci-agent-88e9e60d-bfb0-4567-921e-c955eac25653").front["node"]["connectionState"] = "stopping";
+        }),
+        "/hcloud/servers", (ref Json j) {
+            j["servers"][0]["id"] = 1321993;
+            j["servers"][0]["name"] = "ci-agent-88e9e60d-bfb0-4567-921e-c955eac25653";
+            j["servers"][0]["created"] = (now - 30.minutes).toISOExtString;
+            j["servers"] ~= j["servers"][0].clone;
+            j["servers"][1]["id"] = 1321994;
+            j["servers"][1]["name"] = "ci-agent-93faf8ca-6633-4b96-9abb-3d9cb1c4018e";
+            j["servers"][1]["created"] = (now - 40.minutes).toISOExtString;
+        },
+        "/scaleway/servers", (ref Json j) {
+            j["servers"][0]["id"] = "a4919456-92a2-4cab-b503-ca13aa14c786";
+            j["servers"][0]["name"] = "release-builder-89cd08ef-e418-4b0f-9453-7a218662fbdb";
+            j["servers"][0]["creation_date"] = (now - 60.minutes).toISOExtString;
+        },
+    );
+
+    cronReapDeadServers();
 }

@@ -1,7 +1,7 @@
 module dlangbot.github_api;
 
-string githubAPIURL = "https://api.github.com";
-string githubAuth, githubHookSecret;
+shared string githubAPIURL = "https://api.github.com";
+shared string githubAuth, githubHookSecret;
 
 import std.algorithm, std.range;
 import std.datetime : SysTime;

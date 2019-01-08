@@ -1,0 +1,92 @@
+{
+  "server": {
+    "allowed_actions": [
+      "poweron",
+      "backup"
+    ],
+    "maintenances": [],
+    "state_detail": "",
+    "image": {
+      "creation_date": "2018-11-20T15:07:49.832074+00:00",
+      "default_bootscript": {
+        "kernel": "http://169.254.42.24/kernel/x86_64-mainline-lts-4.9-4.9.93-rev1/vmlinuz-4.9.93",
+        "initrd": "http://169.254.42.24/initrd/initrd-Linux-x86_64-v3.14.6.gz",
+        "default": false,
+        "bootcmdargs": "LINUX_COMMON scaleway boot=local nbd.max_part=16",
+        "architecture": "x86_64",
+        "title": "x86_64 mainline 4.9.93 rev1",
+        "dtb": "",
+        "organization": "11111111-1111-4111-8111-111111111111",
+        "id": "15fbd2f7-a0f9-412b-8502-6a44da8d98b8",
+        "public": true
+      },
+      "from_server": null,
+      "arch": "x86_64",
+      "id": "8391d08a-e1df-4230-90c0-0c572907f105",
+      "root_volume": {
+        "size": 50000000000,
+        "id": "0121feb4-5f47-4a2f-9a9e-00c13c681aba",
+        "volume_type": "l_ssd",
+        "name": "release-builder"
+      },
+      "name": "release-builder",
+      "modification_date": "2018-11-20T15:07:49.832074+00:00",
+      "state": "available",
+      "organization": "e7f21552-b79a-404d-96f9-ff4a14f37841",
+      "extra_volumes": {},
+      "public": false
+    },
+    "creation_date": "2018-12-31T18:08:33.340845+00:00",
+    "public_ip": null,
+    "private_ip": null,
+    "id": "d44e0d79-bd91-4497-8c1f-6f1521213325",
+    "dynamic_ip_required": true,
+    "modification_date": "2018-12-31T18:08:34.018624+00:00",
+    "enable_ipv6": false,
+    "hostname": "release-builder-123",
+    "state": "stopped",
+    "bootscript": {
+      "kernel": "http://169.254.42.24/kernel/x86_64-mainline-lts-4.9-4.9.93-rev1/vmlinuz-4.9.93",
+      "initrd": "http://169.254.42.24/initrd/initrd-Linux-x86_64-v3.14.6.gz",
+      "default": false,
+      "bootcmdargs": "LINUX_COMMON scaleway boot=local nbd.max_part=16",
+      "architecture": "x86_64",
+      "title": "x86_64 mainline 4.9.93 rev1",
+      "dtb": "",
+      "organization": "11111111-1111-4111-8111-111111111111",
+      "id": "15fbd2f7-a0f9-412b-8502-6a44da8d98b8",
+      "public": true
+    },
+    "location": null,
+    "boot_type": "bootscript",
+    "ipv6": null,
+    "commercial_type": "C2S",
+    "tags": [],
+    "arch": "x86_64",
+    "extra_networks": [],
+    "name": "release-builder-123",
+    "protected": false,
+    "volumes": {
+      "0": {
+        "size": 50000000000,
+        "state": "available",
+        "name": "release-builder",
+        "modification_date": "2018-12-31T18:08:33.969740+00:00",
+        "organization": "e7f21552-b79a-404d-96f9-ff4a14f37841",
+        "export_uri": null,
+        "creation_date": "2018-12-31T18:08:33.340845+00:00",
+        "id": "1ae99328-2c8b-4150-9a3f-83a17af3fe09",
+        "volume_type": "l_ssd",
+        "server": {
+          "id": "d44e0d79-bd91-4497-8c1f-6f1521213325",
+          "name": "release-builder-123"
+        }
+      }
+    },
+    "security_group": {
+      "id": "12f49887-4dda-43ce-895e-cbb7ad29ce1a",
+      "name": "Default security group"
+    },
+    "organization": "e7f21552-b79a-404d-96f9-ff4a14f37841"
+  }
+}

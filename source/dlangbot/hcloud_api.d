@@ -13,8 +13,8 @@ import vibe.stream.operations : readAllUTF8;
 
 import dlangbot.utils : request;
 
-string hcloudAPIURL = "https://api.hetzner.cloud/v1";
-string hcloudAuth;
+shared string hcloudAPIURL = "https://api.hetzner.cloud/v1";
+shared string hcloudAuth;
 
 //==============================================================================
 // Hetzner Cloud (KVM) servers
@@ -26,6 +26,7 @@ struct Server
     string name;
     enum Status { running, initializing, starting, stopping, off, deleting, migrating, rebuilding, unknown }
     @byName Status status;
+    SysTime created;
 
     void decommission()
     {
