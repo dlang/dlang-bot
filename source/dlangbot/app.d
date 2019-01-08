@@ -321,7 +321,8 @@ void buildkiteHook(HTTPServerRequest req, HTTPServerResponse res)
         return res.writeBody("handled");
 
     case "build.scheduled":
-        handleBuild(json["pipeline"]["name"].get!string);
+        auto pipeline = json["pipeline"]["name"].get!string;
+        runTaskHelper(&handleBuild, pipeline);
         break;
 
     default:
@@ -338,9 +339,9 @@ void agentShutdownCheck(HTTPServerRequest req, HTTPServerResponse res)
     import std.algorithm.searching : startsWith;
 
     verifyAgentRequest(req.headers.get("Authentication"));
-    auto hostname = req.form.get("hostname");
+    string hostname = req.form.get("hostname");
     logInfo("agentShutdownCheck hostname:%s", hostname);
-    agentShutdownCheck(hostname);
+    runTaskHelper(&agentShutdownCheck, hostname);
     res.writeBody("");
 }
 
