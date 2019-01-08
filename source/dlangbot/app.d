@@ -72,7 +72,7 @@ void startCrons()
     {
         enum periodic = true;
         setTimer(uniform(0, interval.total!"seconds").seconds,
-            { setTimer(interval, callback, periodic); },
+            { setTimer(interval, callback, periodic); callback(); },
             !periodic
         );
     }
