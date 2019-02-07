@@ -50,6 +50,8 @@ shared static this()
     scalewayOrg = "aa435976-67f1-455c-b988-f4dc04c91f40";
     hcloudAuth = "Bearer BDc2RZCKKvgdyF6Dgex1kg4NGwkScI9xzBZqGJemkR4GopohwatiH0IRD2iTg61o";
     dlangbotAgentAuth = "Bearer fjSL8ITFkOxS5PF9p5lM41mox";
+    bugzillaLogin = "bugzilla@test.org";
+    bugzillaPassword = "BUGZILLA_DUMMY_PW";
 
     // start our hook server
     auto settings = new HTTPServerSettings;
