@@ -84,18 +84,24 @@ Issue[] getDescriptions(R)(R issueRefs)
 
 shared string bugzillaLogin, bugzillaPassword;
 
-Json apiCall(string method, Json[string] params)
+Json apiCall(string method, Json[string] params = null)
 {
     import vibe.stream.operations : readAllUTF8;
     import dlangbot.utils : request;
 
-    string[string] urlParams = [
-        "method" : method,
-    ];
-    if (params)
-        urlParams["params"] = params.Json.toString();
-    auto url = bugzillaURL ~ "/jsonrpc.cgi?" ~ urlEncode(urlParams);
-    auto jsonText = url.request.bodyReader.readAllUTF8;
+    auto url = bugzillaURL ~ "/jsonrpc.cgi";
+    auto jsonText = url.request(
+        (scope req) {
+            import vibe.http.common : HTTPMethod;
+            req.method = HTTPMethod.POST;
+            req.headers["Content-Type"] = "application/json-rpc";
+            req.writeJsonBody([
+                "method" : method.Json,
+                "params" : [params.Json].Json,
+                "id" : 0.Json, // https://bugzilla.mozilla.org/show_bug.cgi?id=694663
+            ].Json);
+        }
+    ).bodyReader.readAllUTF8;
     auto reply = jsonText.parseJsonString();
     enforce(reply["error"] == null, "Server error: " ~ reply["error"].to!string);
     return reply["result"];
