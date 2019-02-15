@@ -1,10 +1,12 @@
 module dlangbot.bugzilla;
 
-import vibe.data.json : Json;
+import vibe.data.json : Json, parseJsonString;
+import vibe.inet.webform : urlEncode;
 
 shared string bugzillaURL = "https://issues.dlang.org";
 
 import std.algorithm, std.conv, std.range, std.string;
+import std.exception : enforce;
 import std.format : format;
 
 //==============================================================================
@@ -78,4 +80,49 @@ Issue[] getDescriptions(R)(R issueRefs)
         .array
         .sort!((a, b) => a.id < b.id)
         .release;
+}
+
+shared string bugzillaLogin, bugzillaPassword;
+
+Json apiCall(string method, Json[string] params = null)
+{
+    import vibe.stream.operations : readAllUTF8;
+    import dlangbot.utils : request;
+
+    auto url = bugzillaURL ~ "/jsonrpc.cgi";
+    auto jsonText = url.request(
+        (scope req) {
+            import vibe.http.common : HTTPMethod;
+            req.method = HTTPMethod.POST;
+            req.headers["Content-Type"] = "application/json-rpc";
+            req.writeJsonBody([
+                "method" : method.Json,
+                "params" : [params.Json].Json,
+                "id" : 0.Json, // https://bugzilla.mozilla.org/show_bug.cgi?id=694663
+            ].Json);
+        }
+    ).bodyReader.readAllUTF8;
+    auto reply = jsonText.parseJsonString();
+    enforce(reply["error"] == null, "Server error: " ~ reply["error"].to!string);
+    return reply["result"];
+}
+
+Json authenticatedApiCall(string method, Json[string] params)
+{
+    params["Bugzilla_login"] = bugzillaLogin;
+    params["Bugzilla_password"] = bugzillaPassword;
+    return apiCall(method, params);
+}
+
+/// Close these bug IDs as FIXED and leave a comment.
+void closeIssues(int[] bugIDs, string comment)
+{
+    authenticatedApiCall("Bug.update", [
+        "ids" : bugIDs.map!(id => Json(id)).array.Json,
+        "status" : "RESOLVED".Json,
+        "resolution" : "FIXED".Json,
+        "comment" : [
+            "body" : comment.Json,
+        ].Json,
+    ]);
 }

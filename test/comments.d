@@ -279,7 +279,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
-@("do-not-readd-labels-2-#112")
+@("do-not-read-labels-2-#112")
 unittest
 {
     setAPIExpectations(
@@ -303,7 +303,7 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_5519.json");
 }
 
-@("do-not-readd-labels-3-#112")
+@("do-not-read-labels-3-#112")
 unittest
 {
     setAPIExpectations(

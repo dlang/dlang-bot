@@ -50,6 +50,8 @@ shared static this()
     scalewayOrg = "aa435976-67f1-455c-b988-f4dc04c91f40";
     hcloudAuth = "Bearer BDc2RZCKKvgdyF6Dgex1kg4NGwkScI9xzBZqGJemkR4GopohwatiH0IRD2iTg61o";
     dlangbotAgentAuth = "Bearer fjSL8ITFkOxS5PF9p5lM41mox";
+    bugzillaLogin = "bugzilla@test.org";
+    bugzillaPassword = "BUGZILLA_DUMMY_PW";
 
     // start our hook server
     auto settings = new HTTPServerSettings;
@@ -109,10 +111,9 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     }
     else
     {
-        scope(failure) {
-            writeln("Remaining expected URLs:", apiExpectations.map!(x => x.url));
-        }
-        assert(0, "Request for unexpected URL received: " ~ req.requestURL);
+        logError("Remaining expected URLs: %s", apiExpectations.map!(x => x.url));
+        logError("Request for unexpected URL received: '%s'", req.requestURL);
+        assert(0);
     }
 
     res.statusCode = expectation.respStatusCode;
@@ -138,7 +139,8 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
 
     if (!filePath.exists)
     {
-        assert(0, "Please create payload: " ~ filePath);
+        logError("Please create payload: " ~ filePath);
+        assert(0);
     }
     else
     {

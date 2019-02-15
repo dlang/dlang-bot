@@ -6,7 +6,7 @@ import dlangbot.github;
 import dlangbot.trello;
 import dlangbot.utils;
 
-public import dlangbot.bugzilla : bugzillaURL;
+public import dlangbot.bugzilla : bugzillaLogin, bugzillaPassword, bugzillaURL;
 public import dlangbot.github_api   : githubAPIURL, githubAuth, githubHookSecret;
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
 public import dlangbot.twitter : oAuth, tweet, twitterURL, twitterEnabled;
@@ -276,6 +276,20 @@ void handlePR(string action, PullRequest* _pr)
         logDebug("[github/handlePR](%s): updating trello card", _pr.pid);
         updateTrelloCard(action, pr.htmlURL, refs, descs);
     }
+
+    if (action == "merged")
+    {
+        import std.algorithm.iteration : filter, map;
+        import std.array : array;
+
+        auto ids = refs.filter!(r => r.fixed).map!(r => r.id).array;
+        if (ids.length)
+            closeIssues(ids,
+                "%s pull request #%d \"%s\" was merged:\n\n%s".format(
+                    pr.baseRepoSlug, pr.number, pr.title,
+                    pr.htmlURL,
+                ));
+    }
 }
 
 void handleReview(string action, PullRequest* _pr)
@@ -384,6 +398,8 @@ else void main(string[] args)
     oAuth.config.consumerKeySecret = environment["TWITTER_CONSUMER_KEY_SECRET"];
     oAuth.config.accessToken = environment["TWITTER_ACCESS_TOKEN"];
     oAuth.config.accessTokenSecret = environment["TWITTER_ACCESS_TOKEN_SECRET"];
+    bugzillaLogin = environment["BUGZILLA_LOGIN"];
+    bugzillaPassword = environment["BUGZILLA_PASSWORD"];
     twitterEnabled = true;
 
     // workaround for stupid openssl.conf on Heroku
