@@ -137,26 +137,18 @@ Json authenticatedApiCall(string method, Json[string] params)
     return apiCall(method, params);
 }
 
-/// Post a comment for these bug IDs.
-void postIssueComment(int[] bugIDs, string comment)
+void updateBugs(int[] bugIDs, string comment, bool closeAsFixed)
 {
-    authenticatedApiCall("Bug.update", [
-        "ids" : bugIDs.map!(id => Json(id)).array.Json,
-        "comment" : [
-            "body" : comment.Json,
-        ].Json,
-    ]);
-}
+    Json[string] params;
+    params["ids"] = bugIDs.map!(id => Json(id)).array.Json;
 
-/// Close these bug IDs as FIXED and leave a comment.
-void closeIssues(int[] bugIDs, string comment)
-{
-    authenticatedApiCall("Bug.update", [
-        "ids" : bugIDs.map!(id => Json(id)).array.Json,
-        "status" : "RESOLVED".Json,
-        "resolution" : "FIXED".Json,
-        "comment" : [
-            "body" : comment.Json,
-        ].Json,
-    ]);
+    if (comment)
+        params["comment"] = ["body" : comment.Json].Json;
+    if (closeAsFixed)
+    {
+        params["status"] = "RESOLVED".Json;
+        params["resolution"] = "FIXED".Json;
+    }
+
+    authenticatedApiCall("Bug.update", params);
 }

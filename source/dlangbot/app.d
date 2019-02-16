@@ -288,10 +288,8 @@ void handlePR(string action, PullRequest* _pr)
             pr.htmlURL,
         );
 
-        if (refs.canFind!(r => !r.fixed))
-            postIssueComment(refs.filter!(r => !r.fixed).map!(r => r.id).array, issueComment);
-        if (refs.canFind!(r => r.fixed))
-            closeIssues(refs.filter!(r => r.fixed).map!(r => r.id).array, issueComment);
+        foreach (r; refs)
+            updateBugs([r.id], issueComment, r.fixed);
     }
 }
 
