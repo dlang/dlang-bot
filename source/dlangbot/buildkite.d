@@ -115,16 +115,16 @@ struct Info
 
 Info queryState(string pipelineSearch=null)
 {
-    import std.algorithm : remove;
-    import vibe.core.concurrency : async;
+    import std.algorithm : map, remove, each;
+    import std.array : array;
+    import vibe.core.core : runTask;
 
     typeof(return) ret;
-    auto org = async(&organization, pipelineSearch),
-        hcS = async(&hc.servers),
-        scwS = async(&scw.servers);
-    ret.organization = org.getResult;
-    ret.hcServers = hcS.getResult.remove!(s => !s.name.startsWith("ci-agent-"));
-    ret.scwServers = scwS.getResult.remove!(s => !s.name.startsWith("release-builder-"));
+    [
+        { ret.organization = organization(pipelineSearch); },
+        { ret.hcServers = hc.servers.remove!(s => !s.name.startsWith("ci-agent-")); },
+        { ret.scwServers = scw.servers.remove!(s => !s.name.startsWith("release-builder-")); },
+    ].map!runTask.array.each!(task => task.join);
     return ret;
 }
 
