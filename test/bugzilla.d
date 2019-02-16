@@ -1,3 +1,5 @@
+import std.string;
+
 import utils;
 
 @("after-merge-close-issue-bugzilla")
@@ -22,6 +24,15 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.POST);
             assert(req.json["method"].get!string == "Bug.update");
+
+            auto comment = req.json["params"][0]["comment"]["body"].get!string;
+			enum expected = q"EOF
+dlang/phobos pull request #4963 "[DEMO for DIP1005] Converted imports to selective imports in std.array" was merged:
+
+https://github.com/dlang/phobos/pull/4963
+EOF".chomp;
+            assert(comment == expected, comment);
+
             auto j = Json(["error" : Json(null), "result" : Json.emptyObject]);
             res.writeJsonBody(j);
         },
