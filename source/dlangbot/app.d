@@ -280,11 +280,30 @@ void handlePR(string action, PullRequest* _pr)
     if (action == "merged")
     {
         import std.algorithm.iteration : filter, map;
-        import std.algorithm.searching : canFind;
-        import std.array : array, replace;
+        import std.algorithm.searching : canFind, all;
+        import std.array : array, assocArray, join, replace;
+        import std.regex : regex, matchAll;
+
+        auto oldComments = getBugComments(refs.map!(r => r.id).array);
 
         foreach (r; refs)
         {
+            auto previouslyMentionedCommits = oldComments[r.id]
+                // Look at only our comments
+                .filter!(comment => comment["creator"].get!string == bugzillaLogin)
+                // Get comment body
+                .map!(comment => comment["text"].get!string)
+                // Concatenate all of our comments' bodies
+                .join
+                // Extract mentioned commit hashes (see format string below)
+                .matchAll(regex(`\n- ([0-9a-f]{40}) by `))
+                // Extract matches and convert to hashset
+                .map!(m => tuple(m[1], (void[0]).init))
+                .assocArray;
+
+            if (r.commits.map!(c => c["sha"].get!string).all!(c => c in previouslyMentionedCommits))
+                continue; // We've previously already mentioned all commits in this PR in this issue thread.
+
             auto issueComment = "%s pull request #%d \"%s\" was merged into %s:\n\n%-(%s\n\n%)\n\n%s".format(
                 pr.baseRepoSlug, pr.number, pr.title, pr.base.ref_,
                 r.commits.map!(c =>
