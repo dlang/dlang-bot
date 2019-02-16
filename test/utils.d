@@ -299,11 +299,9 @@ void postGitHubHook(string payload, string eventType = "pull_request",
         req.headers["X-Hub-Signature"] = getSignature(respStr);
         req.writeBody(cast(ubyte[]) respStr);
     });
-    scope(failure) {
-        if (req.statusCode != 200)
-            writeln(req.bodyReader.readAllUTF8);
-    }
-    assert(req.statusCode == 200);
+    assert(req.statusCode == 200,
+        "Request failed with status %d. Response body:\n\n%s"
+        .format(req.statusCode, req.bodyReader.readAllUTF8));
     assert(req.bodyReader.readAllUTF8 == "handled");
     checkAPIExpectations;
 }
