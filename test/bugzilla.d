@@ -31,6 +31,9 @@ unittest
 			enum expected = q"EOF
 dlang/phobos pull request #4963 "[DEMO for DIP1005] Converted imports to selective imports in std.array" was merged into master:
 
+- e064d5664f92c4b2f0866c08f6d0290ba66825ed by Andrei Alexandrescu:
+  Fix Issue 17564
+
 https://github.com/dlang/phobos/pull/4963
 EOF".chomp;
             assert(comment == expected, comment);
@@ -63,6 +66,9 @@ unittest
             auto comment = req.json["params"][0]["comment"]["body"].get!string;
 			enum expected = q"EOF
 dlang/phobos pull request #4963 "[DEMO for DIP1005] Converted imports to selective imports in std.array" was merged into master:
+
+- e064d5664f92c4b2f0866c08f6d0290ba66825ed by Andrei Alexandrescu:
+  Do something with Issue 17564
 
 https://github.com/dlang/phobos/pull/4963
 EOF".chomp;

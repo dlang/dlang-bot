@@ -281,15 +281,24 @@ void handlePR(string action, PullRequest* _pr)
     {
         import std.algorithm.iteration : filter, map;
         import std.algorithm.searching : canFind;
-        import std.array : array;
-
-        auto issueComment = "%s pull request #%d \"%s\" was merged into %s:\n\n%s".format(
-            pr.baseRepoSlug, pr.number, pr.title, pr.base.ref_,
-            pr.htmlURL,
-        );
+        import std.array : array, replace;
 
         foreach (r; refs)
+        {
+            auto issueComment = "%s pull request #%d \"%s\" was merged into %s:\n\n%-(%s\n\n%)\n\n%s".format(
+                pr.baseRepoSlug, pr.number, pr.title, pr.base.ref_,
+                r.commits.map!(c =>
+                    "- %s by %s:\n  %s".format(
+                        c["sha"].get!string,
+                        c["commit"]["author"]["name"].get!string,
+                        c["commit"]["message"].get!string.replace("\n", "\n  "),
+                    )
+                ),
+                pr.htmlURL,
+            );
+
             updateBugs([r.id], issueComment, r.fixed);
+        }
     }
 }
 
