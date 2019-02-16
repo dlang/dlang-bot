@@ -280,15 +280,18 @@ void handlePR(string action, PullRequest* _pr)
     if (action == "merged")
     {
         import std.algorithm.iteration : filter, map;
+        import std.algorithm.searching : canFind;
         import std.array : array;
 
-        auto ids = refs.filter!(r => r.fixed).map!(r => r.id).array;
-        if (ids.length)
-            closeIssues(ids,
-                "%s pull request #%d \"%s\" was merged into %s:\n\n%s".format(
-                    pr.baseRepoSlug, pr.number, pr.title, pr.base.ref_,
-                    pr.htmlURL,
-                ));
+        auto issueComment = "%s pull request #%d \"%s\" was merged into %s:\n\n%s".format(
+            pr.baseRepoSlug, pr.number, pr.title, pr.base.ref_,
+            pr.htmlURL,
+        );
+
+        if (refs.canFind!(r => !r.fixed))
+            postIssueComment(refs.filter!(r => !r.fixed).map!(r => r.id).array, issueComment);
+        if (refs.canFind!(r => r.fixed))
+            closeIssues(refs.filter!(r => r.fixed).map!(r => r.id).array, issueComment);
     }
 }
 

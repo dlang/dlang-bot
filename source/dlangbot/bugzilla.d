@@ -114,6 +114,17 @@ Json authenticatedApiCall(string method, Json[string] params)
     return apiCall(method, params);
 }
 
+/// Post a comment for these bug IDs.
+void postIssueComment(int[] bugIDs, string comment)
+{
+    authenticatedApiCall("Bug.update", [
+        "ids" : bugIDs.map!(id => Json(id)).array.Json,
+        "comment" : [
+            "body" : comment.Json,
+        ].Json,
+    ]);
+}
+
 /// Close these bug IDs as FIXED and leave a comment.
 void closeIssues(int[] bugIDs, string comment)
 {
