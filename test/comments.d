@@ -24,6 +24,8 @@ Auto-close | Bugzilla | Severity | Description
             assert(req.json["body"].get!string.canFind(expectedComment));
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi", // Bug.comments
+        "/bugzilla/jsonrpc.cgi", // Bug.update
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
@@ -55,6 +57,8 @@ Auto-close | Bugzilla | Severity | Description
             res.writeVoidBody;
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi", // Bug.comments
+        "/bugzilla/jsonrpc.cgi", // Bug.update
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
@@ -142,6 +146,8 @@ unittest
             assert(req.json[].equal(["Enhancement"]));
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi", // Bug.comments
+        "/bugzilla/jsonrpc.cgi", // Bug.update
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
@@ -168,6 +174,8 @@ unittest
             assert(body_.canFind("@andralex"));
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi", // Bug.comments
+        "/bugzilla/jsonrpc.cgi", // Bug.update
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
@@ -252,6 +260,8 @@ Auto-close | Bugzilla | Severity | Description
             res.writeVoidBody;
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi", // Bug.comments
+        "/bugzilla/jsonrpc.cgi", // Bug.update
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
@@ -298,6 +308,8 @@ unittest
         },
         "/github/repos/dlang/phobos/issues/5519/labels",
         "/trello/1/search?query=name:%22Issue%2017564%22&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi", // Bug.comments
+        "/bugzilla/jsonrpc.cgi", // Bug.update
     );
 
     postGitHubHook("dlang_phobos_synchronize_5519.json");
@@ -334,6 +346,8 @@ unittest
         "/github/repos/dlang/phobos/issues/4921/comments",
         "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi", // Bug.comments
+        "/bugzilla/jsonrpc.cgi", // Bug.update
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json", "pull_request", (ref Json j, scope req) {
@@ -365,6 +379,8 @@ unittest
             assert(!req.json["body"].get!string.canFind("Regression or critical bug fixes"));
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi", // Bug.comments
+        "/bugzilla/jsonrpc.cgi", // Bug.update
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
@@ -396,6 +412,7 @@ unittest
             assert(!req.json["body"].get!string.canFind("Regression or critical bug fixes"));
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi", // Bug.comments
     );
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
