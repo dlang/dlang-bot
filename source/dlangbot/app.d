@@ -285,8 +285,8 @@ void handlePR(string action, PullRequest* _pr)
         auto ids = refs.filter!(r => r.fixed).map!(r => r.id).array;
         if (ids.length)
             closeIssues(ids,
-                "%s pull request #%d \"%s\" was merged:\n\n%s".format(
-                    pr.baseRepoSlug, pr.number, pr.title,
+                "%s pull request #%d \"%s\" was merged into %s:\n\n%s".format(
+                    pr.baseRepoSlug, pr.number, pr.title, pr.base.ref_,
                     pr.htmlURL,
                 ));
     }
