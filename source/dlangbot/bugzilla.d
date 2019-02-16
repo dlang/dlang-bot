@@ -137,7 +137,7 @@ Json authenticatedApiCall(string method, Json[string] params)
     return apiCall(method, params);
 }
 
-void updateBugs(int[] bugIDs, string comment, bool closeAsFixed)
+void updateBugs(int[] bugIDs, string comment, bool closeAsFixed, string[] addKeywords = null)
 {
     Json[string] params;
     params["ids"] = bugIDs.map!(id => Json(id)).array.Json;
@@ -149,6 +149,8 @@ void updateBugs(int[] bugIDs, string comment, bool closeAsFixed)
         params["status"] = "RESOLVED".Json;
         params["resolution"] = "FIXED".Json;
     }
+    if (addKeywords)
+        params["keywords"] = ["add" : addKeywords.map!(k => Json(k)).array.Json].Json;
 
     authenticatedApiCall("Bug.update", params);
 }

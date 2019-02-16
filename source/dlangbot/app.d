@@ -318,7 +318,7 @@ void handlePR(string action, PullRequest* _pr)
                 pr.htmlURL,
             );
 
-            updateBugs([r.id], issueComment, false);
+            updateBugs([r.id], issueComment, false, r.fixed ? ["pull"] : null);
         }
     }
 

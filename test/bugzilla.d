@@ -192,6 +192,7 @@ unittest
             assert(req.json["method"].get!string == "Bug.update");
             assert("status" !in req.json["params"][0]);
             assert("resolution" !in req.json["params"][0]);
+            assert("keywords" in req.json["params"][0]);
 
             auto comment = req.json["params"][0]["comment"]["body"].get!string;
 			enum expected = q"EOF
