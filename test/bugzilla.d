@@ -42,7 +42,7 @@ unittest
             assert(req.json["params"][0]["resolution"].get!string == "FIXED");
 
             auto comment = req.json["params"][0]["comment"]["body"].get!string;
-			enum expected = q"EOF
+            enum expected = q"EOF
 dlang/phobos pull request #4963 "[DEMO for DIP1005] Converted imports to selective imports in std.array" was merged into master:
 
 - e064d5664f92c4b2f0866c08f6d0290ba66825ed by Andrei Alexandrescu:
@@ -92,7 +92,7 @@ unittest
             assert("resolution" !in req.json["params"][0]);
 
             auto comment = req.json["params"][0]["comment"]["body"].get!string;
-			enum expected = q"EOF
+            enum expected = q"EOF
 dlang/phobos pull request #4963 "[DEMO for DIP1005] Converted imports to selective imports in std.array" was merged into master:
 
 - e064d5664f92c4b2f0866c08f6d0290ba66825ed by Andrei Alexandrescu:
@@ -131,7 +131,7 @@ unittest
         "/bugzilla/jsonrpc.cgi",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.json["method"].get!string == "Bug.comments");
-			enum oldComment = q"EOF
+            enum oldComment = q"EOF
 dlang/phobos pull request #4963 "[DEMO for DIP1005] Converted imports to selective imports in std.array" was merged into stable:
 
 - e064d5664f92c4b2f0866c08f6d0290ba66825ed by Andrei Alexandrescu:
@@ -195,7 +195,7 @@ unittest
             assert("keywords" in req.json["params"][0]);
 
             auto comment = req.json["params"][0]["comment"]["body"].get!string;
-			enum expected = q"EOF
+            enum expected = q"EOF
 @MartinNowak created dlang/dmd pull request #6359 "fix Issue 16794 - dmd not working on Ubuntu 16.10" fixing this issue:
 
 - fix Issue 16794 - dmd not working on Ubuntu 16.10
@@ -257,7 +257,7 @@ unittest
         "/bugzilla/jsonrpc.cgi", // Bug.comments
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.json["method"].get!string == "Bug.comments");
-			enum oldComment = q"EOF
+            enum oldComment = q"EOF
 @andralex created dlang/phobos pull request #4921 "[DEMO for DIP1005] Converted imports to selective imports in std.array" mentioning this issue:
 
 - yada yada

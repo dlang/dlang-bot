@@ -3,8 +3,8 @@
     "result" : {
         "bugs" : {
             "16794" : {
-		"comments" : []
-	    }
+                "comments" : []
+            }
         },
         "comments" : {}
     }

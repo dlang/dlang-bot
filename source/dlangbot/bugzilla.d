@@ -161,11 +161,11 @@ Json[][int] getBugComments(int[] ids)
 
     foreach (chunk; ids.chunks(1000))
     {
-		// Use an authenticated API call to also get users' email addresses
-		// (to identify our own comments).
-		auto result = authenticatedApiCall("Bug.comments", [
-			"ids" : chunk.map!(id => id.Json).array.Json
-		]);
+        // Use an authenticated API call to also get users' email addresses
+        // (to identify our own comments).
+        auto result = authenticatedApiCall("Bug.comments", [
+            "ids" : chunk.map!(id => id.Json).array.Json
+        ]);
         foreach (string id, Json bugComments; result["bugs"])
             comments[id.to!int] = bugComments["comments"].get!(Json[]);
     }
