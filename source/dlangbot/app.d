@@ -294,7 +294,7 @@ void handlePR(string action, PullRequest* _pr)
             // may include previously-merged commits with mentions to bugs long fixed.
             auto statuses = descs.filter!(d => d.id == r.id);
             auto status = statuses.empty ? null : statuses.front.status;
-            if (!status.among("NEW", "REOPENED"))
+            if (!status.among("NEW", "ASSIGNED", "REOPENED"))
                 continue;
 
             // Only mention a PR at most once in an issue's comments.
