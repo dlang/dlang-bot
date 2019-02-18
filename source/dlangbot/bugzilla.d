@@ -39,18 +39,41 @@ unittest
     assert(equal(matchIssueRefs("Fixes Issues 1234 and 2345\nblabla\nFixes Issue 3456"), [IssueRef(1234, true), IssueRef(2345, true)]));
 }
 
-struct IssueRef { int id; bool fixed; }
+struct IssueRef { int id; bool fixed; Json[] commits; }
 // get all issues mentioned in a commit
 IssueRef[] getIssueRefs(Json[] commits)
 {
-    auto issues = commits
-        .map!(c => c["commit"]["message"].get!string.matchIssueRefs)
-        .array
-        .joiner
+    return commits
+        // Collect all issue references (range of ranges per commit)
+        .map!(c => c["commit"]["message"]
+            .get!string
+            .matchIssueRefs
+            .map!((r) { r.commits = [c]; return r; })
+        )
+        // Join to flat list
+        .join
+        // Sort and group by issue ID
+        .sort!((a, b) => a.id < b.id, SwapStrategy.stable)
+        .groupBy
+        // Reduce each per-ID group to a single IssueRef
+        .map!(g => g
+            .reduce!((a, b) =>
+                IssueRef(a.id, a.fixed || b.fixed, a.commits ~ b.commits)
+            )
+        )
         .array;
-    issues.multiSort!((a, b) => a.id < b.id, (a, b) => a.fixed > b.fixed);
-    issues.length -= issues.uniq!((a, b) => a.id == b.id).copy(issues).length;
-    return issues;
+}
+
+unittest
+{
+    Json fix(int id) { return ["commit":["message":"Fix Issue %d".format(id).Json].Json].Json; }
+    Json mention(int id) { return ["commit":["message":"Issue %d".format(id).Json].Json].Json; }
+
+    assert(getIssueRefs([fix(1)]) == [IssueRef(1, true, [fix(1)])]);
+    assert(getIssueRefs([mention(1)]) == [IssueRef(1, false, [mention(1)])]);
+    assert(getIssueRefs([fix(1), mention(1)]) == [IssueRef(1, true, [fix(1), mention(1)])]);
+    assert(getIssueRefs([mention(1), fix(1)]) == [IssueRef(1, true, [mention(1), fix(1)])]);
+    assert(getIssueRefs([mention(1), fix(2), fix(1)]) == [IssueRef(1, true, [mention(1), fix(1)]), IssueRef(2, true, [fix(2)])]);
 }
 
 struct Issue
@@ -114,15 +137,38 @@ Json authenticatedApiCall(string method, Json[string] params)
     return apiCall(method, params);
 }
 
-/// Close these bug IDs as FIXED and leave a comment.
-void closeIssues(int[] bugIDs, string comment)
+void updateBugs(int[] bugIDs, string comment, bool closeAsFixed, string[] addKeywords = null)
 {
-    authenticatedApiCall("Bug.update", [
-        "ids" : bugIDs.map!(id => Json(id)).array.Json,
-        "status" : "RESOLVED".Json,
-        "resolution" : "FIXED".Json,
-        "comment" : [
-            "body" : comment.Json,
-        ].Json,
-    ]);
+    Json[string] params;
+    params["ids"] = bugIDs.map!(id => Json(id)).array.Json;
+
+    if (comment)
+        params["comment"] = ["body" : comment.Json].Json;
+    if (closeAsFixed)
+    {
+        params["status"] = "RESOLVED".Json;
+        params["resolution"] = "FIXED".Json;
+    }
+    if (addKeywords)
+        params["keywords"] = ["add" : addKeywords.map!(k => Json(k)).array.Json].Json;
+
+    authenticatedApiCall("Bug.update", params);
+}
+
+Json[][int] getBugComments(int[] ids)
+{
+    Json[][int] comments;
+
+    foreach (chunk; ids.chunks(1000))
+    {
+        // Use an authenticated API call to also get users' email addresses
+        // (to identify our own comments).
+        auto result = authenticatedApiCall("Bug.comments", [
+            "ids" : chunk.map!(id => id.Json).array.Json
+        ]);
+        foreach (string id, Json bugComments; result["bugs"])
+            comments[id.to!int] = bugComments["comments"].get!(Json[]);
+    }
+
+    return comments;
 }

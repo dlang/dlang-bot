@@ -122,7 +122,19 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     if (expectation.respStatusCode / 100 != 2)
         _expectedStatusCode = expectation.respStatusCode;
 
-    string filePath = buildPath(payloadDir, req.requestURL[1 .. $].replace("/", "_"));
+    auto requestURL = req.requestURL;
+    if (requestURL == "/bugzilla/jsonrpc.cgi")
+    {
+        // Bugzilla uses JSON-RPC, with parameters passed as POST data.
+        // This does not work for us, as we can't provide different
+        // payloads for different requests.
+        // Extract them from the POST data and apply them on the path.
+        assert(req.method == HTTPMethod.POST);
+        requestURL ~= "/" ~ req.json["method"].get!string;
+        if ("params" in req.json && "ids" in req.json["params"][0])
+            requestURL ~= "/" ~ req.json["params"][0]["ids"].get!(Json[]).map!(id => id.get!int.to!string).join(",");
+    }
+    string filePath = buildPath(payloadDir, requestURL[1 .. $].replace("/", "_"));
 
     if (expectation.reqHandler !is null)
     {
@@ -299,11 +311,9 @@ void postGitHubHook(string payload, string eventType = "pull_request",
         req.headers["X-Hub-Signature"] = getSignature(respStr);
         req.writeBody(cast(ubyte[]) respStr);
     });
-    scope(failure) {
-        if (req.statusCode != 200)
-            writeln(req.bodyReader.readAllUTF8);
-    }
-    assert(req.statusCode == 200);
+    assert(req.statusCode == 200,
+        "Request failed with status %d. Response body:\n\n%s"
+        .format(req.statusCode, req.bodyReader.readAllUTF8));
     assert(req.bodyReader.readAllUTF8 == "handled");
     checkAPIExpectations;
 }

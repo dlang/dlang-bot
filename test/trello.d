@@ -72,6 +72,7 @@ unittest
         "/trello/1/board/55586bf9fd02d8c66074321a/lists?"~trelloAuth,
         "/trello/1/cards/583f517a333add7c28e0cec7/idList?value=55586d9b810fb97f9459df7d&"~trelloAuth,
         "/trello/1/cards/583f517a333add7c28e0cec7/pos?value=bottom&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi",
     );
 
     postGitHubHook("dlang_dmd_open_6359.json");
@@ -106,6 +107,7 @@ unittest
         "/trello/1/cards/583f517a333add7c28e0cec7?"~trelloAuth,
         (ref Json j) { j["idList"] = "55586d9b810fb97f9459df7d"; },
         "/trello/1/board/55586bf9fd02d8c66074321a/lists?"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi",
     );
 
     postGitHubHook("dlang_dmd_open_6359.json");

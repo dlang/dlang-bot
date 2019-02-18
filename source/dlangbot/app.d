@@ -277,18 +277,95 @@ void handlePR(string action, PullRequest* _pr)
         updateTrelloCard(action, pr.htmlURL, refs, descs);
     }
 
+    // When a PR is opened or updated mentioning some Bugzilla issues,
+    // post a link to the PR as an issue comment.
+    if (action == "opened" || action == "synchronize")
+    {
+        import std.algorithm.iteration : filter, map;
+        import std.algorithm.searching : canFind;
+        import std.array : array, join, replace;
+
+        auto oldComments = getBugComments(refs.map!(r => r.id).array);
+
+        foreach (r; refs)
+        {
+            // Make sure to only update open issues.
+            // Otherwise, a mistake in creating the PR (e.g. wrong target branch)
+            // may include previously-merged commits with mentions to bugs long fixed.
+            auto statuses = descs.filter!(d => d.id == r.id);
+            auto status = statuses.empty ? null : statuses.front.status;
+            if (!status.among("NEW", "ASSIGNED", "REOPENED"))
+                continue;
+
+            // Only mention a PR at most once in an issue's comments.
+            // This check also allows us to safely include new issue
+            // references when new commits are pushed.
+            auto ourComments = oldComments[r.id]
+                // Look at only our comments
+                .filter!(comment => comment["creator"].get!string == bugzillaLogin)
+                // Get comment body
+                .map!(comment => comment["text"].get!string ~ "\n")
+                // Concatenate all of our comments' bodies
+                .join;
+            // Check for PR mention (see format string below)
+            if (ourComments.canFind("\n" ~ pr.htmlURL ~ "\n"))
+                continue;
+
+            auto issueComment = "@%s %s %s pull request #%d \"%s\" %s this issue:\n\n%-(%s\n\n%)\n\n%s".format(
+                pr.user.login, action == "opened" ? "created" : "updated", pr.baseRepoSlug,
+                pr.number, pr.title, r.fixed ? "fixing" : "mentioning",
+                r.commits.map!(c => "- " ~ c["commit"]["message"].get!string.replace("\n", "\n  ")),
+                pr.htmlURL,
+            );
+
+            updateBugs([r.id], issueComment, false, r.fixed ? ["pull"] : null);
+        }
+    }
+
+    // When a PR is merged, update Bugzilla issues
+    // (leave a comment with a link to the PR, and close them appropriately).
     if (action == "merged")
     {
         import std.algorithm.iteration : filter, map;
-        import std.array : array;
+        import std.algorithm.searching : canFind, all;
+        import std.array : array, assocArray, join, replace;
+        import std.regex : regex, matchAll;
 
-        auto ids = refs.filter!(r => r.fixed).map!(r => r.id).array;
-        if (ids.length)
-            closeIssues(ids,
-                "%s pull request #%d \"%s\" was merged:\n\n%s".format(
-                    pr.baseRepoSlug, pr.number, pr.title,
-                    pr.htmlURL,
-                ));
+        auto oldComments = getBugComments(refs.map!(r => r.id).array);
+
+        foreach (r; refs)
+        {
+            static commitRe = regex(`\n- ([0-9a-f]{40}) by `);
+            auto previouslyMentionedCommits = oldComments[r.id]
+                // Look at only our comments
+                .filter!(comment => comment["creator"].get!string == bugzillaLogin)
+                // Get comment body
+                .map!(comment => comment["text"].get!string)
+                // Concatenate all of our comments' bodies
+                .join
+                // Extract mentioned commit hashes (see format string below)
+                .matchAll(commitRe)
+                // Extract matches and convert to hashset
+                .map!(m => tuple(m[1], (void[0]).init))
+                .assocArray;
+
+            if (r.commits.map!(c => c["sha"].get!string).all!(c => c in previouslyMentionedCommits))
+                continue; // We've previously already mentioned all commits in this PR in this issue thread.
+
+            auto issueComment = "%s pull request #%d \"%s\" was merged into %s:\n\n%-(%s\n\n%)\n\n%s".format(
+                pr.baseRepoSlug, pr.number, pr.title, pr.base.ref_,
+                r.commits.map!(c =>
+                    "- %s by %s:\n  %s".format(
+                        c["sha"].get!string,
+                        c["commit"]["author"]["name"].get!string,
+                        c["commit"]["message"].get!string.replace("\n", "\n  "),
+                    )
+                ),
+                pr.htmlURL,
+            );
+
+            updateBugs([r.id], issueComment, r.fixed);
+        }
     }
 }
 
