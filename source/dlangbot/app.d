@@ -335,6 +335,7 @@ void handlePR(string action, PullRequest* _pr)
 
         foreach (r; refs)
         {
+            static commitRe = regex(`\n- ([0-9a-f]{40}) by `);
             auto previouslyMentionedCommits = oldComments[r.id]
                 // Look at only our comments
                 .filter!(comment => comment["creator"].get!string == bugzillaLogin)
@@ -343,7 +344,7 @@ void handlePR(string action, PullRequest* _pr)
                 // Concatenate all of our comments' bodies
                 .join
                 // Extract mentioned commit hashes (see format string below)
-                .matchAll(regex(`\n- ([0-9a-f]{40}) by `))
+                .matchAll(commitRe)
                 // Extract matches and convert to hashset
                 .map!(m => tuple(m[1], (void[0]).init))
                 .assocArray;
