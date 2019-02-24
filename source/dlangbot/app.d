@@ -327,7 +327,7 @@ void handlePR(string action, PullRequest* _pr)
     if (action == "merged")
     {
         import std.algorithm.iteration : filter, map;
-        import std.algorithm.searching : canFind, all;
+        import std.algorithm.searching : canFind, all, startsWith;
         import std.array : array, assocArray, join, replace;
         import std.regex : regex, matchAll;
 
@@ -349,7 +349,9 @@ void handlePR(string action, PullRequest* _pr)
                 .map!(m => tuple(m[1], (void[0]).init))
                 .assocArray;
 
-            if (r.commits.map!(c => c["sha"].get!string).all!(c => c in previouslyMentionedCommits))
+            if (r.commits.all!(c =>
+                    c["sha"].get!string in previouslyMentionedCommits ||
+                    c["commit"]["message"].get!string.startsWith("Merge pull request #")))
                 continue; // We've previously already mentioned all commits in this PR in this issue thread.
 
             auto issueComment = "%s pull request #%d \"%s\" was merged into %s:\n\n%-(%s\n\n%)\n\n%s".format(
