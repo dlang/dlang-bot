@@ -1,7 +1,7 @@
 # Dlang-Bot
 
 [![Travis build status](https://travis-ci.org/dlang/dlang-bot.svg?branch=master)](https://travis-ci.org/dlang/dlang-bot)
-[![Codecov](https://img.shields.io/codecov/c/github/dlang-bots/dlang-bot/master.svg)](https://codecov.io/gh/dlang-bots/dlang-bot)
+[![Codecov](https://img.shields.io/codecov/c/github/dlang/dlang-bot/master.svg)](https://codecov.io/gh/dlang/dlang-bot)
 
 <img alt="dlang-bot" height="200px" src="public/img/dlang_bot.png" />
 
@@ -162,7 +162,7 @@ Currently the hard-coded set of detected labels is:
 Send contributing advice message
 ---------------------------------
 
-For all repos in the `dlang` organization (and `dlang-bots`) Dlang-Bot provides contributing advice on a new PR:
+For all repos in the `dlang` organization Dlang-Bot provides contributing advice on a new PR:
 
 ![image](https://user-images.githubusercontent.com/4370550/27757092-c237063e-5dfd-11e7-8aab-7e655aea3ac8.png)
 
@@ -212,4 +212,4 @@ For example, `dlang/phobos` is configured as follows:
 Missing a feature?
 ------------------
 
-Is there a feature that you would love the Dlang-Bot to do? Then don't hesistate to let us know and [open a new issue](https://github.com/dlang-bots/dlang-bot/issues/new).
+Is there a feature that you would love the Dlang-Bot to do? Then don't hesistate to let us know and [open a new issue](https://github.com/dlang/dlang-bot/issues/new).
