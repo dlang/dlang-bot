@@ -1,0 +1,2 @@
+bug_id,"short_desc","bug_status","resolution","bug_severity","priority","keywords"
+17564,"std.experimental.allocator.theAllocator is null within shared static this","NEW","---","normal","P1",

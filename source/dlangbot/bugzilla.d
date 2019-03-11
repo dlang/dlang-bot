@@ -84,6 +84,7 @@ struct Issue
     string resolution;
     string severity;
     string priority;
+    string keywords;
 }
 
 // get pairs of (issue number, short descriptions) from bugzilla
@@ -95,7 +96,7 @@ Issue[] getDescriptions(R)(R issueRefs)
 
     if (issueRefs.empty)
         return null;
-    return "%s/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority"
+    return "%s/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords"
         .format(bugzillaURL, issueRefs.map!(r => r.id))
         .request
         .bodyReader.readAllUTF8
