@@ -28,6 +28,7 @@ import vibe.stream.operations : readAllUTF8;
 
 bool runAsync = true;
 bool runTrello = true;
+bool runBugzillaUpdates = true;
 
 Duration timeBetweenFullPRChecks = 1.minutes; // this should never be larger 30 mins on heroku
 Throttler!(typeof(&searchForAutoMergePrs)) prThrottler;
@@ -279,7 +280,7 @@ void handlePR(string action, PullRequest* _pr)
 
     // When a PR is opened or updated mentioning some Bugzilla issues,
     // post a link to the PR as an issue comment.
-    if (action == "opened" || action == "synchronize")
+    if (runBugzillaUpdates && (action == "opened" || action == "synchronize"))
     {
         import std.algorithm.iteration : filter, map;
         import std.algorithm.searching : canFind;
@@ -324,7 +325,7 @@ void handlePR(string action, PullRequest* _pr)
 
     // When a PR is merged, update Bugzilla issues
     // (leave a comment with a link to the PR, and close them appropriately).
-    if (action == "merged")
+    if (runBugzillaUpdates && action == "merged")
     {
         import std.algorithm.iteration : filter, map;
         import std.algorithm.searching : canFind, all;

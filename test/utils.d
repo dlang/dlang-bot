@@ -435,3 +435,25 @@ SysTime now(immutable TimeZone tz = UTC())
     now.fracSecs = Duration.zero;
     return now;
 }
+
+/*
+A convenience struct for disabling parts of the dlang-bot for a single test.
+---
+unittest
+{
+    auto d = Disable!("runTrello", "runBugzillaUpdates")(0);
+    ...
+}
+---
+*/
+struct Disable(params...)
+{
+    this(int dummy) {
+        static foreach (p; params)
+            mixin(p ~ `= false;`);
+    }
+    ~this() {
+        static foreach (p; params)
+            mixin(p ~ `= true;`);
+    }
+}
