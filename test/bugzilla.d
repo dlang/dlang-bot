@@ -19,7 +19,7 @@ unittest
             res.writeVoidBody;
         },
         "/trello/1/search?query=name:%22Issue%2017564%22&"~trelloAuth,
-        "/bugzilla/buglist.cgi?bug_id=17564&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/bugzilla/buglist.cgi?bug_id=17564&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
         "/bugzilla/jsonrpc.cgi",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.json["method"].get!string == "Bug.comments");
@@ -69,7 +69,7 @@ unittest
          },
         "/github/repos/dlang/phobos/issues/4963/comments",
         "/trello/1/search?query=name:%22Issue%2017564%22&"~trelloAuth,
-        "/bugzilla/buglist.cgi?bug_id=17564&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/bugzilla/buglist.cgi?bug_id=17564&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
         "/bugzilla/jsonrpc.cgi",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.json["method"].get!string == "Bug.comments");
@@ -127,7 +127,7 @@ unittest
             res.writeVoidBody;
         },
         "/trello/1/search?query=name:%22Issue%2017564%22&"~trelloAuth,
-        "/bugzilla/buglist.cgi?bug_id=17564&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/bugzilla/buglist.cgi?bug_id=17564&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
         "/bugzilla/jsonrpc.cgi",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.json["method"].get!string == "Bug.comments");
@@ -166,11 +166,11 @@ unittest
     setAPIExpectations(
         "/github/repos/dlang/dmd/pulls/6359/commits",
         "/github/repos/dlang/dmd/issues/6359/comments",
-        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             res.writeBody(
-`bug_id,"short_desc","bug_status","resolution","bug_severity","priority"
-16794,"dmd not working on Ubuntu 16.10 because of default PIE linking","NEW","---","critical","P1"`);
+`bug_id,"short_desc","bug_status","resolution","bug_severity","priority","keywords"
+16794,"dmd not working on Ubuntu 16.10 because of default PIE linking","NEW","---","critical","P1",`);
         },
         "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/dmd/issues/6359/comments",
@@ -222,7 +222,7 @@ unittest
     setAPIExpectations(
         "/github/repos/dlang/dmd/pulls/6359/commits",
         "/github/repos/dlang/dmd/issues/6359/comments",
-        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority", // "RESOLVED"/"FIXED"
+        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords", // "RESOLVED"/"FIXED"
         "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/labels",
@@ -250,7 +250,7 @@ unittest
         "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments",
         "/github/orgs/dlang/public_members?per_page=100",
-        "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority", // "NEW"/"---"
+        "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords", // "NEW"/"---"
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {},
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,

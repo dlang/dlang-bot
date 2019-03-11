@@ -6,7 +6,7 @@ import std.stdio, std.format : format;
 unittest
 {
     setAPIExpectations(
-        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
         "/trello/1/cards/583f517a333add7c28e0cec7/actions?filter=commentCard&"~trelloAuth,
         (ref Json j) { j = Json.emptyArray; },
         "/trello/1/cards/583f517a333add7c28e0cec7/actions/comments?"~trelloAuth,
@@ -25,7 +25,7 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
         "/trello/1/cards/583f517a333add7c28e0cec7/actions?filter=commentCard&"~trelloAuth,
         (ref Json j) { j[0]["data"]["text"] = "- [Issue 16794 - bla bla](https://issues.dlang.org/show_bug.cgi?id=16794)\n"; },
         "/trello/1/cards/583f517a333add7c28e0cec7/actions/583f517b91413ef81f1f9d34/comments?"~trelloAuth,
@@ -46,7 +46,7 @@ unittest
     setAPIExpectations(
         "/github/repos/dlang/dmd/pulls/6359/commits",
         "/github/repos/dlang/dmd/issues/6359/comments",
-        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
         "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/labels", (ref Json j){
@@ -84,7 +84,7 @@ unittest
     setAPIExpectations(
         "/github/repos/dlang/dmd/pulls/6359/commits",
         "/github/repos/dlang/dmd/issues/6359/comments",
-        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority",
+        "/bugzilla/buglist.cgi?bug_id=16794&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
         "/github/orgs/dlang/public_members?per_page=100",
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/github/repos/dlang/dmd/issues/6359/labels", (ref Json j){
