@@ -436,9 +436,9 @@ unittest
             (scope HTTPServerRequest req, scope HTTPServerResponse res){
                 assert(req.method == HTTPMethod.DELETE);
             },
-             "/github/repos/dlang/phobos/issues/4921/comments",
+            "/github/repos/dlang/phobos/issues/4921/comments",
             "/github/orgs/dlang/public_members?per_page=100",
-             "/github/repos/dlang/phobos/issues/comments/262784442",
+            "/github/repos/dlang/phobos/issues/comments/262784442",
             (scope HTTPServerRequest req, scope HTTPServerResponse res){
                 assert(req.method == HTTPMethod.PATCH);
                 auto body_ = req.json["body"].get!string;
@@ -449,4 +449,64 @@ unittest
         );
         postGitHubHook("dlang_phobos_synchronize_4921.json");
     }
+}
+
+@("warn-for-ices")
+unittest
+{
+    auto d = Disable!("runTrello", "runBugzillaUpdates")(0);
+
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
+            j[0]["commit"]["message"] = "Issue 19296";
+        },
+        "/github/repos/dlang/phobos/issues/4921/labels",
+        "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
+            j = Json.emptyArray;
+        },
+        "/bugzilla/buglist.cgi?bug_id=19296&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            res.writeBody(
+`bug_id,"short_desc","bug_status","resolution","bug_severity","priority","keywords"
+19296,"ICE on Unknown member type in struct returned from function","NEW"," ---","normal","P1","ice"`);
+        },
+        "/github/orgs/dlang/public_members?per_page=100",
+        "/github/repos/dlang/phobos/issues/4921/comments",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.POST);
+            assert(!req.json["body"].get!string.canFind("Regression or critical bug fixes"));
+        },
+    );
+
+    postGitHubHook("dlang_phobos_synchronize_4921.json");
+}
+
+@("warn-for-ices-multiple-keywords")
+unittest
+{
+    auto d = Disable!("runTrello", "runBugzillaUpdates")(0);
+
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
+            j[0]["commit"]["message"] = "Issue 19296";
+        },
+        "/github/repos/dlang/phobos/issues/4921/labels",
+        "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
+            j = Json.emptyArray;
+        },
+        "/bugzilla/buglist.cgi?bug_id=19296&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            res.writeBody(
+`bug_id,"short_desc","bug_status","resolution","bug_severity","priority","keywords"
+19296,"ICE on Unknown member type in struct returned from function","NEW"," ---","normal","P1","foo, ice, bar"`);
+        },
+        "/github/orgs/dlang/public_members?per_page=100",
+        "/github/repos/dlang/phobos/issues/4921/comments",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.POST);
+            assert(!req.json["body"].get!string.canFind("Regression or critical bug fixes"));
+        },
+    );
+
+    postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
