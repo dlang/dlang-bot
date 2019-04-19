@@ -331,6 +331,7 @@ void handlePR(string action, PullRequest* _pr)
         import std.algorithm.searching : canFind, all, startsWith;
         import std.array : array, assocArray, join, replace;
         import std.regex : regex, matchAll;
+        import std.typecons : tuple;
 
         auto oldComments = getBugComments(refs.map!(r => r.id).array);
 
