@@ -22,7 +22,7 @@ matrix:
       env: COVERAGE=true
       script:
         # Tests are neither random- nor parallelizable atm., so use a --single serial thread.
-        - dub test --compiler=$DC --build=unittest-cov -- --single --trace
+        - dub test --compiler=$DC --build=unittest-cov -- --single --trace --debug
       after_success:
         - bash <(curl -s https://codecov.io/bash)
   allow_failures:
