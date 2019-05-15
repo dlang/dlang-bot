@@ -164,6 +164,7 @@ public:
     }
 }
 
+@("throttle-timer")
 unittest
 {
     int[string] cDict;
