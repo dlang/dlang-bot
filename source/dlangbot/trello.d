@@ -188,7 +188,7 @@ import std.string : representation;
 
 private char[28] base64Digest(Range)(Range range)
 {
-    import std.digest.digest, std.digest.hmac, std.digest.sha;
+    import std.digest, std.digest.hmac, std.digest.sha;
     import std.base64;
 
     auto hmac = HMAC!SHA1(trelloSecret.representation);
