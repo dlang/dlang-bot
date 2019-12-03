@@ -421,7 +421,7 @@ struct GHMilestone
 
 auto getSignature(string data)
 {
-    import std.digest.digest, std.digest.hmac, std.digest.sha;
+    import std.digest, std.digest.hmac, std.digest.sha;
     import std.string : representation;
 
     auto hmac = HMAC!SHA1(githubHookSecret.representation);
