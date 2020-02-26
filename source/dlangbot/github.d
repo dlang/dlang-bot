@@ -99,7 +99,6 @@ If your PR contains non-trivial changes, please [reference a Bugzilla issue](htt
 If you don't have a [local development environment setup](https://wiki.dlang.org/Starting_as_a_Contributor), you can use [Digger](https://github.com/CyberShadow/Digger) to test this PR:
 
 ```sh
-dub fetch digger
 dub run digger -- build \"%s + %s#%d\"
 ```
 ".format(pr.base.ref_, pr.base.repo.name, pr.number));
