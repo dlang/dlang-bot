@@ -2,15 +2,14 @@ name "dlang-bot"
 description "dlang-bot for automated bugzilla, github, and trello references"
 copyright "Copyright © 2015, Martin Nowak"
 authors "Martin Nowak"
-dependency "vibe-d" version="~>0.8.0"
-subConfiguration "vibe-d:core" "vibe-core"
+dependency "vibe-d" version="~>0.8.6"
 targetType "executable"
 
 configuration "executable" {
 }
 
 configuration "unittest" {
-    dependency "unit-threaded" version="~>0.7.11"
+    dependency "unit-threaded" version="~>0.10.8"
     mainSourceFile "ut.d"
     preBuildCommands "dub run unit-threaded -c gen_ut_main -- -f ut.d"
     sourcePaths "source" "test"
