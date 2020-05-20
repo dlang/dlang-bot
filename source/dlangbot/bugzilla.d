@@ -33,10 +33,13 @@ auto matchIssueRefs(string message)
 
 unittest
 {
-    assert(equal(matchIssueRefs("fix issue 16319 and fix std.traits.isInnerClass"), [IssueRef(16319, true)]));
-    assert(equal(matchIssueRefs("Fixes issues 17494, 17505, 17506"), [IssueRef(17494, true), IssueRef(17505, true), IssueRef(17506, true)]));
+    assert(equal(matchIssueRefs("fix issue 16319 and fix std.traits.isInnerClass"),
+                 [IssueRef(16319, true)]));
+    assert(equal(matchIssueRefs("Fixes issues 17494, 17505, 17506"),
+                 [IssueRef(17494, true),IssueRef(17505, true), IssueRef(17506, true)]));
     // only first match considered, see #175
-    assert(equal(matchIssueRefs("Fixes Issues 1234 and 2345\nblabla\nFixes Issue 3456"), [IssueRef(1234, true), IssueRef(2345, true)]));
+    assert(equal(matchIssueRefs("Fixes Issues 1234 and 2345\nblabla\nFixes Issue 3456"),
+                 [IssueRef(1234, true), IssueRef(2345, true)]));
 }
 
 struct IssueRef { int id; bool fixed; Json[] commits; }
