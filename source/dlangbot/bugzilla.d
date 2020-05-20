@@ -19,15 +19,15 @@ auto matchIssueRefs(string message)
 
     static auto matchToRefs(M)(M m)
     {
-        enum splitRE = regex(`[^\d]+`); // ctRegex throws a weird error in unittest compilation
-        auto closed = !m.captures[1].empty;
-        return m.captures[5].stripRight.splitter(splitRE)
-            .filter!(id => !id.empty) // see #6
-            .map!(id => IssueRef(id.to!int, closed));
+        enum splitRE = ctRegex!(`(\d+)`);
+        // [1] is the issue numbers that are fixed, [2] are for simple refs
+        const bool closed = !m.captures[1].empty;
+        return m.captures[2 - closed].matchAll(ctRegex!`\d+`)
+            .map!(match => IssueRef(match.hit.to!int, closed));
     }
 
-    // see https://github.com/github/github-services/blob/2e886f407696261bd5adfc99b16d36d5e7b50241/lib/services/bugzilla.rb#L155
-    enum issueRE = ctRegex!(`((close|fix|address)e?(s|d)? )?(ticket|bug|tracker item|issue)s?:? *([\d ,\+&#and]+)`, "i");
+    enum issueRE = ctRegex!(`(?:^fix(?:es)?(?:\s+(?:issues?|bugs?))?\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))|` ~
+                            `(?:(?:issues?|bugs?)\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))`, "i");
     return matchToRefs(message.matchFirst(issueRE));
 }
 
@@ -37,9 +37,42 @@ unittest
                  [IssueRef(16319, true)]));
     assert(equal(matchIssueRefs("Fixes issues 17494, 17505, 17506"),
                  [IssueRef(17494, true),IssueRef(17505, true), IssueRef(17506, true)]));
+    assert(equal(matchIssueRefs("Fix issues 42, 55, 98: Baguette poisson fraise"),
+                 [ IssueRef(42, true), IssueRef(55, true), IssueRef(98, true)  ]));
     // only first match considered, see #175
     assert(equal(matchIssueRefs("Fixes Issues 1234 and 2345\nblabla\nFixes Issue 3456"),
                  [IssueRef(1234, true), IssueRef(2345, true)]));
+    // Related, but not closing
+    assert(equal(matchIssueRefs("Issue 242: Refactor prior to fix"),
+                 [IssueRef(242, false)]));
+    assert(equal(matchIssueRefs("Bug 123: Add a test"),
+                 [IssueRef(123, false)]));
+    assert(equal(matchIssueRefs("Issue #456: Improve error message"),
+                 [IssueRef(456, false)]));
+
+    // Short hand syntax
+    assert(equal(matchIssueRefs("Fix 222, 333 and 42000: Baguette poisson fraise"),
+                 [ IssueRef(222, true), IssueRef(333, true), IssueRef(42000, true)  ]));
+    assert(equal(matchIssueRefs("Fix 4242 & 131 Baguette poisson fraise"),
+                 [ IssueRef(4242, true), IssueRef(131, true)  ]));
+    // Just a reference, not a fix
+    assert(equal(matchIssueRefs("Issue 242: Warn about buggy behavior"),
+                 [IssueRef(242, false)]));
+    assert(equal(matchIssueRefs("Do not quite fix issue 242 but it's a start"),
+                 [IssueRef(242, false)]));
+    assert(equal(matchIssueRefs("Workaround needed to make bug 131415 less deadly"),
+                 [IssueRef(131415, false)]));
+
+    // Shouldn't match
+    const IssueRef[] empty;
+    assert(equal(matchIssueRefs("Will fix 242 and 131 later"), empty));
+    assert(equal(matchIssueRefs("Issue with 242 character"), empty));
+    // Too ambiguous to match
+    assert(equal(matchIssueRefs("#4242: Reduce indentation prior to fix"), empty));
+
+    // Note: This *will match* so just don't use that verb?
+    assert(equal(matchIssueRefs("DMD issues 10 weird error message on shutdown"),
+                 [IssueRef(10, false)]));
 }
 
 struct IssueRef { int id; bool fixed; Json[] commits; }
