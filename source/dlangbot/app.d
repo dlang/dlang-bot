@@ -447,14 +447,15 @@ shared static this()
     import std.process : environment;
     version (linux)
     {
-        // register memory error handler on heroku
-        if ("DYNO" in environment)
+        // Only Glibc x86 / x86_64 supports this method, so check if defined
+        import etc.linux.memoryerror;
+        static if (is(typeof(registerMemoryErrorHandler)))
         {
-            import etc.linux.memoryerror : registerMemoryErrorHandler;
-            registerMemoryErrorHandler();
+            // register memory error handler on heroku
+            if ("DYNO" in environment)
+                registerMemoryErrorHandler();
         }
     }
-
 }
 
 version (unittest) {}
