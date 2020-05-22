@@ -412,7 +412,7 @@ void postAgentShutdownCheck(string hostname, int line = __LINE__, string file = 
     req.dropBody;
 }
 
-void testCronDaily(string[] repositories, int line = __LINE__, string file = __FILE__)
+void runCronDailyTest(string[] repositories, int line = __LINE__, string file = __FILE__)
 {
     import dlangbot.app : cronDaily;
     import dlangbot.cron : CronConfig;

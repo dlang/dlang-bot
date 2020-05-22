@@ -63,7 +63,7 @@ unittest
             ));
         },
     );
-    testCronDaily(repositories);
+    runCronDailyTest(repositories);
 }
 
 @("stalled-sticks-on-labelling")
@@ -89,7 +89,7 @@ unittest
         },
     );
 
-    testCronDaily(repositories);
+    runCronDailyTest(repositories);
 }
 
 @("no-label-updates-with-inactivity")
@@ -108,7 +108,7 @@ unittest
         "/github/repos/dlang/phobos/pulls/2526/comments",
     );
 
-    testCronDaily(repositories);
+    runCronDailyTest(repositories);
 }
 
 @("merge-state-refreshed")
@@ -136,7 +136,7 @@ unittest
         },
     );
 
-    testCronDaily(repositories);
+    runCronDailyTest(repositories);
 }
 
 @("blocked-mergeable-removes-needs-rebase")
@@ -162,7 +162,7 @@ unittest
         },
     );
 
-    testCronDaily(repositories);
+    runCronDailyTest(repositories);
 }
 
 @("more-than-two-failures-requires-work")
@@ -187,5 +187,5 @@ unittest
         },
     );
 
-    testCronDaily(repositories);
+    runCronDailyTest(repositories);
 }
