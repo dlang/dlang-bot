@@ -9,7 +9,7 @@ configuration "executable" {
 }
 
 configuration "unittest" {
-    dependency "unit-threaded" version="~>0.10.8"
+    dependency "unit-threaded" version="~>1.0"
     mainSourceFile "ut.d"
     preBuildCommands "dub run unit-threaded -c gen_ut_main -- -f ut.d"
     sourcePaths "source" "test"
