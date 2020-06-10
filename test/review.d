@@ -11,7 +11,7 @@ unittest
         "/github/users/ZombineDev",
         "/github/repos/dlang/phobos/pulls/5114/merge", (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.json["sha"] == "0fb66f092b897b55318509c6582008b3f912311a");
-            assert(req.json["merge_method"] == "merge");
+            assert(req.json["merge_method"] == "rebase");
             assert(req.json["commit_message"] == "Fix tan returning -nan for inputs where abs(x) >= 2^63\n"~
                    "merged-on-behalf-of: ZombineDev <ZombineDev@users.noreply.github.com>");
         }

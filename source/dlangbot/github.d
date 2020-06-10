@@ -197,6 +197,9 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
     }
 
     auto labelName = method.labelName;
+    if (commits.length == 1)
+        method = GHMerge.MergeMethod.rebase;
+
     auto events = ghGetRequest(pr.eventsURL).readJson[]
         .retro
         .filter!(e => e["event"] == "labeled" && e["label"]["name"] == labelName);
