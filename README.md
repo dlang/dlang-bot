@@ -62,14 +62,14 @@ GitHub's Bugzilla integration will automatically comment to Bugzilla with a rega
 
 <img alt="dlang-bot-bugzilla" height="120px" src="public/img/dlang_bot_bugzilla_comment.png" />
 
-Of course it will also automatically close the references issues (at least if either
-"fix", "close" or "address" occurs before the issue id).
+It will also automatically close the referenced issues if `fix` or `fixes` (case-insensitive)
+appears before the issue reference.
 
 Using this syntax is also very important because for the changelog generation, the
 git history will be used. Thus _only_ if the Dlang-Bot has detected an issue
 and commented on your PR it can become part of the changelog.
 
-In doubt, you can use e.g. [Regex101](https://regex101.com/r/aI0Rp6/5) to validate your commit message.
+In doubt, you can use e.g. [Regex101](https://regex101.com/r/aI0Rp6/7) to validate your commit message.
 
 ### Referencing multiple issues
 
@@ -77,7 +77,8 @@ It's possible to reference multiple issues, e.g. with "Fixes issues 17494, 17505
 
 ![image](https://user-images.githubusercontent.com/4370550/27887078-2322e06e-61df-11e7-85cd-4cd5648e0139.png)
 
-Of course, the Dlang-Bot will aggregate all mentioned issues over multiple commits.
+Accepted optional separators are: commas (`,`), the word `and`, as well as the plus sign (`+`),
+and any amount of whitespace. Dlang-Bot will aggregate all mentioned issues over multiple commits.
 
 ### Nerdy details
 
@@ -85,7 +86,7 @@ Of course, the Dlang-Bot will aggregate all mentioned issues over multiple commi
 - the exact RegEx is:
 
 ```
-((close|fix|address)e?(s|d)? )?(ticket|bug|tracker item|issue)s?:? *([\d ,\+&#and]+)
+(?:^fix(?:es)?(?:\s+(?:issues?|bugs?))?\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))|(?:(?:issues?|bugs?)\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))
 ```
 
 (the GitHub Bugzilla integration and the Dlang-Bot use the same RegEx to parse
