@@ -46,8 +46,6 @@ shared static this()
     trelloAuth = "key=01234&token=abcde";
     buildkiteAuth = "Bearer abcdef";
     buildkiteHookSecret = "1234567890";
-    scalewayAuth = "89f66bbd-f2f0-4f95-9382-56d141c1c09e";
-    scalewayOrg = "aa435976-67f1-455c-b988-f4dc04c91f40";
     hcloudAuth = "Bearer BDc2RZCKKvgdyF6Dgex1kg4NGwkScI9xzBZqGJemkR4GopohwatiH0IRD2iTg61o";
     dlangbotAgentAuth = "Bearer fjSL8ITFkOxS5PF9p5lM41mox";
     bugzillaLogin = "bugzilla@test.org";
@@ -87,7 +85,6 @@ void startFakeAPIServer()
     githubAPIURL = fakeAPIServerURL ~ "/github";
     trelloAPIURL = fakeAPIServerURL ~ "/trello";
     buildkiteAPIURL = fakeAPIServerURL ~ "/buildkite";
-    scalewayAPIURL = fakeAPIServerURL ~ "/scaleway";
     hcloudAPIURL = fakeAPIServerURL ~ "/hcloud";
     bugzillaURL = fakeAPIServerURL ~ "/bugzilla";
     twitterURL = fakeAPIServerURL ~ "/twitter";
@@ -158,12 +155,11 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     {
         logInfo("reading payload: %s", filePath);
         auto payload = filePath.readText;
-        if (req.requestURL.startsWith("/github", "/trello", "/scaleway", "/buildkite", "/hcloud"))
+        if (req.requestURL.startsWith("/github", "/trello", "/buildkite", "/hcloud"))
         {
             auto payloadJson = payload.parseJsonString;
             replaceAPIReferences("https://api.github.com", githubAPIURL, payloadJson);
             replaceAPIReferences("https://api.trello.com", trelloAPIURL, payloadJson);
-            replaceAPIReferences("https://dp-par1.scaleway.com", scalewayAPIURL, payloadJson);
             replaceAPIReferences("https://api.buildkite.com/v2", buildkiteAPIURL, payloadJson);
 
             if (expectation.jsonHandler !is null)

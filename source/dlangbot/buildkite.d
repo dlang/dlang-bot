@@ -16,7 +16,6 @@ import vibe.http.client : HTTPClientRequest;
 import vibe.http.common : enforceHTTP, HTTPStatus, HTTPMethod;
 
 import dlangbot.utils : request;
-static import scw=dlangbot.scaleway_api;
 static import hc=dlangbot.hcloud_api;
 
 shared string buildkiteAPIURL = "https://graphql.buildkite.com/v1";
@@ -50,10 +49,7 @@ void handleBuild(string pipeline)
         info = reapDeadServers(info);
     catch (Exception e)
         logWarn("reapDeadServers failed %s", e);
-    if (pipeline == "build-release")
-        provisionReleaseBuilder(numReleaseBuilds(info.pipelines), info.scwServers);
-    else
-        provisionCIAgent(numCIBuilds(info.pipelines), info.hcServers);
+    provisionCIAgent(numCIBuilds(info.pipelines), info.hcServers);
 }
 
 void agentShutdownCheck(string hostname)
@@ -65,9 +61,7 @@ void agentShutdownCheck(string hostname)
         info = reapDeadServers(info);
     catch (Exception e)
         logWarn("reapDeadServers failed %s", e);
-    if (hostname.startsWith("release-builder-"))
-        decommissionReleaseBuilder(numReleaseBuilds(info.pipelines), info.scwServers, hostname);
-    else if (hostname.startsWith("ci-agent-"))
+    if (hostname.startsWith("ci-agent-"))
         decommissionCIAgent(numCIBuilds(info.pipelines), info.hcServers, hostname);
 }
 
@@ -82,16 +76,12 @@ Info reapDeadServers(Info info, Duration bootTimeout = 10.minutes)
     immutable now = Clock.currTime(UTC());
     auto deadHCServers = info.hcServers
         .partition!(s => runningAgentHosts.canFind(s.name) || s.created > now - bootTimeout);
-    auto deadSCWServers = info.scwServers
-        .partition!(s => runningAgentHosts.canFind(s.name) || s.creation_date > now - bootTimeout);
-    if (deadHCServers.length || deadSCWServers.length)
+    if (deadHCServers.length)
     {
-        logInfo("found dead servers hcloud: %s, scaleway: %s", deadHCServers.length, deadSCWServers.length);
+        logInfo("found dead servers hcloud: %s", deadHCServers.length);
         deadHCServers.each!(s => s.decommission);
-        deadSCWServers.each!(s => s.decommission);
     }
     info.hcServers.length -= deadHCServers.length;
-    info.scwServers.length -= deadSCWServers.length;
     return info;
 }
 
@@ -110,7 +100,6 @@ struct Info
     Organization organization;
     alias organization this;
     hc.Server[] hcServers;
-    scw.Server[] scwServers;
 }
 
 Info queryState(string pipelineSearch=null)
@@ -123,35 +112,8 @@ Info queryState(string pipelineSearch=null)
     [
         { ret.organization = organization(pipelineSearch); },
         { ret.hcServers = hc.servers.remove!(s => !s.name.startsWith("ci-agent-")); },
-        { ret.scwServers = scw.servers.remove!(s => !s.name.startsWith("release-builder-")); },
     ].map!runTask.array.each!(task => task.join);
     return ret;
-}
-
-private void provisionReleaseBuilder(uint nbuilds, scw.Server[] servers)
-{
-    immutable nservers = servers.length;
-    logInfo("check provision release-builder nservers: %s, nbuilds: %s", nservers, nbuilds);
-    if (nservers >= nbuilds)
-        return;
-
-    immutable img = scw.images.find!(i => i.name == "release-builder").front;
-    foreach (_; nservers .. nbuilds)
-        scw.createServer("release-builder-" ~ randomUUID().toString, "C2S", img).action(scw.Server.Action.poweron);
-}
-
-private void decommissionReleaseBuilder(uint nbuilds, scw.Server[] servers, string hostname)
-{
-    assert(hostname.startsWith("release-builder-"));
-
-    if (nbuilds >= servers.length)
-        return;
-
-    servers = servers.find!(s => s.name == hostname);
-    if (servers.empty)
-        logWarn("Failed to find server to decommission %s", hostname);
-    else
-        servers.front.decommission();
 }
 
 private void provisionCIAgent(uint nbuilds, hc.Server[] servers)

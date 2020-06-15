@@ -11,7 +11,6 @@ public import dlangbot.github_api   : githubAPIURL, githubAuth, githubHookSecret
 public import dlangbot.trello   : trelloAPIURL, trelloAuth, trelloSecret;
 public import dlangbot.twitter : oAuth, tweet, twitterURL, twitterEnabled;
 public import dlangbot.buildkite : buildkiteAPIURL, buildkiteAuth, buildkiteHookSecret, dlangbotAgentAuth;
-public import dlangbot.scaleway_api : scalewayAPIURL, scalewayAuth, scalewayOrg;
 public import dlangbot.hcloud_api : hcloudAPIURL, hcloudAuth;
 
 import std.datetime : Clock, days, Duration, minutes, seconds, SysTime;
@@ -472,8 +471,6 @@ else void main(string[] args)
     trelloAuth = "key="~environment["TRELLO_KEY"]~"&token="~environment["TRELLO_TOKEN"];
     buildkiteAuth = "Bearer "~environment["BK_TOKEN"];
     buildkiteHookSecret = environment["BK_HOOK_SECRET"];
-    scalewayAuth = environment["SCW_TOKEN"];
-    scalewayOrg = environment["SCW_ORG"];
     hcloudAuth = "Bearer "~environment["HCLOUD_TOKEN"];
     dlangbotAgentAuth = "Bearer "~environment["DB_AGENT_TOKEN"];
     oAuth.config.consumerKey = environment["TWITTER_CONSUMER_KEY"];
