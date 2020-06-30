@@ -14,6 +14,6 @@
 		"taggedalgebraic": "0.11.16",
 		"unit-threaded": "1.0.4",
 		"vibe-core": "1.9.2",
-		"vibe-d": "0.8.6"
+		"vibe-d": "0.9.0-rc.1"
 	}
 }
