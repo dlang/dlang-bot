@@ -2,13 +2,8 @@ name "dlang-bot"
 description "dlang-bot for automated bugzilla, github, and trello references"
 copyright "Copyright © 2015, Martin Nowak"
 authors "Martin Nowak"
-dependency "vibe-d" version="~>0.8.6"
+dependency "vibe-d" version="~>0.9.0"
 dependency "vibe-d:tls" version="*"
-// Note: Currently this project does not link on OSX with openssl-1.1
-// (the default if you use Homebrew), because it needs a newer release
-// of Vibe.d (with https://github.com/vibe-d/vibe.d/pull/2401).
-// If you need to test locally, uncomment the following:
-// subConfiguration "vibe-d:tls" "openssl-1.1"
 targetType "executable"
 
 configuration "executable" {
