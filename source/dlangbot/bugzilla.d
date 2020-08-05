@@ -27,7 +27,7 @@ auto matchIssueRefs(string message)
     }
 
     enum issueRE = ctRegex!(`(?:^fix(?:es)?(?:\s+(?:issues?|bugs?))?\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))|` ~
-                            `(?:(?:issues?|bugs?)\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))`, "i");
+                            `(?:(?:issues?|bugs?)\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))`, "im");
     return matchToRefs(message.matchFirst(issueRE));
 }
 
@@ -39,6 +39,9 @@ unittest
                  [IssueRef(17494, true),IssueRef(17505, true), IssueRef(17506, true)]));
     assert(equal(matchIssueRefs("Fix issues 42, 55, 98: Baguette poisson fraise"),
                  [ IssueRef(42, true), IssueRef(55, true), IssueRef(98, true)  ]));
+    // Multi-line
+    assert(equal(matchIssueRefs("Bla bla bla\n\nFixes issue #123"),
+                 [IssueRef(123, true)]));
     // only first match considered, see #175
     assert(equal(matchIssueRefs("Fixes Issues 1234 and 2345\nblabla\nFixes Issue 3456"),
                  [IssueRef(1234, true), IssueRef(2345, true)]));
