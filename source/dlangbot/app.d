@@ -238,40 +238,43 @@ void handlePR(string action, PullRequest* _pr)
     if (commits is null)
         commits = ghGetRequest(pr.commitsURL).readJson[];
 
-    auto refs = getIssueRefs(commits);
-
-    auto descs = getDescriptions(refs);
     auto comment = pr.getBotComment;
 
     UserMessage[] msgs;
-    if (action == "opened" || action == "synchronize")
-    {
-        msgs = pr.checkForWarnings(descs, refs);
-    }
-
+    IssueRef[] refs;
+    Issue[] descs;
     if (pr.base.repo.owner.login.among("dlang", "dlang-bots"))
+    {
+        refs = getIssueRefs(commits);
+        descs = getDescriptions(refs);
+        if (action == "opened" || action == "synchronize")
+        {
+            msgs = pr.checkForWarnings(descs, refs);
+        }
+
         pr.updateGithubComment(comment, action, refs, descs, msgs);
 
-    if (refs.any!(r => r.fixed))
-    {
-        import std.algorithm : canFind, filter, map, sort, uniq;
-        import std.array : array;
-        // references are already sorted by id
-        auto bugzillaIds = refs.map!(r => r.id).uniq;
-        auto bugzillSeverities = descs
-            .filter!(d => bugzillaIds.canFind(d.id))
-            .map!(i => i.severity);
-        logDebug("[github/handlePR](%s): trying to add bug fix label", _pr.pid);
-        string[] labels;
-        if (bugzillSeverities.canFind("enhancement"))
-            labels ~= "Enhancement";
-        else
-            labels ~= "Bug Fix";
+        if (refs.any!(r => r.fixed))
+        {
+            import std.algorithm : canFind, filter, map, sort, uniq;
+            import std.array : array;
+            // references are already sorted by id
+            auto bugzillaIds = refs.map!(r => r.id).uniq;
+            auto bugzillSeverities = descs
+                .filter!(d => bugzillaIds.canFind(d.id))
+                .map!(i => i.severity);
+            logDebug("[github/handlePR](%s): trying to add bug fix label", _pr.pid);
+            string[] labels;
+            if (bugzillSeverities.canFind("enhancement"))
+                labels ~= "Enhancement";
+            else
+                labels ~= "Bug Fix";
 
-        pr.addLabels(labels);
+            pr.addLabels(labels);
+        }
     }
 
-    if (runTrello)
+    if (runTrello && pr.base.repo.owner.login == "dlang")
     {
         logDebug("[github/handlePR](%s): updating trello card", _pr.pid);
         updateTrelloCard(action, pr.htmlURL, refs, descs);
@@ -279,7 +282,8 @@ void handlePR(string action, PullRequest* _pr)
 
     // When a PR is opened or updated mentioning some Bugzilla issues,
     // post a link to the PR as an issue comment.
-    if (runBugzillaUpdates && (action == "opened" || action == "synchronize"))
+    if (runBugzillaUpdates && pr.base.repo.owner.login == "dlang" &&
+        (action == "opened" || action == "synchronize"))
     {
         import std.algorithm.iteration : filter, map;
         import std.algorithm.searching : canFind;
@@ -324,7 +328,8 @@ void handlePR(string action, PullRequest* _pr)
 
     // When a PR is merged, update Bugzilla issues
     // (leave a comment with a link to the PR, and close them appropriately).
-    if (runBugzillaUpdates && action == "merged")
+    if (runBugzillaUpdates && pr.base.repo.owner.login == "dlang" &&
+        action == "merged")
     {
         import std.algorithm.iteration : filter, map;
         import std.algorithm.searching : canFind, all, startsWith;

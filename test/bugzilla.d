@@ -110,6 +110,21 @@ EOF".chomp;
     postGitHubHook("dlang_phobos_merged_4963.json");
 }
 
+@("after-merge-dont-comment-other-org")
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/pulls/4963/commits", (ref Json j) {
+            j[0]["commit"]["message"] = "Do something with Issue 17564";
+         },
+        "/github/repos/dlang/phobos/issues/4963/comments",
+    );
+
+    postGitHubHook("dlang_phobos_merged_4963.json", "pull_request", (ref Json j, scope req) {
+        j["pull_request"]["base"]["repo"]["owner"]["login"] = "dlang-community";
+    });
+}
+
 @("after-merge-dont-spam-bugzilla")
 unittest
 {
@@ -214,6 +229,19 @@ EOF".chomp;
     );
 
     postGitHubHook("dlang_dmd_open_6359.json");
+}
+
+@("pr-open-different-org")
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/dmd/pulls/6359/commits",
+        "/github/repos/dlang/dmd/issues/6359/comments",
+    );
+
+    postGitHubHook("dlang_dmd_open_6359.json", "pull_request", (ref Json j, scope req) {
+        j["pull_request"]["base"]["repo"]["owner"]["login"] = "dlang-community";
+    });
 }
 
 @("pr-open-dont-spam-closed-bugzilla-issues")

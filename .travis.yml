@@ -11,11 +11,6 @@ script:
   # Tests are neither random- nor parallelizable atm., so use a --single serial thread.
   - dub test --compiler=$DC -- --single --trace
 
-addons:
-  apt:
-    packages:
-      - libevent-dev
-
 matrix:
   include:
     - d: dmd-2.085.0 # the deployment compiler
