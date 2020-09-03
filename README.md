@@ -210,6 +210,15 @@ For example, `dlang/phobos` is configured as follows:
 
 <a name="missing-a-feature" />
 
+Improve the bot
+---------------
+
+Run the testsuite:
+
+```
+dub test -- --single --trace
+```
+
 Missing a feature?
 ------------------
 
