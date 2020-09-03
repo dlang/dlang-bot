@@ -25,10 +25,31 @@ void printBugList(W)(W app, in IssueRef[] refs, in Issue[] descs)
     app.put("--- | --- | --- | ---\n");
     foreach (num, closed, severity, desc; combined)
     {
+        const escapedDesc = markdownEscape(desc);
         app.formattedWrite(
             "%1$s | [%2$s](%5$s/show_bug.cgi?id=%2$s) | %3$s | %4$s\n",
-            closed ? "✓" : "✗", num, severity, desc, bugzillaURL);
+            closed ? "✓" : "✗", num, severity, escapedDesc, bugzillaURL);
     }
+}
+
+string markdownEscape(string desc)
+{
+    import std.array : appender;
+    auto app = appender!string;
+    foreach (c; desc)
+    {
+        if (c == '|') app ~= "&#124;";
+        else if (c == '`') app ~= "``";
+        else if (c.among('\\', '*', '_', '{', '}', '[', ']', '(', ')', '#',
+                       '+', '-', '.', '!'))
+        {
+            app ~= '\\';
+            app ~= c;
+        }
+        else
+            app ~= c;
+    }
+    return app.data;
 }
 
 string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs, in UserMessage[] msgs)

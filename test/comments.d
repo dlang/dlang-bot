@@ -510,3 +510,14 @@ unittest
 
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
+
+
+@("github-markdown-escape")
+unittest
+{
+    import dlangbot.github : markdownEscape;
+    assert("a|b".markdownEscape == "a&#124;b");
+    assert("a`b".markdownEscape == "a``b");
+    assert("a\\b".markdownEscape == "a\\\\b");
+    assert("a+b".markdownEscape == r"a\+b");
+}

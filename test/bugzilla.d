@@ -231,6 +231,54 @@ EOF".chomp;
     postGitHubHook("dlang_dmd_open_6359.json");
 }
 
+@("pr-open-notify-bugzilla-whitehole")
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/dmd/pulls/6359/commits",
+        (ref Json j){
+            j[0]["commit"]["message"] = "Fix Issue 20540 - (White|Black)Hole does not work with return|scope functions";
+        },
+        "/github/repos/dlang/dmd/issues/6359/comments",
+        "/bugzilla/buglist.cgi?bug_id=20540&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            res.writeBody(
+`bug_id,"short_desc","bug_status","resolution","bug_severity","priority","keywords"
+20540,"(White|Black)Hole does not work with return|scope functions","NEW","---","normal","P1","pull"`);
+        },
+        "/github/orgs/dlang/public_members?per_page=100",
+        "/github/repos/dlang/dmd/issues/6359/comments",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            assert(req.method == HTTPMethod.POST);
+            assert(req.json["body"].get!string.canFind(r"| \(White&#124;Black\)Hole does not work with return&#124;scope functions"));
+        },
+        "/github/repos/dlang/dmd/issues/6359/labels",
+        "/github/repos/dlang/dmd/issues/6359/labels",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {},
+        "/trello/1/search?query=name:%22Issue%2020540%22&"~trelloAuth,
+        (scope HTTPServerRequest req, scope HTTPServerResponse res) {
+            res.writeBody(`{"cards": []}`);
+        },
+        "/bugzilla/jsonrpc.cgi", // Bug.comments
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            res.writeBody(`{"error" : null, "result" : {
+                "bugs" : {"20540" : {"comments" : []}},
+                "comments" : {}
+            }}`);
+        },
+        "/bugzilla/jsonrpc.cgi", // Bug.update
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.method == HTTPMethod.POST);
+            assert(req.json["method"].get!string == "Bug.update");
+
+            auto j = Json(["error" : Json(null), "result" : Json.emptyObject]);
+            res.writeJsonBody(j);
+        },
+    );
+
+    postGitHubHook("dlang_dmd_open_6359.json");
+}
+
 @("pr-open-different-org")
 unittest
 {
