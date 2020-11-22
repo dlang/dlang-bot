@@ -66,13 +66,13 @@ string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs
     if (isMember)
     {
         app.formattedWrite(
-`Thanks for your pull request, @%s!
+`Thanks for your pull request, %s!
 `, pr.user.login, pr.repoSlug);
     }
     else
     {
         app.formattedWrite(
-"Thanks for your pull request and interest in making D better, @%s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
+"Thanks for your pull request and interest in making D better, %s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
 Please verify that your PR follows this checklist:
 
 - My PR is fully covered with tests (you can see the coverage diff by visiting the _details_ link of the codecov check)
