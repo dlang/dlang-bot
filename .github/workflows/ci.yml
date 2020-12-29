@@ -1,0 +1,38 @@
+name: CI
+on: [ push, pull_request ]
+
+jobs:
+  main:
+    name: Run
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        dc: [ dmd-latest, dmd-beta, ldc-latest ]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Prepare compiler
+        uses: dlang-community/setup-dlang@v1
+        with:
+          compiler: ${{ matrix.dc }}
+
+      - uses: actions/checkout@v2
+
+      - name: Test
+        if: matrix.dc != 'ldc-latest'
+        run: |
+          # Tests are neither random- nor parallelizable atm., so use a --single serial thread.
+          dub test --compiler=$DC  -- --single --trace
+
+      - name: Test with coverage
+        if: matrix.dc == 'ldc-latest'
+        env:
+          COVERAGE: true
+        run: |
+          # Mirrot the previous `run` step but with `--build=unittest-cov`
+          dub test --compiler=$DC --build=unittest-cov -- --single --trace
+
+      - name: Upload code coverage
+        if: matrix.dc == 'ldc-latest'
+        uses: codecov/codecov-action@v1

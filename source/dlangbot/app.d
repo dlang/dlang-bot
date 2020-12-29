@@ -449,6 +449,10 @@ void agentShutdownCheck(HTTPServerRequest req, HTTPServerResponse res)
 shared static this()
 {
     import std.process : environment;
+    // TODO: This should work on other compilers, but created a linker error on Github CI:
+    // /home/runner/work/dlang-bot/dlang-bot/source/dlangbot/app.d:460: error: undefined reference to '_D3etc5linux11memoryerror26registerMemoryErrorHandlerFZb'
+    // See https://github.com/dlang/dlang-bot/pull/263
+    version (DMD)
     version (linux)
     {
         // Only Glibc x86 / x86_64 supports this method, so check if defined
