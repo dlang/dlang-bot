@@ -161,8 +161,8 @@ struct PullRequest
     GHUser[] assignees;
     Nullable!GHMilestone milestone;
 
-    string baseRepoSlug() const { return base.repo.fullName; }
-    string headRepoSlug() const { return head.repo.fullName; }
+    string baseRepoSlug() const { return base.repo.get().fullName; }
+    string headRepoSlug() const { return head.repo.get().fullName; }
     alias repoSlug = baseRepoSlug;
     bool isOpen() const { return state == GHState.open; }
 
@@ -175,7 +175,7 @@ struct PullRequest
     string reviewsURL() const { return "%s/repos/%s/pulls/%d/reviews".format(githubAPIURL, repoSlug, number); }
     string mergeURL() const { return "%s/repos/%s/pulls/%d/merge".format(githubAPIURL, repoSlug, number); }
     string combinedStatusURL() const { return "%s/repos/%s/commits/%s/status".format(githubAPIURL, repoSlug, head.sha); }
-    string membersURL() const { return "%s/orgs/%s/public_members".format(githubAPIURL, base.repo.owner.login); }
+    string membersURL() const { return "%s/orgs/%s/public_members".format(githubAPIURL, base.repo.get().owner.login); }
 
     string pid() const
     {
@@ -390,7 +390,7 @@ struct GHIssue
     {
         assert(isPullRequest);
 
-        return ghGetRequest(_pullRequest.url)
+        return ghGetRequest(_pullRequest.get().url)
                 .readJson
                 .deserializeJson!PullRequest;
     }

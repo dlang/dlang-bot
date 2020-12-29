@@ -132,7 +132,7 @@ mergable:
 
     // "needs rebase" gets automatically removed on a new push
     with(LabelAction)
-    return LabelResponse(!isMergeable ? add : remove, "needs rebase");
+    return LabelResponse(!isMergeable.get() ? add : remove, "needs rebase");
 }
 
 auto detectPRWithPersistentCIFailures(PRTuple t)

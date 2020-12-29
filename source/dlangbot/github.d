@@ -122,7 +122,7 @@ If you don't have a [local development environment setup](https://wiki.dlang.org
 ```sh
 dub run digger -- build \"%s + %s#%d\"
 ```
-".format(pr.base.ref_, pr.base.repo.name, pr.number));
+".format(pr.base.ref_, pr.base.repo.get().name, pr.number));
     }
     return app.data;
 }
