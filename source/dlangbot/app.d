@@ -201,10 +201,10 @@ void handlePR(string action, PullRequest* _pr)
     try {
         if (action == "merged")
         {
-            if (twitterEnabled && pr.base.user.login == "dlang")
+            if (twitterEnabled && pr.base.user.get().login == "dlang")
             {
                 tweet(`%s: PR #%d "%s" by %s has been merged %s`.format(
-                    pr.baseRepoSlug, pr.number, pr.title, pr.head.user.login, pr.htmlURL));
+                    pr.baseRepoSlug, pr.number, pr.title, pr.head.user.get().login, pr.htmlURL));
             }
         }
     } catch (Exception e) {
@@ -243,7 +243,7 @@ void handlePR(string action, PullRequest* _pr)
     UserMessage[] msgs;
     IssueRef[] refs;
     Issue[] descs;
-    if (pr.base.repo.owner.login.among("dlang", "dlang-bots"))
+    if (pr.base.repo.get().owner.login.among("dlang", "dlang-bots"))
     {
         refs = getIssueRefs(commits);
         descs = getDescriptions(refs);
@@ -274,7 +274,7 @@ void handlePR(string action, PullRequest* _pr)
         }
     }
 
-    if (runTrello && pr.base.repo.owner.login == "dlang")
+    if (runTrello && pr.base.repo.get().owner.login == "dlang")
     {
         logDebug("[github/handlePR](%s): updating trello card", _pr.pid);
         updateTrelloCard(action, pr.htmlURL, refs, descs);
@@ -282,7 +282,7 @@ void handlePR(string action, PullRequest* _pr)
 
     // When a PR is opened or updated mentioning some Bugzilla issues,
     // post a link to the PR as an issue comment.
-    if (runBugzillaUpdates && pr.base.repo.owner.login == "dlang" &&
+    if (runBugzillaUpdates && pr.base.repo.get().owner.login == "dlang" &&
         (action == "opened" || action == "synchronize"))
     {
         import std.algorithm.iteration : filter, map;
@@ -328,7 +328,7 @@ void handlePR(string action, PullRequest* _pr)
 
     // When a PR is merged, update Bugzilla issues
     // (leave a comment with a link to the PR, and close them appropriately).
-    if (runBugzillaUpdates && pr.base.repo.owner.login == "dlang" &&
+    if (runBugzillaUpdates && pr.base.repo.get().owner.login == "dlang" &&
         action == "merged")
     {
         import std.algorithm.iteration : filter, map;
