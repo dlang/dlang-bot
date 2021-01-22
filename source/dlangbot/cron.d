@@ -98,7 +98,7 @@ mergable:
     {
         logInfo("[cron-daily/%s/%d/detectMerge]: mergeableState = %s", t.pr.repoSlug, t.pr.number, t.pr.mergeableState.get);
         with (PullRequest.MergeableState)
-        final switch(t.pr.mergeableState)
+        final switch(t.pr.mergeableState.get)
         {
             case clean:
                 // branch is up to date with master and has no conflicts
