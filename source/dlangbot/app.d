@@ -40,8 +40,6 @@ void startServer(HTTPServerSettings settings)
     import vibe.http.fileserver : serveStaticFiles;
     import vibe.http.server : HTTPServerOption, listenHTTP, render;
 
-    settings.bindAddresses = ["0.0.0.0"];
-
     auto router = new URLRouter;
     router
         .get("/", (req, res) => res.render!"index.dt")
@@ -469,7 +467,7 @@ shared static this()
 version (unittest) {}
 else void main(string[] args)
 {
-    import std.array : array;
+    import std.array : array, split;
     import std.algorithm.iteration : map;
     import std.process : environment;
     import vibe.core.args : readOption;
@@ -500,8 +498,17 @@ else void main(string[] args)
 
     bool runDailyCron, runDailyCronSimulation;
     auto settings = new HTTPServerSettings;
+
+    string bindAddr;
+    readOption("addr|a", &bindAddr, "Sets the bind address used for serving.");
+    if (bindAddr)
+        settings.bindAddresses = bindAddr.split(",");
+    else
+        settings.bindAddresses = ["0.0.0.0"];
+
     settings.port = 8080;
     readOption("port|p", &settings.port, "Sets the port used for serving.");
+
     readOption("simulate-cron-daily", &runDailyCronSimulation, "Sets the port used for serving.");
     // TODO: move (currently) unused cli crons to timer-based ones
     readOption("cron-daily", &runDailyCron, "Run daily cron tasks.");
