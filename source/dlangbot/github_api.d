@@ -15,6 +15,9 @@ import vibe.http.client : HTTPClientRequest, HTTPClientResponse;
 public import vibe.http.common : HTTPMethod;
 import vibe.stream.operations : readAllUTF8;
 
+import ae.net.ietf.url : applyRelativeURL;
+import ae.sys.file : ensurePathExists, toFile;
+
 import dlangbot.utils : request, expectOK;
 
 /// Represents a GitHub API reply.
@@ -34,9 +37,42 @@ struct Result
 
 Result ghGetRequest(string url)
 {
-    return request(url, (scope req) {
+    import std.digest.sha : sha1Of;
+    import std.digest : toHexString;
+    import std.file : exists, readText;
+
+    auto cacheFileName = "cache/" ~ cast(string)sha1Of(url).toHexString;
+    Result cacheEntry;
+    if (cacheFileName.exists)
+        cacheEntry = cacheFileName.readText.parseJsonString.deserializeJson!Result();
+
+    auto res = request(url, (scope req) {
         req.headers["Authorization"] = githubAuth;
-    }).expectOK.Result;
+        if (auto p = "ETag" in cacheEntry.headers)
+            req.headers["If-None-Match"] = *p;
+        if (auto p = "Last-Modified" in cacheEntry.headers)
+            req.headers["If-Modified-Since"] = *p;
+    });
+    scope(exit) res.dropBody;
+
+    if (res.statusCode == 304 /*Not Modified*/)
+    {
+        logInfo(" > Cache hit!");
+        return cacheEntry;
+    }
+    else if (res.statusCode == 200 /*OK*/)
+    {
+        logInfo(" > Cache miss; ratelimit: %s/%s",
+            res.headers.get("X-Ratelimit-Remaining", "?"),
+            res.headers.get("X-Ratelimit-Limit", "?"),
+        );
+        auto result = res.Result;
+        ensurePathExists(cacheFileName);
+        result.serializeToJsonString.toFile(cacheFileName);
+        return result;
+    }
+    else
+        throw new Exception("GitHub HTTP request failed with status %d".format(res.statusCode));
 }
 
 Result ghGetRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
