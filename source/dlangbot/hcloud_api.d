@@ -11,7 +11,7 @@ import vibe.data.json : byName, Name = name, deserializeJson, serializeToJson, J
 import vibe.http.common : enforceHTTP, HTTPMethod, HTTPStatus;
 import vibe.stream.operations : readAllUTF8;
 
-import dlangbot.utils : request;
+import dlangbot.utils : request, expectOK;
 
 shared string hcloudAPIURL = "https://api.hetzner.cloud/v1";
 shared string hcloudAuth;
@@ -96,7 +96,7 @@ auto hcloudGET(string path)
 {
     return request(hcloudAPIURL ~ path, (scope req) {
         req.headers["Authorization"] = hcloudAuth;
-    });
+    }).expectOK;
 }
 
 auto hcloudPOST(T...)(string path, T arg)
@@ -106,7 +106,7 @@ auto hcloudPOST(T...)(string path, T arg)
         req.headers["Authorization"] = hcloudAuth;
         req.method = HTTPMethod.POST;
         req.writeJsonBody(arg);
-    });
+    }).expectOK;
 }
 
 void hcloudDELETE(string path)
@@ -114,5 +114,5 @@ void hcloudDELETE(string path)
     request(hcloudAPIURL ~ path, (scope req) {
         req.headers["Authorization"] = hcloudAuth;
         req.method = HTTPMethod.DELETE;
-    }).dropBody;
+    }).expectOK.dropBody;
 }

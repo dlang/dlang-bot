@@ -6,6 +6,7 @@ import vibe.http.client : HTTPClientRequest, HTTPClientResponse;
 import vibe.http.common : HTTPStatus;
 
 import std.datetime : Duration;
+import std.format : format;
 
 version (unittest) int _expectedStatusCode;
 
@@ -20,6 +21,16 @@ bool expectedStatusCode(int statusCode) nothrow @safe @nogc
         }
     }
     return false;
+}
+
+HTTPClientResponse expectOK(HTTPClientResponse res)
+{
+    if (res.statusCode / 100 != 2)
+    {
+        res.dropBody();
+        throw new Exception("HTTP request failed with status %d".format(res.statusCode));
+    }
+    return res;
 }
 
 HTTPClientResponse request(

@@ -15,7 +15,7 @@ import vibe.data.json;
 import vibe.http.client : HTTPClientRequest;
 import vibe.http.common : enforceHTTP, HTTPStatus, HTTPMethod;
 
-import dlangbot.utils : request;
+import dlangbot.utils : request, expectOK;
 static import hc=dlangbot.hcloud_api;
 
 shared string buildkiteAPIURL = "https://graphql.buildkite.com/v1";
@@ -248,7 +248,7 @@ private auto bkQuery(string query, string[string] variables = null)
         req.headers["Authorization"] = buildkiteAuth;
         req.method = HTTPMethod.POST;
         req.writeJsonBody(["query": Json(query), "variables": variables.serializeToJson]);
-    });
+    }).expectOK;
 }
 
 //==============================================================================
