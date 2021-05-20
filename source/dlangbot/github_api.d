@@ -135,7 +135,7 @@ struct PullRequest
         Nullable!Repo repo;
     }
     Branch base, head;
-    enum MergeableState { checking, clean, dirty, unstable, blocked, unknown }
+    enum MergeableState { checking, clean, dirty, unstable, blocked, unknown, draft }
     @byName GHState state;
     uint number;
     string url;

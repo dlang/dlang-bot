@@ -118,6 +118,9 @@ mergable:
                 // the repo requires reviews and the PR hasn't been approved yet
                 // the repo requires status checks and they have failed
                 break;
+            case draft:
+                // the PR is still WIP
+                break;
         }
     }
 
