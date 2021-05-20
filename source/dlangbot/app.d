@@ -234,7 +234,7 @@ void handlePR(string action, PullRequest* _pr)
 
     // we only query the commits once
     if (commits is null)
-        commits = ghGetRequest(pr.commitsURL).readJson[];
+        commits = ghGetRequest(pr.commitsURL).body[];
 
     auto comment = pr.getBotComment;
 
@@ -382,7 +382,7 @@ void handleReview(string action, PullRequest* _pr)
     const PullRequest pr = *_pr;
 
     auto labels = ghGetRequest(pr.labelsURL)
-        .readJson
+        .body
         .deserializeJson!(GHLabel[]);
     if (auto method = autoMergeMethod(labels))
         pr.tryMerge(method);
