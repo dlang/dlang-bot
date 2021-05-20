@@ -11,25 +11,40 @@ import std.typecons : Nullable;
 
 import vibe.core.log;
 import vibe.data.json;
-import vibe.http.client : HTTPClientRequest;
+import vibe.http.client : HTTPClientRequest, HTTPClientResponse;
 public import vibe.http.common : HTTPMethod;
 import vibe.stream.operations : readAllUTF8;
 
 import dlangbot.utils : request, expectOK;
 
-auto ghGetRequest(string url)
+/// Represents a GitHub API reply.
+/// May be returned from the GitHub API, or from a local cache.
+struct Result
+{
+    string[string] headers;
+    Json body;
+
+    this(HTTPClientResponse res)
+    {
+        foreach (name, value; res.headers.byKeyValue)
+            this.headers[name] = value;
+        this.body = res.readJson;
+    }
+}
+
+Result ghGetRequest(string url)
 {
     return request(url, (scope req) {
         req.headers["Authorization"] = githubAuth;
-    }).expectOK;
+    }).expectOK.Result;
 }
 
-auto ghGetRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
+Result ghGetRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
 {
     return request(url, (scope req) {
         req.headers["Authorization"] = githubAuth;
         userReq(req);
-    }).expectOK;
+    }).expectOK.Result;
 }
 
 auto ghSendRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
@@ -63,8 +78,8 @@ private struct AllPages
     // does not cache
     Json front() {
         scope req = ghGetRequest(url);
-        link = req.headers.get("Link");
-        return req.readJson;
+        link = req.headers.get("Link", null);
+        return req.body;
     }
     void popFront()
     {
@@ -181,12 +196,12 @@ struct PullRequest
 
     GHComment[] comments() const {
         return ghGetRequest(commentsURL)
-                .readJson
+                .body
                 .deserializeJson!(GHComment[]);
     }
     GHCommit[] commits() const {
         return ghGetRequest(commitsURL)
-                .readJson
+                .body
                 .deserializeJson!(GHCommit[]);
     }
     GHReview[] reviews() const {
@@ -195,19 +210,19 @@ struct PullRequest
             // preview review api: https://developer.github.com/changes/2016-12-14-reviews-api
             req.headers["Accept"] = "application/vnd.github.black-cat-preview+json";
         }, reviewsURL)
-            .readJson
+            .body
             .deserializeJson!(GHReview[]);
     }
     /// get combined status (contains latest status for each CI context)
     GHCombinedCIStatus combinedStatus() const {
         return ghGetRequest(combinedStatusURL)
-                .readJson
+                .body
                 .deserializeJson!GHCombinedCIStatus;
     }
 
     GHLabel[] labels() const {
         return ghGetRequest(labelsURL)
-                .readJson
+                .body
                 .deserializeJson!(GHLabel[]);
     }
 
@@ -224,7 +239,7 @@ struct PullRequest
 
     typeof(this) refresh() {
         return ghGetRequest(url)
-                .readJson
+                .body
                 .deserializeJson!(typeof(this));
     }
 }
@@ -387,7 +402,7 @@ struct GHIssue
         assert(isPullRequest);
 
         return ghGetRequest(_pullRequest.get().url)
-                .readJson
+                .body
                 .deserializeJson!PullRequest;
     }
 }

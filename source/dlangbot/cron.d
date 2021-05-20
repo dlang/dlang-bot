@@ -176,15 +176,15 @@ auto walkPR(Actions)(string repoSlug, GHIssue issue, Actions actions, CronConfig
     string[] removeLabels;
 
     // only the detailed PR page contains more info like the mergeable state
-    auto pr = ghGetRequest(issue.pullRequestURL).readJson.deserializeJson!PullRequest; // TODO: make const
+    auto pr = ghGetRequest(issue.pullRequestURL).body.deserializeJson!PullRequest; // TODO: make const
 
     PRTuple t;
     t.pr = pr;
     t.config = config;
     // TODO: direction doesn't seem to work here
     // https://developer.github.com/v3/issues/comments/#list-comments-in-a-repository
-    t.comments = ghGetRequest(pr.commentsURL).readJson.deserializeJson!(GHComment[]);
-    t.reviewComments = ghGetRequest(pr.reviewCommentsURL).readJson.deserializeJson!(GHComment[]);
+    t.comments = ghGetRequest(pr.commentsURL).body.deserializeJson!(GHComment[]);
+    t.reviewComments = ghGetRequest(pr.reviewCommentsURL).body.deserializeJson!(GHComment[]);
 
     // perform actions
     foreach (action; actions)
@@ -235,9 +235,9 @@ auto walkPRs(Actions)(string repoSlug, Actions actions, CronConfig config = Cron
     size_t loadedPRs;
     foreach (page; pages)
     {
-        foreach (idx, issueJson; page[].enumerate)
+        auto issues = page.deserializeJson!(GHIssue[]);
+        foreach (idx, issue; issues)
         {
-            auto issue = issueJson.deserializeJson!GHIssue;
             logInfo("[cron-daily/%s/%d]: walkPR", repoSlug, issue.number);
             walkPR(repoSlug, issue, actions, config);
 

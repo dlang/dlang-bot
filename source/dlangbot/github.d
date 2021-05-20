@@ -59,7 +59,7 @@ string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs
     auto app = appender!string;
 
     bool isMember = ghGetRequest(pr.membersURL ~ "?per_page=100")
-        .readJson
+        .body
         .deserializeJson!(GHUser[])
         .canFind!(l => l.login == pr.user.login);
 
@@ -131,7 +131,7 @@ GHComment getBotComment(in ref PullRequest pr)
 {
     // the bot may post multiple comments (mention-bot & bugzilla links)
     auto res = ghGetRequest(pr.commentsURL)
-        .readJson[]
+        .body[]
         .find!(c => c["user"]["login"] == "dlang-bot");
     if (res.length)
         return deserializeJson!GHComment(res[0]);
@@ -203,7 +203,7 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
         return null;
     }
 
-    auto commits = ghGetRequest(pr.commitsURL).readJson[];
+    auto commits = ghGetRequest(pr.commitsURL).body[];
 
     if (!pr.isOpen)
     {
@@ -221,7 +221,7 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
     if (commits.length == 1)
         method = GHMerge.MergeMethod.rebase;
 
-    auto events = ghGetRequest(pr.eventsURL).readJson[]
+    auto events = ghGetRequest(pr.eventsURL).body[]
         .retro
         .filter!(e => e["event"] == "labeled" && e["label"]["name"] == labelName);
 
@@ -258,7 +258,7 @@ void addLabels(in ref PullRequest pr, in string[] newLabels)
 {
     import std.uni : icmp;
     auto existingLabels = ghGetRequest(pr.labelsURL)
-                    .readJson[]
+                    .body[]
                     .map!(l => l["name"].get!string);
     auto toBeAdded = newLabels
         .filter!(l => existingLabels.filter!(a => a.icmp(l) == 0).empty);
@@ -283,7 +283,7 @@ void replaceLabels(in ref PullRequest pr, string[] labels)
 
 string getUserEmail(string login)
 {
-    auto user = ghGetRequest("%s/users/%s".format(githubAPIURL, login)).readJson;
+    auto user = ghGetRequest("%s/users/%s".format(githubAPIURL, login)).body;
     auto name = user["name"].opt!string(login);
     auto email = user["email"].opt!string(login ~ "@users.noreply.github.com");
     return "%s <%s>".format(name, email);
@@ -293,7 +293,7 @@ GHIssue[] getIssuesForLabel(string repoSlug, string label)
 {
     return ghGetRequest("%s/repos/%s/issues?state=open&labels=%s"
                 .format(githubAPIURL, repoSlug, label))
-                .readJson
+                .body
                 .deserializeJson!(GHIssue[]);
 }
 
