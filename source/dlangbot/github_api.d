@@ -303,7 +303,7 @@ struct GHCIStatus
 {
     @byName CIState state;
     string description;
-    @name("target_url") string targetUrl;
+    @name("target_url") Nullable!string targetUrl;
     string context; // "CyberShadow/DAutoTest", "Project Tester",
                     // "ci/circleci", "auto-tester", "codecov/project",
                     // "codecov/patch", "continuous-integration/travis-ci/pr"
