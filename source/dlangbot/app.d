@@ -142,7 +142,7 @@ void githubHook(HTTPServerRequest req, HTTPServerResponse res)
             if (json["pull_request"]["merged"].get!bool)
                 action = "merged";
             goto case;
-        case "opened", "reopened", "synchronize", "labeled", "edited":
+        case "opened", "reopened", "synchronize", "labeled", "edited", "ready_for_review":
 
             runTaskHelper(&handlePR, action, &pullRequest);
             return res.writeBody("handled");
@@ -245,7 +245,7 @@ void handlePR(string action, PullRequest* _pr)
     {
         refs = getIssueRefs(commits);
         descs = getDescriptions(refs);
-        if (action == "opened" || action == "synchronize")
+        if (action == "opened" || action == "synchronize" || action == "ready_for_review")
         {
             msgs = pr.checkForWarnings(descs, refs);
         }
@@ -281,7 +281,7 @@ void handlePR(string action, PullRequest* _pr)
     // When a PR is opened or updated mentioning some Bugzilla issues,
     // post a link to the PR as an issue comment.
     if (runBugzillaUpdates && pr.base.repo.get().owner.login == "dlang" &&
-        (action == "opened" || action == "synchronize"))
+        (action == "opened" || action == "synchronize" || action == "ready_for_review"))
     {
         import std.algorithm.iteration : filter, map;
         import std.algorithm.searching : canFind;
