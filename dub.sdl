@@ -4,6 +4,7 @@ copyright "Copyright © 2015, Martin Nowak"
 authors "Martin Nowak"
 dependency "vibe-d" version="~>0.9.0"
 dependency "vibe-d:tls" version="*"
+dependency "ae" version="==0.0.3000"
 targetType "executable"
 
 configuration "executable" {
