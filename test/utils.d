@@ -53,6 +53,7 @@ shared static this()
 
     // start our hook server
     auto settings = new HTTPServerSettings;
+    settings.bindAddresses = ["0.0.0.0"];
     settings.port = getFreePort;
     startServer(settings);
     startFakeAPIServer();
