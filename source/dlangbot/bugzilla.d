@@ -131,13 +131,14 @@ Issue[] getDescriptions(R)(R issueRefs)
 {
     import std.csv;
     import vibe.stream.operations : readAllUTF8;
-    import dlangbot.utils : request;
+    import dlangbot.utils : request, expectOK;
 
     if (issueRefs.empty)
         return null;
     return "%s/buglist.cgi?bug_id=%(%d,%)&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords"
         .format(bugzillaURL, issueRefs.map!(r => r.id))
         .request
+        .expectOK
         .bodyReader.readAllUTF8
         .csvReader!Issue(null)
         .array
@@ -150,7 +151,7 @@ shared string bugzillaLogin, bugzillaPassword;
 Json apiCall(string method, Json[string] params = null)
 {
     import vibe.stream.operations : readAllUTF8;
-    import dlangbot.utils : request;
+    import dlangbot.utils : request, expectOK;
 
     auto url = bugzillaURL ~ "/jsonrpc.cgi";
     auto jsonText = url.request(
@@ -164,7 +165,7 @@ Json apiCall(string method, Json[string] params = null)
                 "id" : 0.Json, // https://bugzilla.mozilla.org/show_bug.cgi?id=694663
             ].Json);
         }
-    ).bodyReader.readAllUTF8;
+    ).expectOK.bodyReader.readAllUTF8;
     auto reply = jsonText.parseJsonString();
     enforce(reply["error"] == null, "Server error: " ~ reply["error"].to!string);
     return reply["result"];

@@ -4,7 +4,7 @@ shared string trelloAPIURL = "https://api.trello.com";
 shared string trelloSecret, trelloAuth;
 
 import dlangbot.bugzilla : Issue, IssueRef;
-import dlangbot.utils : request;
+import dlangbot.utils : request, expectOK;
 import std.algorithm, std.range;
 import std.format : format;
 
@@ -77,9 +77,9 @@ string formatTrelloComment(string existingComment, string pullRequestURL)
 
 auto findTrelloCards(int issueID)
 {
-
     return trelloAPI("/1/search?query=name:\"Issue %d\"", issueID)
         .request
+        .expectOK
         .readJson["cards"][]
         .map!(c => TrelloCard(c["id"].get!string, issueID));
 }
@@ -90,6 +90,7 @@ Comment getTrelloBotComment(string cardID)
 {
     auto res = trelloAPI("/1/cards/%s/actions?filter=commentCard", cardID)
         .request
+        .expectOK
         .readJson[]
         .find!(c => c["memberCreator"]["username"] == "dlangbot");
     if (res.length)
@@ -103,9 +104,11 @@ void moveCardToList(string cardID, string listName)
 {
     auto card = trelloAPI("/1/cards/%s", cardID)
         .request
+        .expectOK
         .readJson;
     auto lists = trelloAPI("/1/board/%s/lists", card["idBoard"].get!string)
         .request
+        .expectOK
         .readJson[];
 
     immutable curListName = lists.find!(c => c["id"].get!string == card["idList"].get!string)

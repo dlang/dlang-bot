@@ -15,13 +15,13 @@ import vibe.http.client : HTTPClientRequest;
 public import vibe.http.common : HTTPMethod;
 import vibe.stream.operations : readAllUTF8;
 
-import dlangbot.utils : request;
+import dlangbot.utils : request, expectOK;
 
 auto ghGetRequest(string url)
 {
     return request(url, (scope req) {
         req.headers["Authorization"] = githubAuth;
-    });
+    }).expectOK;
 }
 
 auto ghGetRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
@@ -29,7 +29,7 @@ auto ghGetRequest(scope void delegate(scope HTTPClientRequest req) userReq, stri
     return request(url, (scope req) {
         req.headers["Authorization"] = githubAuth;
         userReq(req);
-    });
+    }).expectOK;
 }
 
 auto ghSendRequest(scope void delegate(scope HTTPClientRequest req) userReq, string url)
@@ -40,11 +40,7 @@ auto ghSendRequest(scope void delegate(scope HTTPClientRequest req) userReq, str
         userReq(req);
         method = req.method;
     }, (scope res) {
-        if (res.statusCode / 100 == 2)
-        {
-            logInfo("%s %s, %s\n", method, url, res.statusPhrase);
-            res.bodyReader.readAllUTF8;
-        }
+        res.expectOK();
     });
 }
 
