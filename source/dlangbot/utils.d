@@ -1,8 +1,10 @@
 module dlangbot.utils;
 
+import core.time : seconds;
+
 import dlangbot.app : runAsync;
 
-import vibe.http.client : HTTPClientRequest, HTTPClientResponse;
+import vibe.http.client : HTTPClientRequest, HTTPClientResponse, HTTPClientSettings;
 import vibe.http.common : HTTPStatus;
 
 import std.datetime : Duration;
@@ -21,6 +23,14 @@ bool expectedStatusCode(int statusCode) nothrow @safe @nogc
         }
     }
     return false;
+}
+
+private HTTPClientSettings httpClientSettings;
+static this()
+{
+    httpClientSettings = new HTTPClientSettings;
+    httpClientSettings.connectTimeout = 10.seconds;
+    httpClientSettings.readTimeout = 10.seconds;
 }
 
 HTTPClientResponse expectOK(HTTPClientResponse res)
@@ -49,7 +59,8 @@ HTTPClientResponse request(
             if (requester !is null)
                 requester(req);
             method = req.method;
-        });
+        },
+        httpClientSettings);
     if (res.statusCode / 100 != 2 && !expectedStatusCode(res.statusCode))
         logError("%s %s failed;  %s %s.", method, url, res.statusPhrase, res.statusCode);
     return res;
@@ -76,7 +87,8 @@ void request(
             if (res.statusCode / 100 != 2 && !expectedStatusCode(res.statusCode))
                 logError("%s %s failed;  %s %s.", method, url, res.statusPhrase, res.statusCode);
             responder(res);
-        }
+        },
+        httpClientSettings
     );
 
 }
