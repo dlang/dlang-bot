@@ -48,7 +48,7 @@ HTTPClientResponse request(
     scope void delegate(scope HTTPClientRequest) requester = cast(void delegate(scope HTTPClientRequest req))null
 ) @safe
 {
-    import vibe.core.log : logError;
+    import vibe.core.log : logWarn;
     import vibe.http.client : requestHTTP;
     import vibe.http.common : HTTPMethod;
 
@@ -62,7 +62,7 @@ HTTPClientResponse request(
         },
         httpClientSettings);
     if (res.statusCode / 100 != 2 && !expectedStatusCode(res.statusCode))
-        logError("%s %s failed;  %s %s.", method, url, res.statusPhrase, res.statusCode);
+        logWarn("%s %s failed;  %s %s.", method, url, res.statusPhrase, res.statusCode);
     return res;
 }
 
@@ -72,7 +72,7 @@ void request(
     scope void delegate(scope HTTPClientResponse) responder
 ) @safe
 {
-    import vibe.core.log : logError;
+    import vibe.core.log : logWarn;
     import vibe.http.client : requestHTTP;
     import vibe.http.common : HTTPMethod;
 
@@ -85,7 +85,7 @@ void request(
         },
         (scope res) {
             if (res.statusCode / 100 != 2 && !expectedStatusCode(res.statusCode))
-                logError("%s %s failed;  %s %s.", method, url, res.statusPhrase, res.statusCode);
+                logWarn("%s %s failed;  %s %s.", method, url, res.statusPhrase, res.statusCode);
             responder(res);
         },
         httpClientSettings
