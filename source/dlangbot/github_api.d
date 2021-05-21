@@ -16,7 +16,7 @@ public import vibe.http.common : HTTPMethod;
 import vibe.stream.operations : readAllUTF8;
 
 import ae.net.ietf.url : applyRelativeURL;
-import ae.sys.file : ensurePathExists, toFile;
+import ae.sys.file : ensurePathExists, writeTo, atomic;
 
 import dlangbot.utils : request, expectOK;
 
@@ -68,7 +68,7 @@ Result ghGetRequest(string url)
         );
         auto result = res.Result;
         ensurePathExists(cacheFileName);
-        result.serializeToJsonString.toFile(cacheFileName);
+        result.serializeToJsonString.atomic!writeTo(cacheFileName);
         return result;
     }
     else if (res.statusCode / 100 == 3 && "Location" in res.headers)
