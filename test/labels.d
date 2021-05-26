@@ -47,8 +47,8 @@ unittest
             // https://developer.github.com/v3/pulls/#response-if-merge-cannot-be-performed
             assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
             assert(req.json["merge_method"] == "merge");
-            assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
-                   "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
+            assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n\n"~
+                   "Merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
         }
     );
 
@@ -77,8 +77,8 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
             assert(req.json["merge_method"] == "squash");
-            assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
-                   "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
+            assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n\n"~
+                   "Merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
         }
     );
 
@@ -110,8 +110,8 @@ unittest
             // https://developer.github.com/v3/pulls/#response-if-merge-cannot-be-performed
             assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
             assert(req.json["merge_method"] == "merge");
-            assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n"~
-                   "merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
+            assert(req.json["commit_message"] == "Issue 8573 - A simpler Phobos function that returns the index of the …\n\n"~
+                   "Merged-on-behalf-of: Ilya Yaroshenko <testmail@example.com>");
         }
     );
 
@@ -180,8 +180,8 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.json["sha"] == "04b3575c14dc7ad9971e19f153f3e3d712c1bdde");
             assert(req.json["merge_method"] == "rebase");
-            assert(req.json["commit_message"] == "Remove deprecated stdc import\n" ~
-                    "merged-on-behalf-of: Sebastian Wilzbach <wilzbach@users.noreply.github.com>");
+            assert(req.json["commit_message"] == "Remove deprecated stdc import\n\n" ~
+                    "Merged-on-behalf-of: Sebastian Wilzbach <wilzbach@users.noreply.github.com>");
         }
     );
 
@@ -203,8 +203,8 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.json["sha"] == "4941624d1af77e84565ec86979c21c1d582b1c06");
             assert(req.json["merge_method"] == "rebase");
-            assert(req.json["commit_message"] == "Run docker update async + remove previous versions\n" ~
-                    "merged-on-behalf-of: Sebastian Wilzbach <wilzbach@users.noreply.github.com>");
+            assert(req.json["commit_message"] == "Run docker update async + remove previous versions\n\n" ~
+                    "Merged-on-behalf-of: Sebastian Wilzbach <wilzbach@users.noreply.github.com>");
         }
     );
 
