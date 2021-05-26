@@ -236,7 +236,7 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
     logDebug("[github/tryMerge/commitsURL](%s): %s", pr.pid, pr.commitsURL);
     logDebug("[github/tryMerge/commits](%s): %s", pr.pid, commits[$ - 1]);
     GHMerge mergeInput = {
-        commitMessage: "%s\nmerged-on-behalf-of: %s".format(pr.title, author),
+        commitMessage: "%s\n\nMerged-on-behalf-of: %s".format(pr.title, author),
         sha: commits[$ - 1]["sha"].get!string,
         mergeMethod: method
     };
