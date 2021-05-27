@@ -1,5 +1,6 @@
 module dlangbot.github_api;
 
+shared string githubURL = "https://github.com";
 shared string githubAPIURL = "https://api.github.com";
 shared string githubAuth, githubHookSecret;
 

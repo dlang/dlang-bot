@@ -83,6 +83,7 @@ void startFakeAPIServer()
     auto fakeAPIServerURL = "http://" ~ fakeSettings.bindAddresses[0] ~ ":"
                                       ~ fakeSettings.port.to!string;
 
+    githubURL = fakeAPIServerURL ~ "/github.com";
     githubAPIURL = fakeAPIServerURL ~ "/github";
     trelloAPIURL = fakeAPIServerURL ~ "/trello";
     buildkiteAPIURL = fakeAPIServerURL ~ "/buildkite";
@@ -156,9 +157,10 @@ auto payloadServer(scope HTTPServerRequest req, scope HTTPServerResponse res)
     {
         logInfo("reading payload: %s", filePath);
         auto payload = filePath.readText;
-        if (req.requestURL.startsWith("/github", "/trello", "/buildkite", "/hcloud"))
+        if (req.requestURL.startsWith("/github/", "/trello/", "/buildkite/", "/hcloud/"))
         {
             auto payloadJson = payload.parseJsonString;
+            replaceAPIReferences("https://github.com", githubURL, payloadJson);
             replaceAPIReferences("https://api.github.com", githubAPIURL, payloadJson);
             replaceAPIReferences("https://api.trello.com", trelloAPIURL, payloadJson);
             replaceAPIReferences("https://api.buildkite.com/v2", buildkiteAPIURL, payloadJson);
@@ -305,6 +307,7 @@ void postGitHubHook(string payload, string eventType = "pull_request",
         auto payload = payload.readText;
 
         // localize accessed URLs
+        replaceAPIReferences("https://github.com", githubURL, payload);
         replaceAPIReferences("https://api.github.com", githubAPIURL, payload);
 
         req.headers["X-GitHub-Event"] = eventType;
