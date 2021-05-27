@@ -171,6 +171,9 @@ auto detectPRWithPersistentCIFailures(PRTuple t)
 
 auto walkPR(Actions)(string repoSlug, GHIssue issue, Actions actions, CronConfig config)
 {
+    if (!issue.isPullRequest)
+        return;
+
     const labels = issue.labels.map!(l => l.name).array.sort.release;
     string[] addLabels;
     string[] removeLabels;

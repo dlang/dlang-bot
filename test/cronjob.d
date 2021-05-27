@@ -189,3 +189,16 @@ unittest
 
     runCronDailyTest(repositories);
 }
+
+@("actually-this-is-an-issue")
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/tools/issues?state=open&sort=updated&direction=asc", (ref Json j) {
+            // only test one issue
+            j = Json([j[3]]);
+        },
+    );
+
+    runCronDailyTest(["dlang/tools"]);
+}

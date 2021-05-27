@@ -436,7 +436,7 @@ struct GHIssue
         string url;
     }
     // this isn't really useful except for detecting whether it's a pull request
-    @name("pull_request") Nullable!SimplifiedGHPullRequest _pullRequest;
+    @optional @name("pull_request") Nullable!SimplifiedGHPullRequest _pullRequest;
 
     bool isPullRequest() const
     {
