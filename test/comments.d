@@ -81,7 +81,7 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
             auto body_= req.json["body"].get!string;
-            assert(body_.canFind("@andralex"));
+            assert(body_.canFind("**@<!-- -->andralex**"));
             assert(!body_.canFind("Auto-close | Bugzilla"), "Shouldn't contain bug header");
             assert(!body_.canFind("/show_bug.cgi?id="), "Shouldn't contain a Bugzilla reference");
         }
@@ -107,7 +107,7 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
             auto body_= req.json["body"].get!string;
-            assert(body_.canFind("@andralex"));
+            assert(body_.canFind("**@<!-- -->andralex**"));
             assert(!body_.canFind("Auto-close | Bugzilla"), "Shouldn't contain bug header");
             assert(!body_.canFind("/show_bug.cgi?id="), "Shouldn't contain a Bugzilla reference");
         }
@@ -139,7 +139,7 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
             auto body_= req.json["body"].get!string;
-            assert(body_.canFind("@andralex"));
+            assert(body_.canFind("**@<!-- -->andralex**"));
         },
         "/github/repos/dlang/phobos/issues/4921/labels",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
@@ -208,7 +208,7 @@ unittest
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
             auto body_= req.json["body"].get!string;
-            assert(body_.canFind("@andralex"));
+            assert(body_.canFind("**@<!-- -->andralex**"));
         },
         "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
         "/bugzilla/jsonrpc.cgi", // Bug.comments
@@ -317,7 +317,7 @@ unittest
         "/github/repos/dlang/phobos/issues/comments/262784442",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.method == HTTPMethod.PATCH);
-            assert(req.json["body"].get!string.canFind("Thanks for your pull request, @andralex!"));
+            assert(req.json["body"].get!string.canFind("Thanks for your pull request, **@<!-- -->andralex**!"));
             // don't show the the default contributors advice
             assert(!req.json["body"].get!string.canFind("CONTRIBUTING"));
         },
@@ -479,7 +479,7 @@ unittest
             (scope HTTPServerRequest req, scope HTTPServerResponse res){
                 assert(req.method == HTTPMethod.PATCH);
                 auto body_ = req.json["body"].get!string;
-                assert(body_.canFind("@andralex"));
+                assert(body_.canFind("**@<!-- -->andralex**"));
                 assert(!body_.canFind("Auto-close | Bugzilla"), "Shouldn't contain bug header");
                 assert(!body_.canFind("/show_bug.cgi?id="), "Shouldn't contain a Bugzilla reference");
             }

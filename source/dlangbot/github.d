@@ -63,16 +63,19 @@ string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs
         .deserializeJson!(GHUser[])
         .canFind!(l => l.login == pr.user.login);
 
+    // Avoid actually mentioning users when referring to them
+    auto userRef = `**@<!-- -->%s**`.format(pr.user.login);
+
     if (isMember)
     {
         app.formattedWrite(
-`Thanks for your pull request, @%s!
-`, pr.user.login, pr.repoSlug);
+`Thanks for your pull request, %s!
+`, userRef, pr.repoSlug);
     }
     else
     {
         app.formattedWrite(
-"Thanks for your pull request and interest in making D better, @%s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
+"Thanks for your pull request and interest in making D better, %s!  We are looking forward to reviewing it, and you should be hearing from a maintainer soon.
 Please verify that your PR follows this checklist:
 
 - My PR is fully covered with tests (you can see the coverage diff by visiting the _details_ link of the codecov check)
@@ -85,7 +88,7 @@ Please see [CONTRIBUTING.md](https://github.com/%s/blob/master/CONTRIBUTING.md) 
 ---
 
 If you have addressed all reviews or aren't sure how to proceed, don't hesitate to ping us with a simple comment.",
-                           pr.user.login, pr.repoSlug);
+                           userRef, pr.repoSlug);
     }
 
     // markdown doesn't support breaking of long lines
