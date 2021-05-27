@@ -255,18 +255,15 @@ void handlePR(string action, PullRequest* _pr)
         if (refs.any!(r => r.fixed))
         {
             import std.algorithm : canFind, filter, map, sort, uniq;
-            import std.array : array;
+            import std.array : assocArray;
+            import std.typecons : tuple;
             // references are already sorted by id
             auto bugzillaIds = refs.map!(r => r.id).uniq;
-            auto bugzillSeverities = descs
+            auto labels = descs
                 .filter!(d => bugzillaIds.canFind(d.id))
-                .map!(i => i.severity);
+                .map!(i => i.severity == "enhancement" ? "Enhancement" : "Bug Fix")
+                .map!(label => tuple(label, true)).assocArray.keys; // unique
             logDebug("[github/handlePR](%s): trying to add bug fix label", _pr.pid);
-            string[] labels;
-            if (bugzillSeverities.canFind("enhancement"))
-                labels ~= "Enhancement";
-            else
-                labels ~= "Bug Fix";
 
             pr.addLabels(labels);
         }

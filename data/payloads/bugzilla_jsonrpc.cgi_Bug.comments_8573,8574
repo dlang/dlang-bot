@@ -1,0 +1,14 @@
+{
+    "error" : null,
+    "result" : {
+        "bugs" : {
+            "8573" : {
+                "comments" : []
+            },
+            "8574" : {
+                "comments" : []
+            }
+        },
+        "comments" : {}
+    }
+}
