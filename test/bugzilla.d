@@ -125,6 +125,21 @@ unittest
     });
 }
 
+@("after-merge-dont-comment-non-bugzilla")
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/dub/pulls/12345/commits", (ref Json j) {
+            j[0]["commit"]["message"] = "Do something with Issue 17564";
+         },
+        "/github/repos/dlang/dub/issues/12345/comments",
+    );
+
+    postGitHubHook("dlang_dub_merged_12345.json", "pull_request", (ref Json j, scope req) {
+        j["pull_request"]["base"]["repo"]["owner"]["login"] = "dlang-community";
+    });
+}
+
 @("after-merge-dont-spam-bugzilla")
 unittest
 {
