@@ -241,7 +241,7 @@ void handlePR(string action, PullRequest* _pr)
     UserMessage[] msgs;
     IssueRef[] refs;
     Issue[] descs;
-    if (pr.base.repo.get().owner.login.among("dlang", "dlang-bots"))
+    if (bugzillaProjectSlugs.canFind(pr.repoSlug))
     {
         refs = getIssueRefs(commits);
         descs = getDescriptions(refs);

@@ -114,15 +114,13 @@ EOF".chomp;
 unittest
 {
     setAPIExpectations(
-        "/github/repos/dlang/phobos/pulls/4963/commits", (ref Json j) {
+        "/github/repos/notdlang/bar/pulls/12347/commits", (ref Json j) {
             j[0]["commit"]["message"] = "Do something with Issue 17564";
          },
-        "/github/repos/dlang/phobos/issues/4963/comments",
+        "/github/repos/notdlang/bar/issues/12347/comments",
     );
 
-    postGitHubHook("dlang_phobos_merged_4963.json", "pull_request", (ref Json j, scope req) {
-        j["pull_request"]["base"]["repo"]["owner"]["login"] = "dlang-community";
-    });
+    postGitHubHook("notdlang_bar_merged_12347.json");
 }
 
 @("after-merge-dont-comment-non-bugzilla")
@@ -135,9 +133,7 @@ unittest
         "/github/repos/dlang/dub/issues/12345/comments",
     );
 
-    postGitHubHook("dlang_dub_merged_12345.json", "pull_request", (ref Json j, scope req) {
-        j["pull_request"]["base"]["repo"]["owner"]["login"] = "dlang-community";
-    });
+    postGitHubHook("dlang_dub_merged_12345.json");
 }
 
 @("after-merge-dont-spam-bugzilla")
@@ -298,13 +294,11 @@ unittest
 unittest
 {
     setAPIExpectations(
-        "/github/repos/dlang/dmd/pulls/6359/commits",
-        "/github/repos/dlang/dmd/issues/6359/comments",
+        "/github/repos/notdlang/foo/pulls/12346/commits",
+        "/github/repos/notdlang/foo/issues/12346/comments",
     );
 
-    postGitHubHook("dlang_dmd_open_6359.json", "pull_request", (ref Json j, scope req) {
-        j["pull_request"]["base"]["repo"]["owner"]["login"] = "dlang-community";
-    });
+    postGitHubHook("notdlang_foo_open_12346.json");
 }
 
 @("pr-open-dont-spam-closed-bugzilla-issues")
