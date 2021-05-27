@@ -66,6 +66,7 @@ unittest
         "/github/repos/dlang/dmd/commits/782fd3fdd4a9c23e1307b4b963b443ed60517dfe/status",
         "/github/repos/dlang/dmd/pulls/6327/commits",
         "/github/repos/dlang/dmd/issues/6327/events",
+        "/github/repos/dlang/dmd/pulls/6327/reviews",
         "/github/repos/dlang/dmd/pulls/6327/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.json["sha"] == "782fd3fdd4a9c23e1307b4b963b443ed60517dfe");
@@ -100,6 +101,7 @@ unittest
         "/github/repos/dlang/dmd/pulls/6328/commits",
         "/github/repos/dlang/dmd/issues/6328/events",
         "/github/users/MartinNowak",
+        "/github/repos/dlang/dmd/pulls/6328/reviews",
         "/github/repos/dlang/dmd/pulls/6328/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.json["sha"] == "d6fc98058b637f9a558206847e6d7057ab9fb3de");
@@ -130,6 +132,7 @@ unittest
         "/github/repos/dlang/dmd/commits/782fd3fdd4a9c23e1307b4b963b443ed60517dfe/status",
         "/github/repos/dlang/dmd/pulls/6327/commits",
         "/github/repos/dlang/dmd/issues/6327/events",
+        "/github/repos/dlang/dmd/pulls/6327/reviews",
         "/github/repos/dlang/dmd/pulls/6327/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.json["sha"] == "782fd3fdd4a9c23e1307b4b963b443ed60517dfe");
@@ -144,6 +147,7 @@ unittest
         "/github/repos/dlang/dmd/pulls/6328/commits",
         "/github/repos/dlang/dmd/issues/6328/events",
         "/github/users/MartinNowak",
+        "/github/repos/dlang/dmd/pulls/6328/reviews",
         "/github/repos/dlang/dmd/pulls/6328/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res){
             assert(req.json["sha"] == "d6fc98058b637f9a558206847e6d7057ab9fb3de");
