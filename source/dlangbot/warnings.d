@@ -14,6 +14,27 @@ struct UserMessage
 }
 
 
+void checkEnhancementChangelog(in ref PullRequest pr, ref UserMessage[] msgs,
+        in Issue[] bugzillaIssues, in IssueRef[] refs)
+{
+    import dlangbot.utils : request, expectOK;
+    import vibe.stream.operations : readAllUTF8;
+
+    if (bugzillaIssues.any!(i => i.status.among("NEW", "ASSIGNED", "REOPENED") &&
+                                 i.severity == "enhancement" &&
+                                 refs.canFind!(r => r.id == i.id && r.fixed)))
+    {
+        auto diff = request(pr.diffURL).expectOK.bodyReader.readAllUTF8;
+        if (!diff.canFind("\n+++ b/changelog/"))
+        {
+            msgs ~= UserMessage(UserMessage.Type.Warning,
+                "Pull requests implementing enhancements should include a [full changelog entry](https://github.com/dlang/dmd/tree/master/changelog)."
+            );
+        }
+    }
+}
+
+
 /**
 Check bugzilla priority
 - enhancement -> changelog entry
@@ -50,6 +71,7 @@ UserMessage[] checkForWarnings(in PullRequest pr, in Issue[] bugzillaIssues, in 
 {
     UserMessage[] msgs;
     pr.checkBugzilla(msgs, bugzillaIssues, refs);
+    pr.checkEnhancementChangelog(msgs, bugzillaIssues, refs);
     return msgs;
 }
 
