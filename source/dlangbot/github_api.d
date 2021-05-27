@@ -363,6 +363,18 @@ struct GHComment
     }
 }
 
+/// A comment author association with repository.
+enum CommentAuthorAssociation
+{
+    NONE, /// Author has no association with the repository.
+    MANNEQUIN, /// Author is a placeholder for an unclaimed user.
+    FIRST_TIMER, /// Author has not previously committed to GitHub.
+    FIRST_TIME_CONTRIBUTOR, /// Author has not previously committed to the repository.
+    CONTRIBUTOR, /// Author has previously committed to the repository.
+    COLLABORATOR, /// Author has been invited to collaborate on the repository.
+    MEMBER, /// Author is a member of the organization that owns the repository.
+    OWNER, /// Author is the owner of the repository.
+}
 struct GHReview
 {
     GHUser user;
@@ -370,6 +382,7 @@ struct GHReview
     string body_;
     enum State { APPROVED, CHANGES_REQUESTED, COMMENTED }
     @byName State state;
+    @byName @name("author_association") CommentAuthorAssociation authorAssociation;
 }
 
 struct GHCommit
