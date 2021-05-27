@@ -153,6 +153,43 @@ unittest
     postGitHubHook("dlang_phobos_synchronize_4921.json");
 }
 
+@("multiple-severity-labels")
+unittest
+{
+    setAPIExpectations(
+        "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
+            j[0]["commit"]["message"] = "Fix Issue 8573, 8574";
+        },
+         "/github/repos/dlang/phobos/issues/4921/comments",
+        "/bugzilla/buglist.cgi?bug_id=8573,8574&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            res.writeBody(
+`bug_id,"short_desc","bug_status","resolution","bug_severity","priority","keywords"
+8573,"A simpler Phobos function that returns the index of the mix or max item","NEW","---","enhancement","P2",
+8574,"Some Bug","NEW","---","normal","P2",`);
+        },
+        "/github/repos/dlang/phobos/issues/4921/labels",
+        "/github/repos/dlang/phobos/issues/4921/labels", (ref Json j) {
+            j = Json.emptyArray;
+        },
+        "/github/orgs/dlang/public_members?per_page=100",
+        "/github/repos/dlang/phobos/issues/comments/262784442",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+        },
+        "/github/repos/dlang/phobos/issues/4921/labels",
+        (scope HTTPServerRequest req, scope HTTPServerResponse res){
+            assert(req.json[].sort.equal(["Bug Fix", "Enhancement"]));
+        },
+        "/trello/1/search?query=name:%22Issue%208573%22&"~trelloAuth,
+        "/trello/1/search?query=name:%22Issue%208574%22&"~trelloAuth,
+        "/bugzilla/jsonrpc.cgi", // Bug.comments (#8573,#8574)
+        "/bugzilla/jsonrpc.cgi", // Bug.update   (#8573)
+        "/bugzilla/jsonrpc.cgi", // Bug.update   (#8574)
+    );
+
+    postGitHubHook("dlang_phobos_synchronize_4921.json");
+}
+
 @("do-not-readd-labels-1-#97")
 unittest
 {
