@@ -186,7 +186,7 @@ void cronDaily(string[] repositories, CronConfig config)
 
 void handlePR(string action, PullRequest* _pr)
 {
-    import std.algorithm : among, any;
+    import std.algorithm : among, any, canFind;
     import vibe.core.core : setTimer;
     import dlangbot.warnings : checkForWarnings, UserMessage;
     import std.format : format;
@@ -277,7 +277,7 @@ void handlePR(string action, PullRequest* _pr)
 
     // When a PR is opened or updated mentioning some Bugzilla issues,
     // post a link to the PR as an issue comment.
-    if (runBugzillaUpdates && pr.base.repo.get().owner.login == "dlang" &&
+    if (runBugzillaUpdates && bugzillaProjectSlugs.canFind(pr.repoSlug) &&
         (action == "opened" || action == "synchronize" || action == "ready_for_review"))
     {
         import std.algorithm.iteration : filter, map;
@@ -323,7 +323,7 @@ void handlePR(string action, PullRequest* _pr)
 
     // When a PR is merged, update Bugzilla issues
     // (leave a comment with a link to the PR, and close them appropriately).
-    if (runBugzillaUpdates && pr.base.repo.get().owner.login == "dlang" &&
+    if (runBugzillaUpdates && bugzillaProjectSlugs.canFind(pr.repoSlug) &&
         action == "merged")
     {
         import std.algorithm.iteration : filter, map;
