@@ -42,6 +42,7 @@ unittest
             j[1]["label"]["name"] = "auto-merge";
         },
         "/github/users/9il",
+        "/github/repos/dlang/phobos/pulls/4921/reviews",
         "/github/repos/dlang/phobos/pulls/4921/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             // https://developer.github.com/v3/pulls/#response-if-merge-cannot-be-performed
@@ -73,6 +74,7 @@ unittest
             j[1]["label"]["name"] = "auto-merge-squash";
         },
         "/github/users/9il",
+        "/github/repos/dlang/phobos/pulls/4921/reviews",
         "/github/repos/dlang/phobos/pulls/4921/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.json["sha"] == "d2c7d3761b73405ee39da3fd7fe5030dee35a39e");
@@ -105,6 +107,7 @@ unittest
             j[1]["label"]["name"] = "auto-merge";
         },
         "/github/users/9il",
+        "/github/repos/dlang/phobos/pulls/4921/reviews",
         "/github/repos/dlang/phobos/pulls/4921/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             // https://developer.github.com/v3/pulls/#response-if-merge-cannot-be-performed
@@ -176,6 +179,7 @@ unittest
         "/github/repos/vibe-d/vibe-core/issues/22/labels",
         "/github/repos/vibe-d/vibe-core/issues/22/events",
         "/github/users/wilzbach",
+        "/github/repos/vibe-d/vibe-core/pulls/22/reviews",
         "/github/repos/vibe-d/vibe-core/pulls/22/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.json["sha"] == "04b3575c14dc7ad9971e19f153f3e3d712c1bdde");
@@ -199,6 +203,7 @@ unittest
         "/github/repos/dlang-tour/core/issues/583/labels",
         "/github/repos/dlang-tour/core/issues/583/events",
         "/github/users/wilzbach",
+        "/github/repos/dlang-tour/core/pulls/583/reviews",
         "/github/repos/dlang-tour/core/pulls/583/merge",
         (scope HTTPServerRequest req, scope HTTPServerResponse res) {
             assert(req.json["sha"] == "4941624d1af77e84565ec86979c21c1d582b1c06");

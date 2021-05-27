@@ -195,6 +195,7 @@ GHMerge.MergeMethod autoMergeMethod(GHLabel[] labels)
 Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
 {
     import std.conv : to;
+    import ae.utils.aa : OrderedSet;
 
     const status = pr.combinedStatus;
     if (status.state != CIState.success)
@@ -232,11 +233,24 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
         author = getUserEmail(events.front["actor"]["login"].get!string);
     }
 
+    OrderedSet!string reviewers;
+    foreach (ref review; pr.reviews)
+    {
+        if (review.authorAssociation >= CommentAuthorAssociation.COLLABORATOR &&
+            review.state == GHReview.State.APPROVED)
+        {
+            reviewers.add(getUserEmail(review.user.login));
+        }
+    }
+
     logDebug("[github/tryMerge/commits](%s): %s", pr.pid, commits);
     logDebug("[github/tryMerge/commitsURL](%s): %s", pr.pid, pr.commitsURL);
     logDebug("[github/tryMerge/commits](%s): %s", pr.pid, commits[$ - 1]);
     GHMerge mergeInput = {
-        commitMessage: "%s\n\nMerged-on-behalf-of: %s".format(pr.title, author),
+        commitMessage: "%s\n\n%-(Signed-off-by: %s\n%|%)Merged-on-behalf-of: %s".format(
+            pr.title,
+            reviewers.keys,
+            author),
         sha: commits[$ - 1]["sha"].get!string,
         mergeMethod: method
     };
