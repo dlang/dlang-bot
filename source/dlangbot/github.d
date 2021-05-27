@@ -1,6 +1,6 @@
 module dlangbot.github;
 
-import dlangbot.bugzilla : bugzillaURL, Issue, IssueRef;
+import dlangbot.bugzilla : bugzillaURL, bugzillaProjectSlugs, Issue, IssueRef;
 import dlangbot.warnings : printMessages, UserMessage;
 
 import std.algorithm, std.range;
@@ -88,11 +88,8 @@ If you have addressed all reviews or aren't sure how to proceed, don't hesitate 
                            pr.user.login, pr.repoSlug);
     }
 
-    static immutable bugzillaReferences = ["dlang/dmd", "dlang/druntime", "dlang/phobos",
-                     "dlang/dlang.org", "dlang/tools", "dlang/installer"];
-
     // markdown doesn't support breaking of long lines
-    if (bugzillaReferences.canFind(pr.repoSlug))
+    if (bugzillaProjectSlugs.canFind(pr.repoSlug))
     {
         app ~= "\n### Bugzilla references\n\n";
         if (refs.length)
