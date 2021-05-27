@@ -14,12 +14,6 @@ struct UserMessage
 }
 
 
-// check diff length
-void checkDiff(in ref PullRequest pr, ref UserMessage[] msgs)
-{
-}
-
-
 /**
 Check bugzilla priority
 - enhancement -> changelog entry
@@ -55,7 +49,6 @@ git rebase --onto upstream/stable upstream/master
 UserMessage[] checkForWarnings(in PullRequest pr, in Issue[] bugzillaIssues, in IssueRef[] refs)
 {
     UserMessage[] msgs;
-    pr.checkDiff(msgs);
     pr.checkBugzilla(msgs, bugzillaIssues, refs);
     return msgs;
 }
