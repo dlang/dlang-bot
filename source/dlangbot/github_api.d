@@ -71,6 +71,12 @@ Result ghGetRequest(string url)
         result.serializeToJsonString.toFile(cacheFileName);
         return result;
     }
+    else if (res.statusCode / 100 == 3 && "Location" in res.headers)
+    {
+        auto location = res.headers["Location"];
+        logInfo(" > Redirect: %s", location);
+        return ghGetRequest(applyRelativeURL(url, location));
+    }
     else
         throw new Exception("GitHub HTTP request failed with status %d".format(res.statusCode));
 }
