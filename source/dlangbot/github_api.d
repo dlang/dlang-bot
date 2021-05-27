@@ -114,24 +114,66 @@ auto ghSendRequest(T...)(HTTPMethod method, string url, T arg)
 // range-based page loader for the GH API
 private struct AllPages
 {
-    private string url;
-    private string link = "next";
-
-    // does not cache
-    Json front() {
-        scope req = ghGetRequest(url);
-        link = req.headers.get("Link", null);
-        return req.body;
+    private static string[string] parseLinks(string s)
+    {
+        string[string] result;
+        auto items = s.split(", "); // Hacky but should never occur inside an URL or "rel" value
+        foreach (item; items)
+        {
+            auto parts = item.split("; "); // ditto
+            string url; string[string] args;
+            foreach (part; parts)
+            {
+                if (part.startsWith("<") && part.endsWith(">"))
+                    url = part[1..$-1];
+                else
+                {
+                    auto ps = part.findSplit("=");
+                    auto key = ps[0];
+                    auto value = ps[2];
+                    if (value.startsWith('"') && value.endsWith('"'))
+                        value = value[1..$-1];
+                    args[key] = value;
+                }
+            }
+            result[args.get("rel", null)] = url;
+        }
+        return result;
     }
+
+    unittest
+    {
+        auto header = `<https://api.github.com/repositories/1257070/pulls?per_page=100&page=2>; rel="next", ` ~
+            `<https://api.github.com/repositories/1257070/pulls?per_page=100&page=3>; rel="last"`;
+        assert(parseLinks(header) == [
+            "next" : "https://api.github.com/repositories/1257070/pulls?per_page=100&page=2",
+            "last" : "https://api.github.com/repositories/1257070/pulls?per_page=100&page=3",
+        ]);
+    }
+
+    private Result result;
+
+    this(string url)
+    {
+        result = ghGetRequest(url);
+    }
+
+    Json front()
+    {
+        return result.body;
+    }
+
     void popFront()
     {
-        import std.utf : byCodeUnit;
-        if (link)
-            url = link[1..$].byCodeUnit.until(">").array;
+        if (auto pNext = "next" in parseLinks(result.headers.get("Link", null)))
+            result = ghGetRequest(*pNext);
+        else
+            result = Result.init; // empty
     }
+
     bool empty()
     {
-        return !link.canFind("next");
+        return result is Result.init;
     }
 }
 
