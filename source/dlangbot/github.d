@@ -39,9 +39,8 @@ string markdownEscape(string desc)
     foreach (c; desc)
     {
         if (c == '|') app ~= "&#124;";
-        else if (c == '`') app ~= "``";
         else if (c.among('\\', '*', '_', '{', '}', '[', ']', '(', ')', '#',
-                       '+', '-', '.', '!'))
+                       '`', '+', '-', '.', '!'))
         {
             app ~= '\\';
             app ~= c;

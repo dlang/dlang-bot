@@ -554,7 +554,7 @@ unittest
 {
     import dlangbot.github : markdownEscape;
     assert("a|b".markdownEscape == "a&#124;b");
-    assert("a`b".markdownEscape == "a``b");
+    assert("a`b".markdownEscape == "a\\`b");
     assert("a\\b".markdownEscape == "a\\\\b");
     assert("a+b".markdownEscape == r"a\+b");
 }
