@@ -1,7 +1,7 @@
 module dlangbot.warnings;
 
 import dlangbot.bugzilla : Issue, IssueRef;
-import dlangbot.github : PullRequest;
+import dlangbot.github : PullRequest, manualChangelogURL;
 
 import std.algorithm;
 
@@ -19,6 +19,7 @@ void checkEnhancementChangelog(in ref PullRequest pr, ref UserMessage[] msgs,
 {
     import dlangbot.utils : request, expectOK;
     import vibe.stream.operations : readAllUTF8;
+    import std.format : format;
 
     if (bugzillaIssues.any!(i => i.status.among("NEW", "ASSIGNED", "REOPENED") &&
                                  i.severity == "enhancement" &&
@@ -28,7 +29,8 @@ void checkEnhancementChangelog(in ref PullRequest pr, ref UserMessage[] msgs,
         if (!diff.canFind("\n+++ b/changelog/"))
         {
             msgs ~= UserMessage(UserMessage.Type.Warning,
-                "Pull requests implementing enhancements should include a [full changelog entry](https://github.com/dlang/dmd/tree/master/changelog)."
+                "Pull requests implementing enhancements should include a [full changelog entry](%s)."
+                .format(manualChangelogURL(pr.repoSlug))
             );
         }
     }
