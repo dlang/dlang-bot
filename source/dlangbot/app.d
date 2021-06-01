@@ -254,7 +254,7 @@ void handlePR(string action, PullRequest* _pr)
 
         if (refs.any!(r => r.fixed))
         {
-            import std.algorithm : canFind, filter, map, sort, uniq;
+            import std.algorithm : canFind, filter, map, uniq;
             import std.array : assocArray;
             import std.typecons : tuple;
             // references are already sorted by id
@@ -285,6 +285,9 @@ void handlePR(string action, PullRequest* _pr)
         import std.array : array, join, replace;
 
         auto oldComments = getBugComments(refs.map!(r => r.id).array);
+        auto user = pr.head.user.get();
+        auto userId = user.id;
+        auto userName = user.login;
 
         foreach (r; refs)
         {
@@ -318,10 +321,18 @@ void handlePR(string action, PullRequest* _pr)
             );
 
             updateBugs([r.id], issueComment, false, r.fixed ? ["pull"] : null);
+
+            // add event to the fixed bugzilla issues table
+            if (r.fixed)
+            {
+                import std.algorithm.searching : find;
+                import dlangbot.database : updateBugzillaFixedIssuesTable;
+                updateBugzillaFixedIssuesTable(userName, userId, r.id, descs.find!(d => d.id == r.id)[0].severity);
+            }
         }
     }
 
-    // When a PR is merged, update Bugzilla issues
+    // When a PR is merged, update score for author and Bugzilla issues
     // (leave a comment with a link to the PR, and close them appropriately).
     if (runBugzillaUpdates && bugzillaProjectSlugs.canFind(pr.repoSlug) &&
         action == "merged")
