@@ -380,7 +380,7 @@ struct GHReview
     GHUser user;
     @name("commit_id") string commitId;
     string body_;
-    enum State { APPROVED, CHANGES_REQUESTED, COMMENTED }
+    enum State { APPROVED, CHANGES_REQUESTED, COMMENTED, DISMISSED }
     @byName State state;
     @byName @name("author_association") CommentAuthorAssociation authorAssociation;
 }
