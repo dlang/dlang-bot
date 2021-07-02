@@ -285,9 +285,6 @@ void handlePR(string action, PullRequest* _pr)
         import std.array : array, join, replace;
 
         auto oldComments = getBugComments(refs.map!(r => r.id).array);
-        auto user = pr.head.user.get();
-        auto userId = user.id;
-        auto userName = user.login;
 
         foreach (r; refs)
         {
@@ -321,14 +318,6 @@ void handlePR(string action, PullRequest* _pr)
             );
 
             updateBugs([r.id], issueComment, false, r.fixed ? ["pull"] : null);
-
-            // add event to the fixed bugzilla issues table
-            if (r.fixed)
-            {
-                import std.algorithm.searching : find;
-                import dlangbot.database : updateBugzillaFixedIssuesTable;
-                updateBugzillaFixedIssuesTable(userName, userId, r.id, descs.find!(d => d.id == r.id)[0].severity);
-            }
         }
     }
 
@@ -344,6 +333,9 @@ void handlePR(string action, PullRequest* _pr)
         import std.typecons : tuple;
 
         auto oldComments = getBugComments(refs.map!(r => r.id).array);
+        auto user = pr.head.user.get();
+        auto userId = user.id;
+        auto userName = user.login;
 
         foreach (r; refs)
         {
@@ -379,6 +371,14 @@ void handlePR(string action, PullRequest* _pr)
             );
 
             updateBugs([r.id], issueComment, r.fixed);
+
+            // add event to the fixed bugzilla issues table
+            if (r.fixed)
+            {
+                import std.algorithm.searching : find;
+                import dlangbot.database : updateBugzillaFixedIssuesTable;
+                updateBugzillaFixedIssuesTable(userName, userId, r.id, descs.find!(d => d.id == r.id)[0].severity);
+            }
         }
     }
 }
