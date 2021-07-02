@@ -3,6 +3,9 @@ __test__unittest__
 dlang-bot-test-unittest
 ut.d # unit-threaded
 
+# database
+/var
+
 /cache
 
 # Created by https://www.gitignore.io/api/d
