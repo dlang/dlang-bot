@@ -372,13 +372,17 @@ void handlePR(string action, PullRequest* _pr)
             );
 
             updateBugs([r.id], issueComment, r.fixed);
+            auto issueDesc = descs.filter!(d => d.id == r.id);
+            auto status = issueDesc.empty ? null : issueDesc.front.status;
 
-            // add event to the fixed bugzilla issues table
-            if (r.fixed)
+            // Add event to the fixed bugzilla issues table if the issue is still open.
+            // For revert and stable-merge PRs, the database will not be updated.
+            // If a PR is reverted, it is crucial that the bug is manually reopened.
+            if (r.fixed && status.among("NEW", "ASSIGNED", "REOPENED"))
             {
-                import std.algorithm.searching : find;
                 import dlangbot.database : updateBugzillaFixedIssuesTable;
-                updateBugzillaFixedIssuesTable(userName, userId, r.id, descs.find!(d => d.id == r.id)[0].severity);
+                auto severity = issueDesc.front.severity;
+                updateBugzillaFixedIssuesTable(userName, userId, r.id, severity);
             }
         }
     }
