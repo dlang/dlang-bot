@@ -1,0 +1,11 @@
+doctype html
+head
+  title Top Contributors
+body(style="text-align: center; position: absolute; left: 0; top: 0; height: 100%; width: 100%")
+  h2(style="margin-top: 6rem") Top Contributors
+
+  table
+    - foreach (entry; entries)
+      tr
+        - foreach(value; entry)
+          td= value

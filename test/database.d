@@ -79,4 +79,8 @@ unittest
     assert(issueAuthors[4] == user2_id);
     issues.clear;
     issueAuthors.clear;
+
+    auto totalPoints = getContributorsStats();
+    assert(totalPoints[0] == [user1_alias, "135"]);
+    assert(totalPoints[1] == [user2, "100"]);
 }

@@ -51,6 +51,9 @@ Database getDatabase()
     return db;
 }
 
+/**
+Inserts a new entry in the database for a fixed issue
+*/
 void updateBugzillaFixedIssuesTable(string userName, ulong userId, int issueNumber, string severity)
 {
 
@@ -68,6 +71,51 @@ void updateBugzillaFixedIssuesTable(string userName, ulong userId, int issueNumb
     INSERT OR REPLACE INTO [BugzillaFixedIssues] ([IssueNumber], [Severity], [GithubId], [Time])
     VALUES (?, ?, ?, strftime('%s','now'))"
     .exec(issueNumber, severity, userId);
+}
+
+/**
+Returns a string table that contains the contributor name
+and its total points. The records are sorted by total points.
+A sample of how the string matrix will look like:
+[["John", "23"], ["Gigi", "12"], ["Mimi", "5"]].
+*/
+string[][] getContributorsStats()
+{
+    import std.conv : to;
+
+    string[][] ret;
+
+    // first, sum the points of each individual github id
+    foreach(int gid, int points; db.stmt!"
+            SELECT [GithubId], SUM(Points) AS [TotalPoints]
+            FROM
+            (SELECT [GithubId], CASE [Severity]
+                WHEN \"enhancement\" THEN 10
+                WHEN \"trivial\" THEN 10
+                WHEN \"minor\" THEN 15
+                WHEN \"normal\" THEN 20
+                WHEN \"major\" THEN 50
+                WHEN \"critical\" THEN 75
+                WHEN \"blocker\" THEN 75
+                WHEN \"regression\" THEN 100
+            END AS [Points]
+            FROM [BugzillaFixedIssues]
+            )
+            GROUP BY [GithubId]
+            ORDER BY [TotalPoints] DESC;".iterate())
+    {
+        // then, get the human readable name of each github account
+        // and construct the string table.
+        string username;
+        foreach(string name; db.stmt!"
+                SELECT [Name] FROM [GithubNickname]
+                WHERE [GithubId]=?".iterate(gid))
+            username = name;
+
+        ret ~= [username, to!string(points)];
+    }
+
+    return ret;
 }
 
 static this()
