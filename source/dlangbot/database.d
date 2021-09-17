@@ -78,31 +78,37 @@ Returns a string table that contains the contributor name
 and its total points. The records are sorted by total points.
 A sample of how the string matrix will look like:
 [["John", "23"], ["Gigi", "12"], ["Mimi", "5"]].
+
+`startDate` and `endData` designate a time range
+to select events from. Their format is: "YYYY-MM-DD HH:MM:SS.XXXXXX"
 */
-string[][] getContributorsStats()
+string[][] getContributorsStats(string startDate, string endDate)
 {
     import std.conv : to;
 
     string[][] ret;
 
+    enum query = "
+        SELECT [GithubId], SUM(Points) AS [TotalPoints]
+        FROM
+        (SELECT [GithubId], CASE [Severity]
+            WHEN \"enhancement\" THEN 10
+            WHEN \"trivial\" THEN 10
+            WHEN \"minor\" THEN 15
+            WHEN \"normal\" THEN 20
+            WHEN \"major\" THEN 50
+            WHEN \"critical\" THEN 75
+            WHEN \"blocker\" THEN 75
+            WHEN \"regression\" THEN 100
+        END AS [Points]
+        FROM [BugzillaFixedIssues]
+        WHERE datetime([Time], 'unixepoch') BETWEEN ? AND ?
+        )
+        GROUP BY [GithubId]
+        ORDER BY [TotalPoints] DESC;";
+
     // first, sum the points of each individual github id
-    foreach(int gid, int points; db.stmt!"
-            SELECT [GithubId], SUM(Points) AS [TotalPoints]
-            FROM
-            (SELECT [GithubId], CASE [Severity]
-                WHEN \"enhancement\" THEN 10
-                WHEN \"trivial\" THEN 10
-                WHEN \"minor\" THEN 15
-                WHEN \"normal\" THEN 20
-                WHEN \"major\" THEN 50
-                WHEN \"critical\" THEN 75
-                WHEN \"blocker\" THEN 75
-                WHEN \"regression\" THEN 100
-            END AS [Points]
-            FROM [BugzillaFixedIssues]
-            )
-            GROUP BY [GithubId]
-            ORDER BY [TotalPoints] DESC;".iterate())
+    foreach(int gid, int points; db.stmt!query.iterate(startDate, endDate))
     {
         // then, get the human readable name of each github account
         // and construct the string table.
