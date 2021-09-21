@@ -80,7 +80,7 @@ unittest
     issues.clear;
     issueAuthors.clear;
 
-    auto totalPoints = getContributorsStats();
+    auto totalPoints = getContributorsStats("2021-01-01 00:00:00.000000", "2099-01-01 00:00:00.0000");
     assert(totalPoints[0] == [user1_alias, "135"]);
     assert(totalPoints[1] == [user2, "100"]);
 }

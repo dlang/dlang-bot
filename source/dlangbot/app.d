@@ -462,7 +462,7 @@ void contributorStats(HTTPServerRequest req, HTTPServerResponse res)
     import dlangbot.database : getContributorsStats;
     import vibe.http.server : render;
 
-    string[][] entries = getContributorsStats();
+    string[][] entries = getContributorsStats("2021-09-20 00:00:00.000000", "2021-11-21 00:00:00.000000");
     res.render!("contributor_stats.dt", entries);
 }
 
