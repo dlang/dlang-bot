@@ -47,3 +47,10 @@ body(style="text-align: center; position: absolute; left: 0; top: 0; height: 100
       a(href="https://auto-tester.puremagic.com") Dlang Auto-Tester
     li
       a(href="https://circleci.com/gh/dlang") Dlang on CircleCi
+
+  h3 Bug Fixing Standings
+  ul
+    li
+      a(href="https://bot.dlang.io/contributor_stats_overall") Overall hierarchy
+    li
+      a(href="https://bot.dlang.io/contributor_stats_cycle") Current rewarding cycle hierarchy

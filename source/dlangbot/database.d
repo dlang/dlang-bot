@@ -85,6 +85,7 @@ to select events from. Their format is: "YYYY-MM-DD HH:MM:SS.XXXXXX"
 string[][] getContributorsStats(string startDate, string endDate)
 {
     import std.conv : to;
+    import std.algorithm.comparison : among;
 
     string[][] ret;
 
@@ -118,6 +119,9 @@ string[][] getContributorsStats(string startDate, string endDate)
                 WHERE [GithubId]=?".iterate(gid))
             username = name;
 
+        if (username.among("ibuclaw", "WalterBright", "RazvanN7", "CyberShadow",
+                            "kinke", "andralex", "maxhaton", "atilaneves", "mdparker", "Geod24"))
+            username = username ~ "*";
         ret ~= [username, to!string(points)];
     }
 

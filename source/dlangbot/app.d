@@ -50,7 +50,8 @@ void startServer(HTTPServerSettings settings)
         .post("/codecov_hook", &codecovHook)
         .post("/buildkite_hook", &buildkiteHook)
         .post("/agent_shutdown_check", &agentShutdownCheck)
-        .get("/contributor_stats", &contributorStats)
+        .get("/contributor_stats", &contributorStatsOverall)
+        .get("/contributor_stats_cycle", &contributorStatsPerCycle)
         ;
 
     HTTPClient.setUserAgentString("dlang-bot vibe.d/"~vibeVersionString);
@@ -457,13 +458,31 @@ void agentShutdownCheck(HTTPServerRequest req, HTTPServerResponse res)
 
 //==============================================================================
 
-void contributorStats(HTTPServerRequest req, HTTPServerResponse res)
+void contributorStatsOverall(HTTPServerRequest req, HTTPServerResponse res)
+{
+    contributorStats(req, res);
+}
+
+void contributorStatsPerCycle(HTTPServerRequest req, HTTPServerResponse res)
+{
+    contributorStats(req, res, "2022-01-01 00:00:00.000000", "2022-03-01 00:00:00.000000");
+}
+
+private void contributorStats(HTTPServerRequest req, HTTPServerResponse res,
+        string startDate = "2021-01-01 00:00:00.000000", string endDate = "2100-01-01 00:00:00.000000")
 {
     import dlangbot.database : getContributorsStats;
     import vibe.http.server : render;
 
-    string[][] entries = getContributorsStats("2021-01-01 00:00:00.000000", "2100-01-01 00:00:00.000000");
-    res.render!("contributor_stats.dt", entries);
+    string[][] entries = getContributorsStats(startDate, endDate);
+    if (startDate == "2021-01-01 00:00:00.000000")
+    {
+        res.render!("contributor_stats.dt", entries);
+    }
+    else
+    {
+        res.render!("contributor_stats_cycle.dt", entries);
+    }
 }
 
 //==============================================================================
