@@ -51,6 +51,6 @@ body(style="text-align: center; position: absolute; left: 0; top: 0; height: 100
   h3 Bug Fixing Standings
   ul
     li
-      a(href="https://bot.dlang.io/contributor_stats_overall") Overall hierarchy
+      a(href="https://bot.dlang.io/contributor_stats") Overall hierarchy
     li
       a(href="https://bot.dlang.io/contributor_stats_cycle") Current rewarding cycle hierarchy
