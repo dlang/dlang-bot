@@ -1,6 +1,6 @@
 doctype html
 head
-  title Top Contributors January 1, 2022 - March 1, 2022
+  title Top Contributors January 1, 2022 - April 1, 2022
 body(style="text-align: center; position: absolute; left: 0; top: 0; height: 100%; width: 100%")
   h2(style="margin-top: 6rem") Top Contributors January 1, 2022 - March 1, 2022
 
@@ -10,4 +10,4 @@ body(style="text-align: center; position: absolute; left: 0; top: 0; height: 100
         - foreach(value; entry)
           td= value
 
-  p * Foundation member - does not qualifiy for receiving prizes
+  p * Foundation member - does not qualify for receiving prizes
