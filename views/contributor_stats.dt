@@ -1,13 +1,22 @@
 doctype html
 head
-  title Overall Top Contributors
-body(style="text-align: center; position: absolute; left: 0; top: 0; height: 100%; width: 100%")
+  title Top Contributors on fixing D bugs
+body(style="text-align: center; position: absolute; left: 0; top: 0; height: 100%; width: 100%; background-color: #984ea3; color: white")
   h2(style="margin-top: 6rem") Overall Top Contributors
 
+  img(id="rocket", src="img/dlang_rocket.png", style="position: absolute; right: 2rem; top: 8rem; z-index: -1; opacity: 0.75")
   table(style="margin-left: auto; margin-right: auto")
     - foreach (entry; entries)
       tr
         - foreach(value; entry)
           td= value
 
-  p * Foundation member - does not qualify for receiving prizes
+  p For more information on how the rewarding system works visit 
+    a(href="https://dlang.org/blog/2021/09/16/bugzilla-reward-system") this blog post
+    | .
+
+  p For more information on D visit 
+    a(href="https://dlang.org/") dlang.org
+    | .
+
+  p Foundation members are not eligible for prizes. They are marked with an asterisk (*).
