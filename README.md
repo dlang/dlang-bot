@@ -1,6 +1,5 @@
 # Dlang-Bot
 
-[![Travis build status](https://travis-ci.org/dlang/dlang-bot.svg?branch=master)](https://travis-ci.org/dlang/dlang-bot)
 [![Codecov](https://img.shields.io/codecov/c/github/dlang/dlang-bot/master.svg)](https://codecov.io/gh/dlang/dlang-bot)
 
 <img alt="dlang-bot" height="200px" src="public/img/dlang_bot.png" />
