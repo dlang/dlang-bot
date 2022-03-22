@@ -120,7 +120,8 @@ string[][] getContributorsStats(string startDate, string endDate)
             username = name;
 
         if (username.among("ibuclaw", "WalterBright", "RazvanN7", "CyberShadow",
-                            "kinke", "andralex", "maxhaton", "atilaneves", "mdparker", "Geod24"))
+                            "kinke", "andralex", "maxhaton", "atilaneves", "mdparker",
+                            "Geod24", "dkorpel"))
             username = username ~ "*";
         ret ~= [username, to!string(points)];
     }
