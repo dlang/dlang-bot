@@ -1,8 +1,8 @@
 doctype html
 head
-  title Top Contributors on fixing D bugs April 1st, 2022 - July 1st, 2022
+  title Top Contributors on fixing D bugs July 1st, 2022 - October 1st, 2022
 body(style="text-align: center; position: absolute; left: 0; top: 0; height: 100%; width: 100%; background-color: #984ea3; color: white")
-  h2(style="margin-top: 6rem") Top Contributors April 1st, 2022 - July 1st, 2022
+  h2(style="margin-top: 6rem") Top Contributors July 1st, 2022 - October 1st, 2022
 
   img(id="rocket", src="img/dlang_rocket.png", style="position: absolute; right: 2rem; top: 8rem; z-index: -1; opacity: 0.75")
   table(style="margin-left: auto; margin-right: auto")
