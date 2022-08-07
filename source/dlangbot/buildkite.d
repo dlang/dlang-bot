@@ -257,7 +257,7 @@ private auto bkQuery(string query, string[string] variables = null)
 
 enum organizationQuery = q"GQL
 query($pipelineSearch:String) {
-  organization(slug: dlang) {
+  organization(slug: "dlang") {
     pipelines(first: 100, search: $pipelineSearch) {
       edges {
         node {
