@@ -3,9 +3,9 @@ description "dlang-bot for automated bugzilla, github, and trello references"
 copyright "Copyright © 2015, Martin Nowak"
 authors "Martin Nowak"
 dependency "vibe-d" version="~>0.9.0"
-dependency "ae:sqlite" version="==0.0.3053"
+dependency "ae:sqlite" version="==0.0.3228"
 dependency "vibe-d:tls" version="*"
-dependency "ae" version="==0.0.3000"
+dependency "ae" version="==0.0.3228"
 targetType "executable"
 
 configuration "executable" {
