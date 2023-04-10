@@ -465,7 +465,7 @@ void contributorStatsOverall(HTTPServerRequest req, HTTPServerResponse res)
 
 void contributorStatsPerCycle(HTTPServerRequest req, HTTPServerResponse res)
 {
-    contributorStats(req, res, "2023-01-01 00:00:00.000000", "2023-03-31 23:59:59.000000");
+    contributorStats(req, res, "2023-04-01 00:00:00.000000", "2023-06-30 23:59:59.000000");
 }
 
 private void contributorStats(HTTPServerRequest req, HTTPServerResponse res,
