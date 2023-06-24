@@ -99,7 +99,7 @@ struct OAuth
         import std.range : chain;
         import std.string : representation;
 
-        auto query = parameters.map!(a => a.byKeyValue.array)
+        auto query = parameters.map!(a => a.byKeyValue.array.dup)
                         .joiner
                         .array
                         .sort
