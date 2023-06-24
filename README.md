@@ -212,7 +212,7 @@ Improve the bot
 Run the testsuite:
 
 ```
-dub test -- --single --debug --trace
+dub test -- --single --debug --trace --debug
 ```
 
 Missing a feature?
