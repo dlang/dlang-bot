@@ -12,7 +12,7 @@
         "email": "code@dawg.eu",
         "date": "2017-06-28T23:45:01Z"
       },
-      "message": "Fix issue 17564: Eliminate \"static this\" for theAllocator\n\nThis switches to lazy initialization of theAllocator, so that accessing it form within `shared static this` works as expected.",
+      "message": "Fix bugzilla issue 17564: Eliminate \"static this\" for theAllocator\n\nThis switches to lazy initialization of theAllocator, so that accessing it form within `shared static this` works as expected.",
       "tree": {
         "sha": "b490839e4489d62864e0aa8aab9e308a535a8ad8",
         "url": "https://api.github.com/repos/dlang/phobos/git/trees/b490839e4489d62864e0aa8aab9e308a535a8ad8"

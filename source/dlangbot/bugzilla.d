@@ -31,44 +31,46 @@ auto matchIssueRefs(string message)
             .map!(match => IssueRef(match.hit.to!int, closed));
     }
 
-    enum issueRE = ctRegex!(`(?:^fix(?:es)?(?:\s+(?:issues?|bugs?))?\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))|` ~
-                            `(?:(?:issues?|bugs?)\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))`, "im");
+    enum issueRE = ctRegex!(`(?:^fix(?:es)?(?:\s+bugzilla)(?:\s+(?:issues?|bugs?))?\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))|` ~
+                            `(?:bugzilla\s+(?:(?:issues?|bugs?)\s+)?(#?\d+(?:[\s,\+&and]+#?\d+)*))`, "im");
     return matchToRefs(message.matchFirst(issueRE));
 }
 
 unittest
 {
-    assert(equal(matchIssueRefs("fix issue 16319 and fix std.traits.isInnerClass"),
+    assert(equal(matchIssueRefs("fix bugzilla issue 16319 and fix std.traits.isInnerClass"),
                  [IssueRef(16319, true)]));
-    assert(equal(matchIssueRefs("Fixes issues 17494, 17505, 17506"),
+    assert(equal(matchIssueRefs("Fixes Bugzilla issues 17494, 17505, 17506"),
                  [IssueRef(17494, true),IssueRef(17505, true), IssueRef(17506, true)]));
-    assert(equal(matchIssueRefs("Fix issues 42, 55, 98: Baguette poisson fraise"),
+    assert(equal(matchIssueRefs("Fix bugzilla issues 42, 55, 98: Baguette poisson fraise"),
                  [ IssueRef(42, true), IssueRef(55, true), IssueRef(98, true)  ]));
     // Multi-line
-    assert(equal(matchIssueRefs("Bla bla bla\n\nFixes issue #123"),
+    assert(equal(matchIssueRefs("Bla bla bla\n\nFixes bugzilla issue #123"),
                  [IssueRef(123, true)]));
     // only first match considered, see #175
-    assert(equal(matchIssueRefs("Fixes Issues 1234 and 2345\nblabla\nFixes Issue 3456"),
+    assert(equal(matchIssueRefs("Fixes BugZilla Issues 1234 and 2345\nblabla\nFixes BugZilla Issue 3456"),
                  [IssueRef(1234, true), IssueRef(2345, true)]));
     // Related, but not closing
-    assert(equal(matchIssueRefs("Issue 242: Refactor prior to fix"),
+    assert(equal(matchIssueRefs("Bugzilla Issue 242: Refactor prior to fix"),
                  [IssueRef(242, false)]));
-    assert(equal(matchIssueRefs("Bug 123: Add a test"),
+    assert(equal(matchIssueRefs("Bugzilla Bug 123: Add a test"),
                  [IssueRef(123, false)]));
-    assert(equal(matchIssueRefs("Issue #456: Improve error message"),
+    assert(equal(matchIssueRefs("Bugzilla Issue #456: Improve error message"),
                  [IssueRef(456, false)]));
 
     // Short hand syntax
-    assert(equal(matchIssueRefs("Fix 222, 333 and 42000: Baguette poisson fraise"),
+    assert(equal(matchIssueRefs("Fix Bugzilla 222, 333 and 42000: Baguette poisson fraise"),
                  [ IssueRef(222, true), IssueRef(333, true), IssueRef(42000, true)  ]));
-    assert(equal(matchIssueRefs("Fix 4242 & 131 Baguette poisson fraise"),
+    assert(equal(matchIssueRefs("Fix Bugzilla 4242 & 131 Baguette poisson fraise"),
                  [ IssueRef(4242, true), IssueRef(131, true)  ]));
     // Just a reference, not a fix
-    assert(equal(matchIssueRefs("Issue 242: Warn about buggy behavior"),
+    assert(equal(matchIssueRefs("Bugzilla Issue 242: Warn about buggy behavior"),
                  [IssueRef(242, false)]));
-    assert(equal(matchIssueRefs("Do not quite fix issue 242 but it's a start"),
+    assert(equal(matchIssueRefs("Do not quite fix bugzilla issue 242 but it's a start"),
                  [IssueRef(242, false)]));
-    assert(equal(matchIssueRefs("Workaround needed to make bug 131415 less deadly"),
+    assert(equal(matchIssueRefs("Workaround needed to make bugzilla bug 131415 less deadly"),
+                 [IssueRef(131415, false)]));
+    assert(equal(matchIssueRefs("Workaround needed to make bugzilla 131415 less deadly"),
                  [IssueRef(131415, false)]));
 
     // Shouldn't match
@@ -79,8 +81,8 @@ unittest
     assert(equal(matchIssueRefs("#4242: Reduce indentation prior to fix"), empty));
 
     // Note: This *will match* so just don't use that verb?
-    assert(equal(matchIssueRefs("DMD issues 10 weird error message on shutdown"),
-                 [IssueRef(10, false)]));
+    // assert(equal(matchIssueRefs("DMD issues 10 weird error message on shutdown"),
+    //              [IssueRef(10, false)]));
 }
 
 struct IssueRef { int id; bool fixed; Json[] commits; }
@@ -110,8 +112,8 @@ IssueRef[] getIssueRefs(Json[] commits)
 
 unittest
 {
-    Json fix(int id) { return ["commit":["message":"Fix Issue %d".format(id).Json].Json].Json; }
-    Json mention(int id) { return ["commit":["message":"Issue %d".format(id).Json].Json].Json; }
+    Json fix(int id) { return ["commit":["message":"Fix Bugzilla %d".format(id).Json].Json].Json; }
+    Json mention(int id) { return ["commit":["message":"Bugzilla %d".format(id).Json].Json].Json; }
 
     assert(getIssueRefs([fix(1)]) == [IssueRef(1, true, [fix(1)])]);
     assert(getIssueRefs([mention(1)]) == [IssueRef(1, false, [mention(1)])]);

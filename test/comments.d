@@ -121,7 +121,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Fix Issue 8573";
+            j[0]["commit"]["message"] = "Fix Bugzilla Issue 8573";
         },
          "/github/repos/dlang/phobos/issues/4921/comments",
         "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
@@ -158,7 +158,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Fix Issue 8573, 8574";
+            j[0]["commit"]["message"] = "Fix Bugzilla 8573, 8574";
         },
          "/github/repos/dlang/phobos/issues/4921/comments",
         "/bugzilla/buglist.cgi?bug_id=8573,8574&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
@@ -195,7 +195,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Fix Issue 8573";
+            j[0]["commit"]["message"] = "Fix Bugzilla 8573";
         },
          "/github/repos/dlang/phobos/issues/4921/comments",
         "/bugzilla/buglist.cgi?bug_id=8573&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",
@@ -259,7 +259,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Fix Issue 8573";
+            j[0]["commit"]["message"] = "Fix Bugzilla Issue 8573";
         },
         "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
@@ -397,7 +397,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Issue 8573";
+            j[0]["commit"]["message"] = "Bugzilla 8573";
         },
         "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
@@ -428,7 +428,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Fix Issue 8573";
+            j[0]["commit"]["message"] = "Fix Bugzilla 8573";
         },
         "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
@@ -495,7 +495,7 @@ unittest
 
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Issue 19296";
+            j[0]["commit"]["message"] = "Bugzilla 19296";
         },
         "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
@@ -525,7 +525,7 @@ unittest
 
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4921/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Issue 19296";
+            j[0]["commit"]["message"] = "Bugzilla 19296";
         },
         "/github/repos/dlang/phobos/issues/4921/labels",
         "/github/repos/dlang/phobos/issues/4921/comments", (ref Json j) {
