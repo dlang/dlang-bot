@@ -22,12 +22,12 @@ Features
 Automated references
 --------------------
 
-For example let's say you fixed [Issue 16582](https://issues.dlang.org/show_bug.cgi?id=16582)
+For example let's say you fixed [Bugzilla Issue 16582](https://issues.dlang.org/show_bug.cgi?id=16582)
 and make a PR for on GitHub.
 If one of your commits mentions the issue, e.g. like this Git commit message:
 
 ```
-fix Issue 16582 - ParameterDefaults fails w/ scope parameter
+fix Bugzilla Issue 16582 - ParameterDefaults fails w/ scope parameter
 ```
 
 The Dlang-Bot will do all the hard work of linking and referencing
@@ -68,7 +68,7 @@ Using this syntax is also very important because for the changelog generation, t
 git history will be used. Thus _only_ if the Dlang-Bot has detected an issue
 and commented on your PR it can become part of the changelog.
 
-In doubt, you can use e.g. [Regex101](https://regex101.com/r/aI0Rp6/7) to validate your commit message.
+In doubt, you can use e.g. [Regex101](https://regex101.com/r/vjOAM4/1) to validate your commit message.
 
 ### Referencing multiple issues
 
