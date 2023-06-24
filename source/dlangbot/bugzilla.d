@@ -13,15 +13,23 @@ static immutable bugzillaProjectSlugs = ["dlang/dmd", "dlang/druntime", "dlang/p
 import std.algorithm, std.conv, std.range, std.string;
 import std.exception : enforce;
 import std.format : format;
+import std.regex : ctRegex, matchFirst, matchAll;
+
+import dlangbot.warnings : UserMessage;
 
 //==============================================================================
 // Bugzilla
 //==============================================================================
 
-auto matchIssueRefs(string message)
-{
-    import std.regex;
+private enum issueRE = ctRegex!(
+    `(?:^fix(?:es)?(?:\s+bugzilla)(?:\s+(?:issues?|bugs?))?\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))|` ~
+    `(?:bugzilla\s+(?:(?:issues?|bugs?)\s+)?(#?\d+(?:[\s,\+&and]+#?\d+)*))`, "im");
+private enum oldIssueRE = ctRegex!(
+    `(?:^fix(?:es)?(?:\s+(?:issues?|bugs?))?\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))|` ~
+    `(?:(?:issues?|bugs?)\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))`, "im");
 
+auto matchIssueRefs(RE)(string message, RE re = issueRE)
+{
     static auto matchToRefs(M)(M m)
     {
         enum splitRE = ctRegex!(`(\d+)`);
@@ -31,9 +39,7 @@ auto matchIssueRefs(string message)
             .map!(match => IssueRef(match.hit.to!int, closed));
     }
 
-    enum issueRE = ctRegex!(`(?:^fix(?:es)?(?:\s+bugzilla)(?:\s+(?:issues?|bugs?))?\s+(#?\d+(?:[\s,\+&and]+#?\d+)*))|` ~
-                            `(?:bugzilla\s+(?:(?:issues?|bugs?)\s+)?(#?\d+(?:[\s,\+&and]+#?\d+)*))`, "im");
-    return matchToRefs(message.matchFirst(issueRE));
+    return matchToRefs(message.matchFirst(re));
 }
 
 unittest
@@ -87,13 +93,13 @@ unittest
 
 struct IssueRef { int id; bool fixed; Json[] commits; }
 // get all issues mentioned in a commit
-IssueRef[] getIssueRefs(Json[] commits)
+IssueRef[] getIssueRefs(RE)(Json[] commits, RE re = issueRE)
 {
     return commits
         // Collect all issue references (range of ranges per commit)
         .map!(c => c["commit"]["message"]
             .get!string
-            .matchIssueRefs
+            .matchIssueRefs(re)
             .map!((r) { r.commits = [c]; return r; })
         )
         // Join to flat list
@@ -121,6 +127,32 @@ unittest
     assert(getIssueRefs([mention(1), fix(1)]) == [IssueRef(1, true, [mention(1), fix(1)])]);
     assert(getIssueRefs([mention(1), fix(2), fix(1)]) == [IssueRef(1, true, [mention(1), fix(1)]), IssueRef(2, true, [fix(2)])]);
 }
+
+UserMessage[] checkLegacyIssueRefs(Json[] commits)
+{
+    auto oldHits = commits.getIssueRefs(oldIssueRE).map!(r => r.id);
+    auto newHits = commits.getIssueRefs(issueRE).map!(r => r.id);
+    auto onlyOld = oldHits.filter!(id => !newHits.canFind(id));
+    if (!onlyOld.empty)
+        return [UserMessage(UserMessage.Type.Warning,
+            "In preparation for migrating from Bugzilla to GitHub Issues, the issue reference syntax has changed. " ~
+            "Please add the word \"Bugzilla\" to issue references.  For example, `Fix Bugzilla Issue 12345` or `Fix Bugzilla 12345`." ~
+            "(Reminder: the edit needs to be done in the Git *commit message*, not the GitHub *pull request*.)"
+        )];
+    return null;
+}
+
+unittest
+{
+   Json fixOld(int id) { return ["commit":["message":"Fix Issue %d".format(id).Json].Json].Json; }
+   Json fixNew(int id) { return ["commit":["message":"Fix Bugzilla %d".format(id).Json].Json].Json; }
+
+   assert( checkLegacyIssueRefs([]).empty);
+   assert( checkLegacyIssueRefs([fixNew(1)]).empty);
+   assert( checkLegacyIssueRefs([fixOld(1), fixNew(1)]).empty);
+   assert(!checkLegacyIssueRefs([fixOld(1)]).empty);
+   assert(!checkLegacyIssueRefs([fixOld(1), fixNew(2)]).empty);
+ }
 
 struct Issue
 {
