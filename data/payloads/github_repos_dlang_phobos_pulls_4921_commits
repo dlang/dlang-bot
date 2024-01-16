@@ -12,7 +12,7 @@
         "email": "razvan.nitu1305@gmail.com",
         "date": "2016-12-16T09:11:07Z"
       },
-      "message": "Issue 8573 - A simpler Phobos function that returns the index of the mix or max item\n\nIssue 8573 - A simpler Phobos function that returns the index of the mix or max item\n\nadded some review fixes\n\nfixed an issue with a mutable variable\n\nApplied review feedback\n\nRenamed functions to minIndex and maxIndex + used sizediff_t for return value type\n\nUpdated function so that it works optimally even for lazy ranges and algorithms\n\nReverted to having only copyable elements in ranges\n\nAdded more unittests; implemented an array path; fixed documentation\n\nSquashed commits",
+      "message": "Bugzilla Issue 8573 - A simpler Phobos function that returns the index of the mix or max item\n\nBugzilla Issue 8573 - A simpler Phobos function that returns the index of the mix or max item\n\nadded some review fixes\n\nfixed an issue with a mutable variable\n\nApplied review feedback\n\nRenamed functions to minIndex and maxIndex + used sizediff_t for return value type\n\nUpdated function so that it works optimally even for lazy ranges and algorithms\n\nReverted to having only copyable elements in ranges\n\nAdded more unittests; implemented an array path; fixed documentation\n\nSquashed commits",
       "tree": {
         "sha": "dae14cbc7dcd78423698c41f9f20d30b89d249c3",
         "url": "https://api.github.com/repos/dlang/phobos/git/trees/dae14cbc7dcd78423698c41f9f20d30b89d249c3"

@@ -12,7 +12,7 @@
         "email": "code@dawg.eu",
         "date": "2016-12-24T17:58:32Z"
       },
-      "message": "fix Issue 16794 - dmd not working on Ubuntu 16.10\n\n- enable PIC by default on amd64 linux (no significant overhead, full\n  PIC/PIE support)\n- also see https://github.com/dlang/installer/pull/207",
+      "message": "fix Bugzilla Issue 16794 - dmd not working on Ubuntu 16.10\n\n- enable PIC by default on amd64 linux (no significant overhead, full\n  PIC/PIE support)\n- also see https://github.com/dlang/installer/pull/207",
       "tree": {
         "sha": "7fe104c3fc612cb2b527eab295f858d2e14796a3",
         "url": "https://api.github.com/repos/dlang/dmd/git/trees/7fe104c3fc612cb2b527eab295f858d2e14796a3"

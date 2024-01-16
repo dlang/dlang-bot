@@ -7,7 +7,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4963/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Fix Issue 17564";
+            j[0]["commit"]["message"] = "Fix bugzilla Issue 17564";
          },
         "/github/repos/dlang/phobos/issues/4963/comments",
         "/github/repos/dlang/phobos/issues/4963/labels",
@@ -46,7 +46,7 @@ unittest
 dlang/phobos pull request #4963 "[DEMO for DIP1005] Converted imports to selective imports in std.array" was merged into master:
 
 - e064d5664f92c4b2f0866c08f6d0290ba66825ed by Andrei Alexandrescu:
-  Fix Issue 17564
+  Fix bugzilla Issue 17564
 
 https://github.com/dlang/phobos/pull/4963
 EOF".chomp;
@@ -65,7 +65,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4963/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Do something with Issue 17564";
+            j[0]["commit"]["message"] = "Do something with Bugzilla Issue 17564";
          },
         "/github/repos/dlang/phobos/issues/4963/comments",
         "/trello/1/search?query=name:%22Issue%2017564%22&"~trelloAuth,
@@ -96,7 +96,7 @@ unittest
 dlang/phobos pull request #4963 "[DEMO for DIP1005] Converted imports to selective imports in std.array" was merged into master:
 
 - e064d5664f92c4b2f0866c08f6d0290ba66825ed by Andrei Alexandrescu:
-  Do something with Issue 17564
+  Do something with Bugzilla Issue 17564
 
 https://github.com/dlang/phobos/pull/4963
 EOF".chomp;
@@ -115,7 +115,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/notdlang/bar/pulls/12347/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Do something with Issue 17564";
+            j[0]["commit"]["message"] = "Do something with Bugzilla Issue 17564";
          },
         "/github/repos/notdlang/bar/issues/12347/comments",
     );
@@ -128,7 +128,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/dub/pulls/12345/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Do something with Issue 17564";
+            j[0]["commit"]["message"] = "Do something with Bugzilla Issue 17564";
          },
         "/github/repos/dlang/dub/issues/12345/comments",
     );
@@ -141,7 +141,7 @@ unittest
 {
     setAPIExpectations(
         "/github/repos/dlang/phobos/pulls/4963/commits", (ref Json j) {
-            j[0]["commit"]["message"] = "Fix Issue 17564";
+            j[0]["commit"]["message"] = "Fix Bugzilla Issue 17564";
         },
         "/github/repos/dlang/phobos/issues/4963/comments",
         "/github/repos/dlang/phobos/issues/4963/labels",
@@ -161,7 +161,7 @@ unittest
 dlang/phobos pull request #4963 "[DEMO for DIP1005] Converted imports to selective imports in std.array" was merged into stable:
 
 - e064d5664f92c4b2f0866c08f6d0290ba66825ed by Andrei Alexandrescu:
-  Fix Issue 17564
+  Fix Bugzilla Issue 17564
 
 https://github.com/dlang/phobos/pull/4963
 EOF".chomp;
@@ -224,7 +224,7 @@ unittest
             enum expected = q"EOF
 @MartinNowak created dlang/dmd pull request #6359 "fix Issue 16794 - dmd not working on Ubuntu 16.10" fixing this issue:
 
-- fix Issue 16794 - dmd not working on Ubuntu 16.10
+- fix Bugzilla Issue 16794 - dmd not working on Ubuntu 16.10
   
   - enable PIC by default on amd64 linux (no significant overhead, full
     PIC/PIE support)
@@ -248,7 +248,7 @@ unittest
     setAPIExpectations(
         "/github/repos/dlang/dmd/pulls/6359/commits",
         (ref Json j){
-            j[0]["commit"]["message"] = "Fix Issue 20540 - (White|Black)Hole does not work with return|scope functions";
+            j[0]["commit"]["message"] = "Fix Bugzilla Issue 20540 - (White|Black)Hole does not work with return|scope functions";
         },
         "/github/repos/dlang/dmd/issues/6359/comments",
         "/bugzilla/buglist.cgi?bug_id=20540&ctype=csv&columnlist=short_desc,bug_status,resolution,bug_severity,priority,keywords",

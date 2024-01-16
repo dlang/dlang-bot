@@ -248,9 +248,8 @@ void handlePR(string action, PullRequest* _pr)
         refs = getIssueRefs(commits);
         descs = getDescriptions(refs);
         if (action == "opened" || action == "synchronize" || action == "ready_for_review")
-        {
-            msgs = pr.checkForWarnings(descs, refs);
-        }
+            msgs ~= pr.checkForWarnings(descs, refs);
+        msgs ~= checkLegacyIssueRefs(commits);
 
         pr.updateGithubComment(comment, action, refs, descs, msgs);
 
