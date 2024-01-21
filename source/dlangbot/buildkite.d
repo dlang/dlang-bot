@@ -106,12 +106,13 @@ Info queryState(string pipelineSearch=null)
 {
     import std.algorithm : map, remove, each;
     import std.array : array;
+    import std.exception : assertNotThrown;
     import vibe.core.core : runTask;
 
     typeof(return) ret;
     [
-        { ret.organization = organization(pipelineSearch); },
-        { ret.hcServers = hc.servers.remove!(s => !s.name.startsWith("ci-agent-")); },
+        { ret.organization = organization(pipelineSearch).assertNotThrown; },
+        { ret.hcServers = hc.servers.remove!(s => !s.name.startsWith("ci-agent-")).assertNotThrown; },
     ].map!runTask.array.each!(task => task.join);
     return ret;
 }

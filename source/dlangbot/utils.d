@@ -4,6 +4,7 @@ import core.time : seconds;
 
 import dlangbot.app : runAsync;
 
+import vibe.core.log : logError;
 import vibe.http.client : HTTPClientRequest, HTTPClientResponse, HTTPClientSettings;
 import vibe.http.common : HTTPStatus;
 
@@ -99,7 +100,17 @@ auto runTaskHelper(Fun, Args...)(Fun fun, auto ref Args args)
     import vibe.core.core : runTask;
 
     if (runAsync)
-        runTask(fun.toDelegate, args);
+        runTask({
+            try
+                fun(args);
+            catch (Exception e)
+            {
+                try
+                    logError(e.toString());
+                catch (Exception) {}
+                assert(false, "Fatal error");
+            }
+        });
     else
         return fun(args);
 }
