@@ -183,9 +183,9 @@ GHMerge.MergeMethod autoMergeMethod(GHLabel[] labels)
         auto labelNames = labels.map!(l => l.name);
         if (labelNames.canFind!(l => (l == "auto-merge" || l == "Merge:auto-merge")))
             return merge;
-        else if (labelNames.canFind!(l => (l == "auto-merge-squash" || || l == "Merge:auto-merge-squash")))
+        else if (labelNames.canFind!(l => (l == "auto-merge-squash" || l == "Merge:auto-merge-squash")))
             return squash;
-        else if (labelNames.canFind!(l => (l == "auto-merge-rebase" || || l == "Merge:auto-merge-rebase")))
+        else if (labelNames.canFind!(l => (l == "auto-merge-rebase" || l == "Merge:auto-merge-rebase")))
             return rebase;
         return none;
     }
