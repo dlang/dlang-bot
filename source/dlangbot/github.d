@@ -181,11 +181,11 @@ GHMerge.MergeMethod autoMergeMethod(GHLabel[] labels)
     with (GHMerge.MergeMethod)
     {
         auto labelNames = labels.map!(l => l.name);
-        if (labelNames.canFind!(l => l == "auto-merge"))
+        if (labelNames.canFind!(l => (l == "auto-merge" || l == "Merge:auto-merge")))
             return merge;
-        else if (labelNames.canFind!(l => l == "auto-merge-squash"))
+        else if (labelNames.canFind!(l => (l == "auto-merge-squash" || || l == "Merge:auto-merge-squash")))
             return squash;
-        else if (labelNames.canFind!(l => l == "auto-merge-rebase"))
+        else if (labelNames.canFind!(l => (l == "auto-merge-rebase" || || l == "Merge:auto-merge-rebase")))
             return rebase;
         return none;
     }
@@ -217,13 +217,17 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
         return commits;
     }
 
-    auto labelName = method.labelName;
+    const labelName = method.labelName;
+    const mergeLabelName = "Merge:" ~ labelName;
     if (commits.length == 1)
         method = GHMerge.MergeMethod.rebase;
 
     auto events = ghGetRequest(pr.eventsURL).body[]
         .retro
-        .filter!(e => e["event"] == "labeled" && e["label"]["name"] == labelName);
+        .filter!(e => e["event"] == "labeled" && (
+                 e["label"]["name"] == labelName)
+              || e["label"]["name"] == mergeLabelName
+                 );
 
     string author = "unknown";
     if (!events.empty)
