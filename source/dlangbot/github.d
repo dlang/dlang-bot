@@ -224,10 +224,7 @@ Json[] tryMerge(in ref PullRequest pr, GHMerge.MergeMethod method)
 
     auto events = ghGetRequest(pr.eventsURL).body[]
         .retro
-        .filter!(e => e["event"] == "labeled" && (
-                 e["label"]["name"] == labelName)
-              || e["label"]["name"] == mergeLabelName
-                 );
+        .filter!(e => e["event"] == "labeled" && e["label"]["name"].among(labelName, mergeLabelName));
 
     string author = "unknown";
     if (!events.empty)
