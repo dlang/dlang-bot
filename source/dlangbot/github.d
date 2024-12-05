@@ -51,6 +51,11 @@ string markdownEscape(string desc)
     return app.data;
 }
 
+bool usesGitHubIssues(in ref PullRequest pr)
+{
+    return pr.repoSlug.among("dlang/phobos");
+}
+
 string formatComment(in ref PullRequest pr, in IssueRef[] refs, in Issue[] descs, in UserMessage[] msgs)
 {
     import std.array : appender;
@@ -91,7 +96,7 @@ If you have addressed all reviews or aren't sure how to proceed, don't hesitate 
     }
 
     // markdown doesn't support breaking of long lines
-    if (bugzillaProjectSlugs.canFind(pr.repoSlug))
+    if (!pr.usesGitHubIssues && bugzillaProjectSlugs.canFind(pr.repoSlug))
     {
         app ~= "\n### Bugzilla references\n\n";
         if (refs.length)
@@ -104,7 +109,7 @@ If your PR contains non-trivial changes, please [reference a Bugzilla issue](htt
 `, pr.repoSlug, pr.repoSlug == "dlang/dlang.org" ? "language-changelog" : "changelog");
     }
 
-    if (msgs.length)
+    if (!pr.usesGitHubIssues && msgs.length)
     {
         if (refs.length)
             app ~= "\n";
